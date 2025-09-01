@@ -122,18 +122,43 @@
         .btn-secondary:disabled { background-color: var(--bg-tertiary); color: var(--text-muted); border-color: var(--border-color); opacity: 0.7; }
 
         .not-container {
-            --zoom-factor: 1.0;
-            border: 2px solid var(--border-color);
+            border: none;
             border-radius: 0.75rem;
-            padding: 1rem 5rem 1rem 1rem;
-            min-height: 100px;
-            overflow-x: hidden;
+            padding: 2rem;
+            min-height: 300px;
             overflow-y: auto;
             position: relative;
-            background-color: #ffffff;
-            color: #1a202c;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
         }
         
+        .page {
+            --zoom-factor: 1.0;
+            background: white;
+            color: #1a202c;
+            width: 800px;
+            max-width: 100%;
+            aspect-ratio: 210 / 297;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page .song-title { text-align: center; font-size: 1.8rem; font-weight: 700; margin-bottom: 1rem; }
+        .page .header-info { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; font-size: 0.9rem; color: #4a5568; }
+        .page .header-info p { margin: 0 0 0.25rem 0; }
+
         .layer-editor-row {
             display: grid; grid-template-columns: 200px 1fr 100px; gap: 1.5rem; align-items: center; border: 2px solid var(--border-color); border-radius: 1rem; padding: 1.5rem; background-color: var(--bg-tertiary); transition: padding 0.3s ease, min-height 0.3s ease;
         }
@@ -198,11 +223,6 @@
         .message-box { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: #22c55e; color: white; padding: 1rem 2rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); z-index: 1000; opacity: 0; transition: opacity 0.5s, top 0.5s; }
         .message-box.show { opacity: 1; top: 30px; }
         .bar-number { position: absolute; top: calc(-1.6em * var(--zoom-factor)); left: calc(0.25em * var(--zoom-factor)); font-size: calc(0.6rem * var(--zoom-factor)); color: #3b82f6; font-weight: 600; font-style: italic; opacity: 0.7; }
-        .printable-area { background-color: white; padding: 2rem; position: relative; }
-        .printable-area .song-title { text-align: center; font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem; }
-        .printable-area .header-info { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; font-size: 1.1rem; color: #4a5568; }
-        .printable-area .header-info p { margin: 0 0 0.25rem 0; }
-        .printable-area .watermark { position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%); font-size: 0.8rem; font-weight: 500; color: #9ca3af; }
         .remove-btn { background-color: #ef4444; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 600; transition: background-color 0.2s; border: none; }
         .remove-btn:hover { background-color: #dc2626; }
         .bass-note { color: #9333ea; }
@@ -527,28 +547,27 @@
 
         function renderCombinedSheet() {
             combinedSheetContainer.innerHTML = '';
-            if (layers.length === 0) return;
+            if (layers.length === 0) {
+                combinedSheetContainer.innerHTML = '<p class="text-gray-500 text-2xl font-bold p-4 text-center opacity-50">PRATINJAU KOSONG</p>';
+                return;
+            }
 
             const birama = parseInt(biramaSelect.value.split('/')[0]);
             const allLayersBars = layers.map(layer => getNotesPerBar(layer.notation, birama));
             const maxBars = Math.max(0, ...allLayersBars.map(bars => bars.length));
-            
+
             if (maxBars === 0) {
-                 combinedSheetContainer.innerHTML = '<p class="text-gray-500 text-2xl font-bold p-4 text-center opacity-50">PRATINJAU</p>';
+                combinedSheetContainer.innerHTML = '<p class="text-gray-500 text-2xl font-bold p-4 text-center opacity-50">PRATINJAU KOSONG</p>';
                 return;
             }
 
-            const musicSheetContainer = document.createElement('div');
-            musicSheetContainer.className = 'music-sheet-internal-container';
-            musicSheetContainer.style.setProperty('--zoom-factor', zoomFactor);
-            musicSheetContainer.style.display = 'flex';
-            musicSheetContainer.style.flexDirection = 'column';
-            
-            const layoutGuideLayer = layers[0]; 
+            // --- 1. Generate all row wrappers in memory ---
+            const allRowWrappers = [];
+            const layoutGuideLayer = layers[0];
             const globalBarsPerRow = parseInt(barsPerRowSelect.value);
-
             let barCursor = 0;
             let rowIndex = 0;
+
             while (barCursor < maxBars) {
                 const barsInThisRow = layoutGuideLayer.rowOverrides[rowIndex] || globalBarsPerRow;
                 const endOfRowCursor = Math.min(barCursor + barsInThisRow, maxBars);
@@ -597,31 +616,82 @@
                 
                 rowWrapper.appendChild(rowDiv);
                 rowWrapper.appendChild(controlsDiv);
-                musicSheetContainer.appendChild(rowWrapper);
+                allRowWrappers.push(rowWrapper);
 
                 barCursor = endOfRowCursor;
                 rowIndex++;
             }
+
+            // --- 2. Paginate the generated rows ---
+            let currentPage;
+            let currentPageContent;
+            let pageNumber = 0;
+
+            const createNewPage = () => {
+                pageNumber++;
+                const pageDiv = document.createElement('div');
+                pageDiv.className = 'page';
+                
+                if (pageNumber === 1) {
+                    const titleValue = titleInput.value || 'Judul Lagu';
+                    const composerValue = composerInput.value || '-';
+                    const arrangerValue = arrangerInput.value || '-';
+                    const bpmValue = bpmInput.value;
+                    const biramaValue = biramaSelect.value;
+
+                    pageDiv.innerHTML = `
+                        <div class="song-title">${titleValue}</div>
+                        <div class="header-info">
+                            <div><p style="font-weight: 500;"><span style="font-family: 'Times New Roman', serif; font-size: 1.5em; vertical-align: middle; line-height: 1;">♩</span> = ${bpmValue}</p><p>Birama: ${biramaValue}</p></div>
+                            <div style="text-align: right;"><p>Komposer: ${composerValue}</p><p>Arranger: ${arrangerValue}</p></div>
+                        </div>
+                    `;
+                }
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'page-content';
+                pageDiv.appendChild(contentDiv);
+                
+                combinedSheetContainer.appendChild(pageDiv);
+                currentPage = pageDiv;
+                currentPageContent = contentDiv;
+                void currentPage.offsetHeight;
+            };
+
+            createNewPage();
+
+            allRowWrappers.forEach(row => {
+                currentPageContent.appendChild(row);
+                if (currentPage.scrollHeight > currentPage.clientHeight && currentPageContent.childElementCount > 1) {
+                    row.remove();
+                    createNewPage();
+                    currentPageContent.appendChild(row);
+                }
+            });
             
-            combinedSheetContainer.appendChild(musicSheetContainer);
-
+            // --- 3. Resize bars within each row ---
             requestAnimationFrame(() => {
-                const availableWidth = combinedSheetContainer.clientWidth;
-                if (availableWidth === 0) return;
+                const allPages = combinedSheetContainer.querySelectorAll('.page');
+                allPages.forEach(page => {
+                    const pageContent = page.querySelector('.page-content');
+                    if (!pageContent) return;
+                    const availableWidth = pageContent.clientWidth;
+                    if (availableWidth === 0) return;
 
-                const standardBarWidth = availableWidth / globalBarsPerRow;
-                const rowWrappers = musicSheetContainer.querySelectorAll('.music-row-wrapper');
+                    const standardBarWidth = availableWidth / globalBarsPerRow;
+                    const rowWrappers = page.querySelectorAll('.music-row-wrapper');
 
-                rowWrappers.forEach(wrapper => {
-                    const rowIndex = parseInt(wrapper.dataset.rowIndex);
-                    const barsInThisRow = wrapper.querySelectorAll('.music-bar');
+                    rowWrappers.forEach(wrapper => {
+                        const rowIndex = parseInt(wrapper.dataset.rowIndex);
+                        const barsInThisRow = wrapper.querySelectorAll('.music-bar');
 
-                    if (layoutGuideLayer.rowOverrides[rowIndex]) {
-                        const customBarWidth = availableWidth / barsInThisRow.length;
-                        barsInThisRow.forEach(bar => { bar.style.width = `${customBarWidth}px`; });
-                    } else {
-                        barsInThisRow.forEach(bar => { bar.style.width = `${standardBarWidth}px`; });
-                    }
+                        if (layers[0].rowOverrides[rowIndex]) {
+                            const customBarWidth = availableWidth / barsInThisRow.length;
+                            barsInThisRow.forEach(bar => { bar.style.width = `${customBarWidth}px`; });
+                        } else {
+                            barsInThisRow.forEach(bar => { bar.style.width = `${standardBarWidth}px`; });
+                        }
+                    });
                 });
             });
         }
@@ -751,93 +821,53 @@
         
         // --- EXPORT FUNCTIONALITY ---
         async function downloadAsPng() {
-            const printableWrapper = document.createElement('div');
-            printableWrapper.style.padding = '1rem';
-            printableWrapper.style.backgroundColor = 'white';
-            printableWrapper.style.position = 'absolute';
-            printableWrapper.style.left = '-9999px';
-            printableWrapper.style.width = '1200px';
+            downloadPngBtn.disabled = true;
+            downloadPngBtn.textContent = 'Memproses...';
 
-            const printableArea = document.createElement('div');
-            printableArea.className = 'printable-area';
-            printableWrapper.appendChild(printableArea);
-
-            const titleValue = titleInput.value || 'Judul Lagu';
-            const composerValue = composerInput.value || '-';
-            const arrangerValue = arrangerInput.value || '-';
-            const bpmValue = bpmInput.value;
-            const biramaValue = biramaSelect.value;
-            
-            printableArea.innerHTML = `
-                <div class="song-title">${titleValue}</div>
-                <div class="header-info">
-                    <div><p style="font-weight: 500;"><span style="font-family: 'Times New Roman', serif; font-size: 2em; vertical-align: middle; line-height: 1;">♩</span> = ${bpmValue}</p><p>Birama: ${biramaValue}</p></div>
-                    <div style="text-align: right;"><p>Komposer: ${composerValue}</p><p>Arranger: ${arrangerValue}</p></div>
-                </div>
-                <div class="watermark">Dibuat dengan ABIMANTRA NOT ANGKA | by Yoga Andika</div>`;
-
-            const combinedSheet = document.createElement('div');
-            combinedSheet.style.setProperty('--zoom-factor', 1.0);
-            combinedSheet.style.display = 'flex';
-            combinedSheet.style.flexDirection = 'column';
-            combinedSheet.style.gap = '2rem';
-            
-            const allLayersBars = layers.map(layer => ({ bars: getNotesPerBar(layer.notation, parseInt(biramaSelect.value.split('/')[0])), layer: layer }));
-            const maxBars = Math.max(0, ...allLayersBars.map(item => item.bars.length));
-            const layoutGuideLayer = layers[0] || { rowOverrides: {} };
-            const globalBarsPerRow = parseInt(barsPerRowSelect.value);
-
-            let barCursor = 0;
-            let rowIndex = 0;
-            while (barCursor < maxBars) {
-                const barsInThisRow = layoutGuideLayer.rowOverrides[rowIndex] || globalBarsPerRow;
-                const endOfRowCursor = Math.min(barCursor + barsInThisRow, maxBars);
-                
-                const rowDiv = document.createElement('div');
-                rowDiv.style.display = 'grid';
-                rowDiv.style.gridTemplateColumns = `repeat(${barsInThisRow}, 1fr)`;
-
-                for (let i = barCursor; i < endOfRowCursor; i++) {
-                    const musicBarDiv = document.createElement('div');
-                    musicBarDiv.className = 'music-bar';
-
-                    const barNumberSpan = document.createElement('span');
-                    barNumberSpan.className = 'bar-number';
-                    barNumberSpan.textContent = i + 1;
-                    musicBarDiv.appendChild(barNumberSpan);
-
-                    if ((i + 1) % barsInThisRow === 0 || i === endOfRowCursor - 1) {
-                       musicBarDiv.style.borderRight = '2px solid #64748b';
-                    }
-
-                    allLayersBars.forEach(item => {
-                        const layerBarNotesDiv = document.createElement('div');
-                        layerBarNotesDiv.className = 'layer-bar-notes';
-                        if (item.bars[i]) {
-                            layerBarNotesDiv.innerHTML = generateBarContentHtml(item.bars[i], item.layer.instrument === 'bass');
-                        }
-                        musicBarDiv.appendChild(layerBarNotesDiv);
-                    });
-                    rowDiv.appendChild(musicBarDiv);
-                }
-                combinedSheet.appendChild(rowDiv);
-                barCursor = endOfRowCursor;
-                rowIndex++;
-            }
-            
-            printableArea.appendChild(combinedSheet);
-            document.body.appendChild(printableWrapper);
-
-            downloadPngBtn.disabled = true; downloadPngBtn.textContent = 'Memproses...';
             try {
-                const canvas = await html2canvas(printableArea, { scale: 2, width: 1200 });
-                const image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+                const pages = document.querySelectorAll('#combined-sheet-container .page');
+                if (pages.length === 0) {
+                    showMessageBox('Tidak ada notasi untuk diunduh.', 'error');
+                    return;
+                }
+
+                const canvases = [];
+                for (const page of pages) {
+                    const canvas = await html2canvas(page, { scale: 2 });
+                    canvases.push(canvas);
+                }
+
+                const totalHeight = canvases.reduce((sum, canvas) => sum + canvas.height, 0);
+                const maxWidth = Math.max(...canvases.map(c => c.width));
+
+                const finalCanvas = document.createElement('canvas');
+                finalCanvas.width = maxWidth;
+                finalCanvas.height = totalHeight;
+                const ctx = finalCanvas.getContext('2d');
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+
+                let currentY = 0;
+                canvases.forEach(canvas => {
+                    ctx.drawImage(canvas, 0, currentY);
+                    currentY += canvas.height;
+                });
+                
+                const titleValue = titleInput.value || 'notasi-lagu';
+                const image = finalCanvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
                 const link = document.createElement('a');
-                link.download = `${titleValue.toLowerCase().replace(/\s/g, '-') || 'notasi-lagu'}.png`;
-                link.href = image; link.click();
+                link.download = `${titleValue.toLowerCase().replace(/\s/g, '-')}.png`;
+                link.href = image;
+                link.click();
                 showMessageBox('PNG berhasil diunduh!', 'success');
-            } catch (error) { console.error("Gagal mengunduh gambar:", error); showMessageBox('Gagal membuat file PNG.', 'error');
-            } finally { document.body.removeChild(printableWrapper); downloadPngBtn.disabled = false; downloadPngBtn.textContent = 'Unduh PNG'; }
+
+            } catch (error) {
+                console.error("Gagal mengunduh gambar:", error);
+                showMessageBox('Gagal membuat file PNG.', 'error');
+            } finally {
+                downloadPngBtn.disabled = false;
+                downloadPngBtn.textContent = 'Unduh PNG';
+            }
         }
         
         async function downloadAudio() {
@@ -1104,4 +1134,5 @@
     </script>
 </body>
 </html>
+
 
