@@ -295,7 +295,7 @@
                 </div>
             </div>
              <div class="instructions-content space-y-3">
-                <div><h4>Dasar</h4><ul><li><code>1-7</code> untuk not, <code>0</code> atau <code>o</code> untuk istirahaf.</li><li>Spasi atau <code>|</code> untuk pemisah bar.</li></ul></div>
+                <div><h4>Dasar</h4><ul><li><code>1-7</code> untuk not.</li><li><code>0</code> untuk istirahat (diam), <code>o</code> untuk istirahat panjang (titik).</li><li>Spasi atau <code>|</code> untuk pemisah ketukan/bar.</li></ul></div>
                 <div><h4>Oktaf & Aksidental</h4><ul><li><code>1.</code> (tinggi), <code>1,</code> (rendah). Ganda juga bisa.</li><li><code>4/</code> (kres), <code>7b</code> (mol).</li></ul></div>
                 <div><h4>Durasi & Artikulasi</h4><ul><li><code>12</code> (1/8), <code>1234</code> (1/16), <code>123</code> (triplet).</li><li><code>1^</code> (staccato).</li></ul></div>
                  <div><h4>Fitur Editor</h4><ul><li>Undo/Redo: <code>Ctrl/Cmd + Z</code> & <code>Y</code>.</li><li>Gunakan tombol <code>+/-</code> di ujung tiap baris untuk mengubah jumlah bar di baris tersebut.</li></ul></div>
@@ -496,7 +496,11 @@
             if (noteData.isStaccato) innerHtml += `<span class="staccato-marker">^</span>`;
             if (noteData.visualSharp) innerHtml += `<span class="accidental-symbol sharp-symbol">&#x2044;</span>`;
             else if (noteData.visualFlat) innerHtml += `<span class="accidental-symbol flat-symbol">\\</span>`;
-            if (noteData.visualNote === 'o' || noteData.visualNote === '0') { innerHtml += `<span class="long-note-dot ${noteClass}">&#x2022;</span>`;
+            
+            if (noteData.visualNote === 'o') { 
+                innerHtml += `<span class="long-note-dot ${noteClass}">&#x2022;</span>`;
+            } else if (noteData.visualNote === '0') {
+                innerHtml += `<span class="note-display ${noteClass}">0</span>`;
             } else {
                 const noteToDisplay = isBass ? (bassDisplayMap[noteData.visualNote] || noteData.visualNote) : noteData.visualNote;
                 innerHtml += `<span class="note-display ${noteClass}">${noteToDisplay}</span>`;
