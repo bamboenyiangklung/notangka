@@ -322,8 +322,14 @@
         }
         
         #floating-editor-window.is-minimized #layers-editor-container,
-        #floating-editor-window.is-minimized .resizer {
+        #floating-editor-window.is-minimized .resizer,
+        #floating-editor-window.is-minimized .editor-header-actions {
             display: none;
+        }
+
+        #floating-editor-window.is-minimized .floating-editor-header {
+            justify-content: flex-start;
+            gap: 1rem;
         }
 
         .floating-editor-header {
@@ -481,6 +487,11 @@
         .layer-editor-row.is-collapsed label:hover {
             background-color: #cbd5e1;
         }
+        
+        .editor-header-actions .btn {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+        }
 
     </style>
 </head>
@@ -494,7 +505,7 @@
         <div id="instructions-panel">
              <h2 class="text-2xl font-bold mb-4 text-gray-800">Petunjuk</h2>
              <div class="instructions-content space-y-3">
-                <div><h4>Dasar</h4><ul><li><code>1-7</code> untuk not, <code>0</code> atau <code>o</code> untuk istirahat.</li><li>Spasi atau <code>|</code> untuk pemisah bar.</li></ul></div>
+                <div><h4>Dasar</h4><ul><li><code>1-7</code> untuk not, <code>0</code> atau <code>o</code> untuk istirahaf.</li><li>Spasi atau <code>|</code> untuk pemisah bar.</li></ul></div>
                 <div><h4>Oktaf & Aksidental</h4><ul><li><code>1.</code> (tinggi), <code>1,</code> (rendah). Ganda juga bisa.</li><li><code>4/</code> (kres), <code>7b</code> (mol).</li></ul></div>
                 <div><h4>Durasi & Artikulasi</h4><ul><li><code>12</code> (1/8), <code>1234</code> (1/16), <code>123</code> (triplet).</li><li><code>1^</code> (staccato).</li></ul></div>
                  <div><h4>Fitur Editor</h4><ul><li>Undo/Redo: <code>Ctrl/Cmd + Z</code> & <code>Y</code>.</li><li>Gunakan tombol <code>+/-</code> di ujung tiap baris untuk mengubah jumlah bar di baris tersebut.</li></ul></div>
@@ -516,7 +527,15 @@
                     <div>
                         <label for="birama" class="block text-gray-700 font-semibold mb-2">Birama</label>
                         <select id="birama" class="w-full">
-                            <option value="4/4">4/4</option> <option value="3/4">3/4</option> <option value="2/4">2/4</option>
+                            <option value="4/4">4/4</option>
+                            <option value="3/4">3/4</option>
+                            <option value="2/4">2/4</option>
+                            <option value="2/2">2/2</option>
+                            <option value="3/8">3/8</option>
+                            <option value="5/4">5/4</option>
+                            <option value="6/8">6/8</option>
+                            <option value="7/8">7/8</option>
+                            <option value="9/8">9/8</option>
                         </select>
                     </div>
                     <div>
@@ -540,9 +559,6 @@
                 <div class="flex justify-between items-center mt-8 mb-4">
                     <h2 class="text-2xl font-bold text-gray-800">Editor Partitur</h2>
                     <div class="flex flex-wrap items-center justify-end gap-4">
-                        <button id="undoBtn" class="btn btn-secondary" disabled>Undo</button>
-                        <button id="redoBtn" class="btn btn-secondary" disabled>Redo</button>
-                        <button id="addLayerBtn" class="btn btn-secondary">Tambah Layer</button>
                         <div id="bars-per-row-container" class="flex items-center gap-2">
                             <label for="barsPerRowSelect" class="text-gray-700 font-semibold">Bar per Baris (Global)</label>
                             <select id="barsPerRowSelect" class="w-auto">
@@ -574,15 +590,25 @@
         }
 
         // --- GLOBAL VARIABLES & DOM ELEMENTS ---
-        const playBtn = document.getElementById('playBtn'), addLayerBtn = document.getElementById('addLayerBtn');
-        const downloadPngBtn = document.getElementById('downloadPngBtn'), downloadWavBtn = document.getElementById('downloadWavBtn');
-        const titleInput = document.getElementById('title'), arrangerInput = document.getElementById('arranger'), composerInput = document.getElementById('composer');
-        const biramaSelect = document.getElementById('birama'), bpmInput = document.getElementById('bpm');
-        const combinedSheetContainer = document.getElementById('combined-sheet-container');
-        let layersEditorContainer; // Will be assigned after creation
-        const barsPerRowSelect = document.getElementById('barsPerRowSelect');
-        const undoBtn = document.getElementById('undoBtn');
-        const redoBtn = document.getElementById('redoBtn');
+        let playBtn, addLayerBtn, downloadPngBtn, downloadWavBtn, titleInput, arrangerInput, composerInput, biramaSelect, bpmInput, combinedSheetContainer, layersEditorContainer, barsPerRowSelect, undoBtn, redoBtn;
+
+        function assignGlobalDOMElements() {
+            playBtn = document.getElementById('playBtn');
+            downloadPngBtn = document.getElementById('downloadPngBtn');
+            downloadWavBtn = document.getElementById('downloadWavBtn');
+            titleInput = document.getElementById('title');
+            arrangerInput = document.getElementById('arranger');
+            composerInput = document.getElementById('composer');
+            biramaSelect = document.getElementById('birama');
+            bpmInput = document.getElementById('bpm');
+            combinedSheetContainer = document.getElementById('combined-sheet-container');
+            barsPerRowSelect = document.getElementById('barsPerRowSelect');
+            
+            // These are now in the floating window
+            undoBtn = document.getElementById('undoBtn');
+            redoBtn = document.getElementById('redoBtn');
+            addLayerBtn = document.getElementById('addLayerBtn');
+        }
         
         let zoomFactor = 1.0; let layers = []; let TonePlayers = {};
         let activeLayerIndex = 0;
@@ -1066,107 +1092,109 @@
         }
 
         // --- EVENT LISTENERS ---
-        addLayerBtn.addEventListener('click', addLayer);
-        playBtn.addEventListener('click', playAllLayers);
-        downloadPngBtn.addEventListener('click', downloadAsPng);
-        downloadWavBtn.addEventListener('click', downloadAudio);
-        undoBtn.addEventListener('click', undo);
-        redoBtn.addEventListener('click', redo);
-        [titleInput, composerInput, arrangerInput, biramaSelect, bpmInput, barsPerRowSelect].forEach(el => { el.addEventListener('change', renderAll); });
-        
-        document.body.addEventListener('input', (e) => {
-            if (!e.target.classList.contains('layer-notation-editor')) return;
+        function addEventListeners() {
+            addLayerBtn.addEventListener('click', addLayer);
+            playBtn.addEventListener('click', playAllLayers);
+            downloadPngBtn.addEventListener('click', downloadAsPng);
+            downloadWavBtn.addEventListener('click', downloadAudio);
+            undoBtn.addEventListener('click', undo);
+            redoBtn.addEventListener('click', redo);
+            [titleInput, composerInput, arrangerInput, biramaSelect, bpmInput, barsPerRowSelect].forEach(el => { el.addEventListener('change', renderAll); });
+            
+            document.body.addEventListener('input', (e) => {
+                if (!e.target.classList.contains('layer-notation-editor')) return;
 
-            const editorRow = e.target.closest('.layer-editor-row');
-            if (!editorRow) return;
-            const index = parseInt(editorRow.dataset.index);
-            const editorTextarea = e.target;
+                const editorRow = e.target.closest('.layer-editor-row');
+                if (!editorRow) return;
+                const index = parseInt(editorRow.dataset.index);
+                const editorTextarea = e.target;
 
-            if (editorTextarea.classList.contains('layer-notation-editor')) {
-                const rawNotation = editorTextarea.value;
-                
-                if (layers[index].notation !== rawNotation) {
-                    layers[index].notation = rawNotation;
-                    recordHistory(index, rawNotation);
-                    renderCombinedSheet();
+                if (editorTextarea.classList.contains('layer-notation-editor')) {
+                    const rawNotation = editorTextarea.value;
                     
-                    const formatterDiv = editorRow.querySelector('.layer-notation-bar-numbers');
-                    formatterDiv.innerHTML = formatNotationWithAutoBars(rawNotation, biramaSelect.value);
+                    if (layers[index].notation !== rawNotation) {
+                        layers[index].notation = rawNotation;
+                        recordHistory(index, rawNotation);
+                        renderCombinedSheet();
+                        
+                        const formatterDiv = editorRow.querySelector('.layer-notation-bar-numbers');
+                        formatterDiv.innerHTML = formatNotationWithAutoBars(rawNotation, biramaSelect.value);
+                    }
                 }
-            }
-        });
+            });
 
-        document.body.addEventListener('focusin', (e) => {
-            if (!e.target.classList.contains('layer-notation-editor')) return;
-             const editorRow = e.target.closest('.layer-editor-row');
-            if (editorRow && e.target.classList.contains('layer-notation-editor')) {
-                activeLayerIndex = parseInt(editorRow.dataset.index);
-                updateUndoRedoButtons();
-            }
-        });
+            document.body.addEventListener('focusin', (e) => {
+                if (!e.target.classList.contains('layer-notation-editor')) return;
+                 const editorRow = e.target.closest('.layer-editor-row');
+                if (editorRow && e.target.classList.contains('layer-notation-editor')) {
+                    activeLayerIndex = parseInt(editorRow.dataset.index);
+                    updateUndoRedoButtons();
+                }
+            });
 
-        document.body.addEventListener('change', (e) => {
-            if (!e.target.closest('.layer-editor-row')) return;
+            document.body.addEventListener('change', (e) => {
+                if (!e.target.closest('.layer-editor-row')) return;
 
-            const editorRow = e.target.closest('.layer-editor-row'); 
-            if (!editorRow) return;
-            const index = parseInt(editorRow.dataset.index);
-
-            if (e.target.classList.contains('layer-instrument-select')) {
-                layers[index].instrument = e.target.value;
-                renderCombinedSheet();
-            }
-
-            if (e.target.classList.contains('layer-editor-toggle')) {
-                layers[index].isEditorHidden = e.target.checked;
-                renderAll();
-            }
-
-        });
-        
-        document.body.addEventListener('click', (e) => {
-            if (e.target.classList.contains('remove-btn')) {
                 const editorRow = e.target.closest('.layer-editor-row'); 
                 if (!editorRow) return;
                 const index = parseInt(editorRow.dataset.index);
-                removeLayer(index);
-            }
-        });
 
-        // Add scroll synchronization for the two-layer editor
-        document.body.addEventListener('scroll', (e) => {
-            if (!e.target.classList.contains('layer-notation-editor')) return;
-
-            const editor = e.target;
-            if (editor.classList.contains('layer-notation-editor')) {
-                const formatter = editor.previousElementSibling;
-                if (formatter) {
-                    formatter.scrollTop = editor.scrollTop;
-                    formatter.scrollLeft = editor.scrollLeft;
+                if (e.target.classList.contains('layer-instrument-select')) {
+                    layers[index].instrument = e.target.value;
+                    renderCombinedSheet();
                 }
-            }
-        }, true); // Use capture phase to catch scroll events on textareas
 
-        combinedSheetContainer.addEventListener('click', (e) => {
-             if (e.target.classList.contains('row-layout-btn')) {
-                const rowWrapper = e.target.closest('.music-row-wrapper');
-                if (!rowWrapper || layers.length === 0) return;
-                
-                const rowIndex = parseInt(rowWrapper.dataset.rowIndex);
-                const action = e.target.dataset.action;
-                const layoutGuideLayer = layers[0];
-                const globalBarsPerRow = parseInt(barsPerRowSelect.value);
-                let currentBars = layoutGuideLayer.rowOverrides[rowIndex] || globalBarsPerRow;
+                if (e.target.classList.contains('layer-editor-toggle')) {
+                    layers[index].isEditorHidden = e.target.checked;
+                    renderAll();
+                }
 
-                if (action === 'increase') { currentBars++; } 
-                else if (action === 'decrease') { currentBars = Math.max(1, currentBars - 1); }
-                
-                if (currentBars === globalBarsPerRow) { delete layoutGuideLayer.rowOverrides[rowIndex]; } 
-                else { layoutGuideLayer.rowOverrides[rowIndex] = currentBars; }
-                
-                renderCombinedSheet();
-            }
-        });
+            });
+            
+            document.body.addEventListener('click', (e) => {
+                if (e.target.classList.contains('remove-btn')) {
+                    const editorRow = e.target.closest('.layer-editor-row'); 
+                    if (!editorRow) return;
+                    const index = parseInt(editorRow.dataset.index);
+                    removeLayer(index);
+                }
+            });
+
+            // Add scroll synchronization for the two-layer editor
+            document.body.addEventListener('scroll', (e) => {
+                if (!e.target.classList.contains('layer-notation-editor')) return;
+
+                const editor = e.target;
+                if (editor.classList.contains('layer-notation-editor')) {
+                    const formatter = editor.previousElementSibling;
+                    if (formatter) {
+                        formatter.scrollTop = editor.scrollTop;
+                        formatter.scrollLeft = editor.scrollLeft;
+                    }
+                }
+            }, true); // Use capture phase to catch scroll events on textareas
+
+            combinedSheetContainer.addEventListener('click', (e) => {
+                 if (e.target.classList.contains('row-layout-btn')) {
+                    const rowWrapper = e.target.closest('.music-row-wrapper');
+                    if (!rowWrapper || layers.length === 0) return;
+                    
+                    const rowIndex = parseInt(rowWrapper.dataset.rowIndex);
+                    const action = e.target.dataset.action;
+                    const layoutGuideLayer = layers[0];
+                    const globalBarsPerRow = parseInt(barsPerRowSelect.value);
+                    let currentBars = layoutGuideLayer.rowOverrides[rowIndex] || globalBarsPerRow;
+
+                    if (action === 'increase') { currentBars++; } 
+                    else if (action === 'decrease') { currentBars = Math.max(1, currentBars - 1); }
+                    
+                    if (currentBars === globalBarsPerRow) { delete layoutGuideLayer.rowOverrides[rowIndex]; } 
+                    else { layoutGuideLayer.rowOverrides[rowIndex] = currentBars; }
+                    
+                    renderCombinedSheet();
+                }
+            });
+        }
 
         function makeDraggable(elmnt) {
             let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
@@ -1280,8 +1308,11 @@
                         </button>
                     </div>
                     <span>Editor Layer</span>
-                    <!-- Placeholder for potential future global controls -->
-                    <div></div>
+                    <div class="editor-header-actions flex items-center gap-2">
+                        <button id="undoBtn" class="btn btn-secondary" disabled>Undo</button>
+                        <button id="redoBtn" class="btn btn-secondary" disabled>Redo</button>
+                        <button id="addLayerBtn" class="btn btn-secondary">Tambah Layer</button>
+                    </div>
                 </div>
                 <div id="layers-editor-container" class="flex flex-col gap-4"></div>
                 <div class="resizer resizer-r"></div>
@@ -1296,6 +1327,8 @@
             document.body.appendChild(floatingWindow);
             layersEditorContainer = document.getElementById('layers-editor-container');
 
+            assignGlobalDOMElements();
+            addEventListeners();
             makeDraggable(floatingWindow);
             makeResizable(floatingWindow);
             initializeInstruments(); 
@@ -1308,6 +1341,5 @@
     </script>
 </body>
 </html>
-
 
 
