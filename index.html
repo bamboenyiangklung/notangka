@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -843,6 +843,7 @@
                 }
 
                 const labelText = layer.isEditorHidden ? 'Tampilkan Editor' : 'Sembunyikan Editor';
+                const removeButtonHtml = index > 0 ? `<button class="remove-btn self-center">Hapus</button>` : '';
 
                 editorRow.innerHTML = `
                     <div class="flex flex-col gap-2 self-start">
@@ -861,7 +862,7 @@
                         <div class="layer-notation-bar-numbers"></div>
                         <textarea class="layer-notation-editor" spellcheck="false"></textarea>
                     </div>
-                    <button class="remove-btn self-center">Hapus</button>
+                    ${removeButtonHtml}
                 `;
                 
                 editorRow.querySelector('.layer-instrument-select').value = layer.instrument;
@@ -1341,5 +1342,4 @@
     </script>
 </body>
 </html>
-
 
