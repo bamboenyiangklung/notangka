@@ -46,6 +46,13 @@
         #app-title-wrapper { grid-area: title; }
         #main-content-area { grid-area: main; }
         #instructions-panel { grid-area: instructions; }
+        
+        .instructions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
 
         .instructions-content {
             background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1.5rem; font-size: 0.9rem; color: #4a5568;
@@ -54,6 +61,23 @@
         .instructions-content code { background-color: #e2e8f0; padding: 0.15rem 0.4rem; border-radius: 0.25rem; font-family: monospace; font-weight: 600; color: #1a202c; }
         .instructions-content ul { list-style-position: inside; padding-left: 0.5rem; }
         .instructions-content li { margin-bottom: 0.5rem; }
+        
+        #instructions-panel.is-minimized .instructions-content {
+            display: none;
+        }
+        #instructions-panel.is-minimized .instructions-header {
+            margin-bottom: 0;
+        }
+        #instructions-panel.is-minimized #minimize-instructions-btn {
+            display: none;
+        }
+        #instructions-panel #maximize-instructions-btn {
+            display: none; /* Hidden by default */
+        }
+        #instructions-panel.is-minimized #maximize-instructions-btn {
+            display: flex; /* Show when minimized */
+        }
+
 
         .input-group { margin-bottom: 1.5rem; }
         input, select, textarea {
@@ -503,7 +527,17 @@
         </div>
 
         <div id="instructions-panel">
-             <h2 class="text-2xl font-bold mb-4 text-gray-800">Petunjuk</h2>
+            <div class="instructions-header">
+                 <h2 class="text-xl font-bold text-gray-800">Petunjuk</h2>
+                 <div id="instructions-window-controls">
+                    <button id="minimize-instructions-btn" class="editor-control-btn" title="Minimize">
+                        <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 6H11" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                    <button id="maximize-instructions-btn" class="editor-control-btn" title="Maximize">
+                         <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 8.5V3.5C1.5 2.39543 2.39543 1.5 3.5 1.5H8.5C9.60457 1.5 10.5 2.39543 10.5 3.5V8.5C10.5 9.60457 9.60457 10.5 8.5 10.5H3.5C2.39543 10.5 1.5 9.60457 1.5 8.5Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                </div>
+            </div>
              <div class="instructions-content space-y-3">
                 <div><h4>Dasar</h4><ul><li><code>1-7</code> untuk not, <code>0</code> atau <code>o</code> untuk istirahaf.</li><li>Spasi atau <code>|</code> untuk pemisah bar.</li></ul></div>
                 <div><h4>Oktaf & Aksidental</h4><ul><li><code>1.</code> (tinggi), <code>1,</code> (rendah). Ganda juga bisa.</li><li><code>4/</code> (kres), <code>7b</code> (mol).</li></ul></div>
@@ -556,8 +590,7 @@
             </div>
 
             <div id="preview-wrapper">
-                <div class="flex justify-between items-center mt-8 mb-4">
-                    <h2 class="text-2xl font-bold text-gray-800">Editor Partitur</h2>
+                <div class="flex justify-end items-center mt-8 mb-4">
                     <div class="flex flex-wrap items-center justify-end gap-4">
                         <div id="bars-per-row-container" class="flex items-center gap-2">
                             <label for="barsPerRowSelect" class="text-gray-700 font-semibold">Bar per Baris (Global)</label>
@@ -923,6 +956,11 @@
         function toggleEditorWindow() {
             const floatingWindow = document.getElementById('floating-editor-window');
             floatingWindow.classList.toggle('is-minimized');
+        }
+        
+        function toggleInstructionsWindow() {
+            const instructionsPanel = document.getElementById('instructions-panel');
+            instructionsPanel.classList.toggle('is-minimized');
         }
         
         // --- LAYER MANAGEMENT ---
@@ -1336,6 +1374,9 @@
 
             document.getElementById('minimize-editor-btn').addEventListener('click', toggleEditorWindow);
             document.getElementById('maximize-editor-btn').addEventListener('click', toggleEditorWindow);
+            
+            document.getElementById('minimize-instructions-btn').addEventListener('click', toggleInstructionsWindow);
+            document.getElementById('maximize-instructions-btn').addEventListener('click', toggleInstructionsWindow);
 
             addLayer(); 
         });
