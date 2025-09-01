@@ -439,7 +439,6 @@
             width: calc(1.5px * var(--zoom-factor));
             background-color: #1a202c;
         }
-
     </style>
 </head>
 <body class="bg-gray-100">
@@ -741,7 +740,8 @@
         }
         
         function createNoteBlockHtml(noteData, isBass) {
-            let innerHtml = ''; const noteClass = isBass ? 'bass-note' : '';
+            let innerHtml = '';
+            const noteClass = isBass ? 'bass-note' : '';
 
             if (noteData.isFermata) {
                 let topOffset = -1.6;
@@ -751,24 +751,49 @@
                 innerHtml += `<span style="position: absolute; font-size: calc(1.8em * var(--zoom-factor)); top: calc(${topOffset}em * var(--zoom-factor)); left: 50%; transform: translateX(-50%); z-index: 51; color: #1a202c; line-height: 1;">𝄐</span>`;
             }
 
-            if (noteData.isStaccato) innerHtml += `<span class="staccato-marker">^</span>`;
-            if (noteData.visualSharp) innerHtml += `<span class="accidental-symbol sharp-symbol">&#x2044;</span>`;
-            else if (noteData.visualFlat) innerHtml += `<span class="accidental-symbol flat-symbol">\\</span>`;
-            
-            if (noteData.visualNote === 'o') { 
+            if (noteData.isStaccato) {
+                innerHtml += `<span class="staccato-marker">^</span>`;
+            }
+
+            if (noteData.visualNote === 'o') {
                 innerHtml += `<span class="long-note-dot ${noteClass}">&#x2022;</span>`;
             } else if (noteData.visualNote === '0') {
                 innerHtml += `<span class="note-display ${noteClass}">0</span>`;
             } else {
-                const noteToDisplay = isBass ? (bassDisplayMap[noteData.visualNote] || noteData.visualNote) : noteData.visualNote;
+                let noteToDisplay;
+                if (isBass) {
+                    noteToDisplay = bassDisplayMap[noteData.visualNote] || noteData.visualNote;
+                    if (noteData.visualSharp) {
+                        noteToDisplay += '#';
+                    } else if (noteData.visualFlat) {
+                        noteToDisplay += 'b';
+                    }
+                } else {
+                    noteToDisplay = noteData.visualNote;
+                    if (noteData.visualSharp) {
+                        innerHtml += `<span class="accidental-symbol sharp-symbol">&#x2044;</span>`;
+                    } else if (noteData.visualFlat) {
+                        innerHtml += `<span class="accidental-symbol flat-symbol">\\</span>`;
+                    }
+                }
+                
                 innerHtml += `<span class="note-display ${noteClass}">${noteToDisplay}</span>`;
-                if (noteData.visualModifier === '..') innerHtml += `<span class="double-dot-high ${noteClass}">..</span>`;
-                else if (noteData.visualModifier === '.') innerHtml += `<span class="dot-high ${noteClass}">&#x2022;</span>`;
-                if (noteData.visualModifier === ',,') innerHtml += `<span class="double-dot-low ${noteClass}">..</span>`;
-                else if (noteData.visualModifier === ',') innerHtml += `<span class="dot-low ${noteClass}">&#x2022;</span>`;
-            } return `<div class="note-block">${innerHtml}</div>`;
+
+                if (noteData.visualModifier === '..') {
+                    innerHtml += `<span class="double-dot-high ${noteClass}">..</span>`;
+                } else if (noteData.visualModifier === '.') {
+                    innerHtml += `<span class="dot-high ${noteClass}">&#x2022;</span>`;
+                }
+                if (noteData.visualModifier === ',,') {
+                    innerHtml += `<span class="double-dot-low ${noteClass}">..</span>`;
+                } else if (noteData.visualModifier === ',') {
+                    innerHtml += `<span class="dot-low ${noteClass}">&#x2022;</span>`;
+                }
+            }
+
+            return `<div class="note-block">${innerHtml}</div>`;
         }
-        
+
         function generateBarContentHtml(barNotes, isBass) {
             let barContentHtml = '';
             barNotes.forEach(noteData => {
@@ -1006,20 +1031,19 @@
                 if(layer.isEditorHidden) {
                     editorRow.classList.add('is-collapsed');
                 }
-
                 const labelText = layer.isEditorHidden ? 'Tampilkan Editor' : 'Sembunyikan Editor';
                 const removeButtonHtml = index > 0 ? `<button class="remove-btn self-center">Hapus</button>` : '';
 
                 editorRow.innerHTML = `
                     <div class="flex flex-col gap-2 self-start">
-                         <div class="flex items-center justify-between">
+                        <div class="flex items-center justify-between">
                             <h3 class="font-bold text-gray-200" style="color: var(--text-headings)">Layer ${index + 1}</h3>
-                         </div>
-                         <select class="layer-instrument-select w-full">
+                        </div>
+                        <select class="layer-instrument-select w-full">
                             <option value="piano">Piano</option> <option value="flute">Flute</option> <option value="bass">Bass</option>
                         </select>
                         <div class="flex items-center mt-2">
-                           <input type="checkbox" id="layer-editor-toggle-${index}" class="layer-editor-toggle h-4 w-4 text-teal-500 rounded focus:ring-teal-500" style="color: var(--accent-color)" ${layer.isEditorHidden ? 'checked' : ''}>
+                           <input type="checkbox" id="layer-editor-toggle-${index}" class="layer-editor-toggle h-4 w-4 rounded" style="color: var(--accent-color)" ${layer.isEditorHidden ? 'checked' : ''}>
                            <label for="layer-editor-toggle-${index}" class="ml-2 text-sm font-semibold">${labelText}</label>
                         </div>
                     </div>
@@ -1029,15 +1053,12 @@
                     </div>
                     ${removeButtonHtml}
                 `;
-                
                 editorRow.querySelector('.layer-instrument-select').value = layer.instrument;
                 const editorTextarea = editorRow.querySelector('.layer-notation-editor');
                 const formatterDiv = editorRow.querySelector('.layer-notation-bar-numbers');
-                
                 editorTextarea.value = layer.notation;
                 formatterDiv.innerHTML = formatNotationWithAutoBars(layer.notation, biramaSelect.value);
-
-
+                
                 layersEditorContainer.appendChild(editorRow);
             });
         }
