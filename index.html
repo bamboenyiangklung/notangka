@@ -299,6 +299,40 @@
             border-color: var(--accent-color);
         }
 
+        /* View Mode Buttons */
+        .view-mode-btn {
+            background: transparent;
+            color: var(--text-secondary);
+            border: none;
+            transition: all 0.2s;
+        }
+        .view-mode-btn.active {
+            background-color: var(--bg-secondary);
+            color: var(--accent-color);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            font-weight: 600;
+        }
+        .dark .view-mode-btn.active {
+            background-color: var(--bg-tertiary);
+        }
+        
+        #combined-sheet-container.mobile-view .page {
+            width: 100%;
+            max-width: 420px;
+            padding: 1rem;
+            aspect-ratio: auto;
+            min-height: 297px;
+        }
+         #combined-sheet-container.mobile-view .page .song-title { font-size: 1.5rem; }
+         #combined-sheet-container.mobile-view .page .header-info { flex-direction: column; align-items: center; gap: 0.5rem; }
+         #combined-sheet-container.mobile-view .page .header-info > div { text-align: center !important; }
+
+        #combined-sheet-container.tablet-view .page {
+            width: 100%;
+            max-width: 680px;
+            padding: 1.5rem;
+        }
+
         /* Custom Fullscreen Mode Styles */
         body.fullscreen-mode {
             padding: 0;
@@ -490,6 +524,23 @@
             <div id="preview-wrapper">
                 <div class="flex justify-end items-center mt-8 mb-4">
                     <div class="flex flex-wrap items-center justify-end gap-4">
+                        <div id="view-mode-controls" class="flex items-center gap-2">
+                            <label class="font-semibold hidden sm:block">Tampilan</label>
+                            <div class="flex rounded-md bg-gray-100 dark:bg-gray-900 p-1 border border-gray-200 dark:border-gray-700">
+                                <button class="view-mode-btn px-3 py-1 text-sm font-semibold rounded-md flex items-center gap-1" data-view="mobile" title="Tampilan Mobile">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                                    <span class="hidden md:inline">Mobile</span>
+                                </button>
+                                <button class="view-mode-btn px-3 py-1 text-sm font-semibold rounded-md flex items-center gap-1" data-view="tablet" title="Tampilan Tablet">
+                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                                    <span class="hidden md:inline">Tablet</span>
+                                </button>
+                                <button class="view-mode-btn px-3 py-1 text-sm font-semibold rounded-md active flex items-center gap-1" data-view="pc" title="Tampilan PC">
+                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="2" y1="21" x2="22" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                                    <span class="hidden md:inline">PC</span>
+                                </button>
+                            </div>
+                        </div>
                         <div id="bars-per-row-container" class="flex items-center gap-2">
                             <label for="barsPerRowSelect" class="font-semibold">Bar per Baris (Global)</label>
                             <select id="barsPerRowSelect" class="w-auto">
@@ -1280,6 +1331,23 @@
             redoBtn.addEventListener('click', redo);
             [titleInput, composerInput, arrangerInput, biramaSelect, bpmInput, barsPerRowSelect].forEach(el => { el.addEventListener('change', renderAll); });
             
+            const viewModeControls = document.getElementById('view-mode-controls');
+            viewModeControls.addEventListener('click', (e) => {
+                const button = e.target.closest('.view-mode-btn');
+                if (button) {
+                    const viewMode = button.dataset.view;
+                    const container = document.getElementById('combined-sheet-container');
+                    
+                    container.classList.remove('mobile-view', 'tablet-view', 'pc-view');
+                    container.classList.add(`${viewMode}-view`);
+
+                    viewModeControls.querySelectorAll('.view-mode-btn').forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    renderCombinedSheet(); // Re-render to apply width changes
+                }
+            });
+
             document.body.addEventListener('input', (e) => {
                 if (!e.target.classList.contains('layer-notation-editor')) return;
                 const editorRow = e.target.closest('.layer-editor-row');
@@ -1495,6 +1563,8 @@
     </script>
 </body>
 </html>
+
+
 
 
 
