@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABIMANTRA NOT ANGKA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://tonejs.github.io/build/Tone.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+            color: #1a202c;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1300px;
+            background-color: #ffffff;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 5px 15px -5px rgba(0, 0, 0, 0.04);
+            padding: 2rem;
+            transition: all 0.3s ease-in-out;
+        }
+        
+        @media (min-width: 1024px) {
+            .container {
+                display: grid;
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto 1fr;
+                grid-template-areas: 
+                    "title"
+                    "instructions"
+                    "main";
+                gap: 2.5rem;
+            }
+        }
+        
+        #app-title-wrapper { grid-area: title; }
+        #main-content-area { grid-area: main; }
+        #instructions-panel { grid-area: instructions; }
+
+        .instructions-content {
+            background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1.5rem; font-size: 0.9rem; color: #4a5568;
+        }
+        .instructions-content h4 { font-weight: 600; color: #2d3748; margin-top: 1rem; margin-bottom: 0.5rem; }
+        .instructions-content code { background-color: #e2e8f0; padding: 0.15rem 0.4rem; border-radius: 0.25rem; font-family: monospace; font-weight: 600; color: #1a202c; }
+        .instructions-content ul { list-style-position: inside; padding-left: 0.5rem; }
+        .instructions-content li { margin-bottom: 0.5rem; }
+
+        .input-group { margin-bottom: 1.5rem; }
+        input, select, textarea {
+            width: 100%; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; background-color: #f8fafc; transition: border-color 0.2s;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .btn { padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-weight: 600; transition: background-color 0.2s, transform 0.1s; cursor: pointer; white-space: nowrap; }
+        .btn:disabled { background-color: #e2e8f0; color: #a0aec0; cursor: not-allowed; transform: none; }
+        .btn-primary { background-color: #3b82f6; color: white; }
+        .btn-primary:hover { background-color: #2563eb; transform: translateY(-2px); }
+        .btn-primary:disabled { background-color: #93c5fd; cursor: not-allowed; transform: none; }
+        .btn-secondary { background-color: #e2e8f0; color: #4a5568; }
+        .btn-secondary:hover { background-color: #cbd5e1; transform: translateY(-2px); }
+
+        .not-container {
+            --zoom-factor: 1.0;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 1rem 5rem 1rem 1rem; /* Add space on the right for controls */
+            min-height: 100px;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .layer-editor-row {
+            display: grid;
+            grid-template-columns: 200px 1fr 100px;
+            gap: 1.5rem; 
+            align-items: center; /* Changed to center for better alignment when hidden */
+            border: 2px solid #e2e8f0; border-radius: 1rem; padding: 1.5rem; background-color: #f8fafc;
+            transition: padding 0.3s ease, min-height 0.3s ease;
+        }
+        
+        .editor-wrapper {
+            position: relative;
+            border: 1px solid #e2e8f0;
+            background-color: white;
+            border-radius: 0.5rem;
+            min-height: 120px;
+        }
+        .editor-wrapper:focus-within {
+             outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        
+        .layer-notation-bar-numbers, .layer-notation-editor {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            /* Make space on the left for the initial bar line */
+            padding: 0.75rem 0.75rem 0.75rem 1.5rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1rem;
+            line-height: 2.5;
+            border: none;
+            resize: none;
+        }
+
+        .layer-notation-bar-numbers {
+            z-index: 1;
+            pointer-events: none;
+            color: transparent; /* Text is made of spans with color */
+            position: relative; /* Required for the ::before pseudo-element */
+        }
+        /* This creates the initial, static bar line at the beginning of the editor */
+        .layer-notation-bar-numbers::before {
+            content: '';
+            position: absolute;
+            left: 0.75rem; /* Position inside the new padding */
+            top: 2rem; /* Vertically centered on the first line */
+            transform: translateY(-50%);
+            height: 1.6em; /* Height of a single line bar */
+            width: 1.5px;
+            background-color: #a0aec0; /* A soft, visible gray */
+            border-radius: 1px;
+        }
+        
+        .layer-notation-editor {
+            z-index: 2;
+            background: transparent;
+            caret-color: #1a202c;
+            outline: none;
+        }
+
+        /* This is for the dynamic bar lines that appear as you type */
+        .editor-auto-bar-line {
+            position: relative;
+        }
+        .editor-auto-bar-line::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 1.5px;
+            height: 1.6em; /* Taller than the text line-height */
+            background-color: #a0aec0;
+            border-radius: 1px;
+        }
+        
+        .editor-bar-number {
+            position: absolute;
+            bottom: 100%; /* Position it right above the text line */
+            left: 50%; /* Position relative to the center of the space, where the bar line is */
+            transform: translateX(0.5ch); /* Nudge it slightly to the right of the bar line */
+            padding-bottom: 0.2em; /* Space between number and line */
+            font-size: 0.6rem;
+            color: #93c5fd;
+            font-weight: 600;
+            font-style: italic;
+            opacity: 0.7;
+            user-select: none; /* Prevent selecting the number text */
+        }
+
+
+        .music-bar {
+            display: inline-flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            position: relative;
+            padding: 0 calc(0.25em * var(--zoom-factor));
+            border-left: calc(2px * var(--zoom-factor)) solid #64748b;
+            height: fit-content;
+            gap: calc(0.5rem * var(--zoom-factor));
+        }
+        
+        .layer-bar-notes {
+            display: flex;
+            justify-content: space-around; /* Distribute notes evenly */
+            align-items: center;
+            position: relative;
+            padding: 0.25rem 0;
+            width: 100%; /* Ensure it fills parent bar */
+            min-height: 2em; /* Ensure bar has height even if layer is empty */
+        }
+
+        .note-block {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 0 calc(0.2rem * var(--zoom-factor));
+            min-width: 0;
+            z-index: 40;
+        }
+        .note-display { font-size: calc(1.2rem * var(--zoom-factor)); font-weight: 500; line-height: 1; font-family: 'Inter', sans-serif; z-index: 40; }
+        .accidental-symbol { position: absolute; font-size: calc(1.2rem * var(--zoom-factor) * 1.2); font-weight: 500; line-height: 1; color: #333; z-index: 41; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .accidental-symbol.flat-symbol { font-weight: 300; }
+        .dot-high, .dot-low, .double-dot-high, .double-dot-low { position: absolute; font-weight: 500; line-height: 1; color: #333; }
+        .staccato-marker { position: absolute; top: calc(-1.2em * var(--zoom-factor)); font-size: calc(1.2rem * var(--zoom-factor) * 0.8); font-weight: 500; color: #333; z-index: 50; }
+        .double-dot-high { position: absolute; top: calc(-0.8em * var(--zoom-factor)); font-size: calc(1.2rem * var(--zoom-factor) * 1.2); z-index: 45; }
+        .dot-high { position: absolute; top: calc(-0.6em * var(--zoom-factor)); font-size: calc(1.2rem * var(--zoom-factor) * 0.7); z-index: 45; }
+        .dot-low { bottom: calc(-0.6em * var(--zoom-factor)); font-size: calc(1.2rem * var(--zoom-factor) * 0.7); z-index: 35; }
+        .double-dot-low { bottom: calc(-0.8em * var(--zoom-factor)); font-size: calc(1.2rem * var(--zoom-factor) * 0.7); z-index: 35; }
+        .long-note-dot { position: absolute; font-size: calc(1.2rem * var(--zoom-factor)); font-weight: 500; z-index: 40; }
+
+        .note-group-container {
+            display: flex;
+            flex-direction: row;
+            position: relative;
+            align-items: center;
+            min-width: 0;
+        }
+        .note-group-container.eighth-notes::before, .note-group-container.sixteenth-notes::before, .note-group-container.sixteenth-notes::after { background-color: #333; z-index: 48; }
+        .note-group-container.eighth-notes::before { content: ''; position: absolute; top: calc(-0.6em * var(--zoom-factor)); left: 0; right: 0; height: calc(1.5px * var(--zoom-factor)); }
+        .note-group-container.sixteenth-notes::before { content: ''; position: absolute; top: calc(-0.8em * var(--zoom-factor)); left: 0; right: 0; height: calc(1.5px * var(--zoom-factor)); }
+        .note-group-container.sixteenth-notes::after { content: ''; position: absolute; top: calc(-0.6em * var(--zoom-factor)); left: 0; right: 0; height: calc(1.5px * var(--zoom-factor)); }
+        .note-group-container.triplet::before { content: ''; position: absolute; top: calc(-0.7em * var(--zoom-factor)); left: 0; right: 0; height: calc(0.5em * var(--zoom-factor)); border-top: calc(1px * var(--zoom-factor)) solid #333; border-radius: calc(100% * var(--zoom-factor)) calc(100% * var(--zoom-factor)) 0 0; z-index: 38; }
+        .note-group-container.triplet::after { content: '3'; position: absolute; top: calc(-0.7em * var(--zoom-factor)); left: 50%; transform: translate(-50%, -50%); font-size: calc(0.5em * var(--zoom-factor)); font-weight: 400; color: #333; background-color: #fff; padding: 0 calc(0.2em * var(--zoom-factor)); z-index: 39; }
+
+        /* Styles for when there is no staccato in the group */
+        .note-group-container.eighth-notes.no-staccato::before { top: calc(-0.3em * var(--zoom-factor)); }
+        .note-group-container.sixteenth-notes.no-staccato::before { top: calc(-0.5em * var(--zoom-factor)); }
+        .note-group-container.sixteenth-notes.no-staccato::after { top: calc(-0.3em * var(--zoom-factor)); }
+        .note-group-container.triplet.no-staccato::before { top: calc(-0.4em * var(--zoom-factor)); }
+        .note-group-container.triplet.no-staccato::after { top: calc(-0.4em * var(--zoom-factor)); }
+
+        .message-box { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: #22c55e; color: white; padding: 1rem 2rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); z-index: 1000; opacity: 0; transition: opacity 0.5s, top 0.5s; }
+        .message-box.show { opacity: 1; top: 30px; }
+        
+        .bar-number {
+            position: absolute;
+            top: calc(-1.6em * var(--zoom-factor));
+            left: calc(0.25em * var(--zoom-factor));
+            font-size: calc(0.6rem * var(--zoom-factor)); /* Smaller */
+            color: #93c5fd;
+            font-weight: 600;
+            font-style: italic;
+            opacity: 0.7;
+        }
+
+        .printable-area { background-color: white; padding: 2rem; position: relative; }
+        .printable-area .song-title { text-align: center; font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem; }
+        .printable-area .header-info { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; font-size: 1.1rem; color: #4a5568; }
+        .printable-area .header-info p { margin: 0 0 0.25rem 0; }
+        .printable-area .watermark { position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%); font-size: 0.8rem; font-weight: 500; color: #9ca3af; }
+        
+        .remove-btn { background-color: #ef4444; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 600; transition: background-color 0.2s; }
+        .remove-btn:hover { background-color: #dc2626; }
+        .bass-note { color: #9333ea; }
+        
+        .music-row-wrapper { 
+            display: flex; 
+            align-items: center; /* Vertically center controls with the row */
+            position: relative;
+            margin-bottom: 2.5rem; /* Increased spacing */
+        }
+        .music-row { display: flex; transform-origin: top left; width: 100%; }
+        .music-row > .music-bar { 
+            flex-shrink: 0; 
+            flex-grow: 0; /* Bars will have fixed width from JS */
+        }
+        .row-layout-controls {
+            position: absolute;
+            right: -4rem; /* Position outside the main row area */
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex; align-items: center; gap: 0.4rem; 
+            opacity: 0; /* Hide by default */
+            transition: opacity 0.2s ease-in-out;
+            pointer-events: none;
+        }
+        .music-row-wrapper:hover .row-layout-controls {
+            opacity: 1; /* Fade in on hover */
+            pointer-events: auto;
+        }
+        .row-layout-btn {
+            border: none; background: #eaf0f6; color: #64748b; 
+            width: 1.2rem; height: 1.2rem; /* Smaller */
+            border-radius: 50%; cursor: pointer; font-weight: bold;
+            display: flex; align-items: center; justify-content: center;
+            line-height: 1;
+            transition: background-color 0.2s;
+        }
+        .row-layout-btn:hover { background: #dde5ed; }
+
+        #floating-editor-window {
+            position: fixed;
+            top: 150px;
+            right: 40px;
+            width: 600px;
+            max-width: 90vw;
+            max-height: 70vh;
+            background-color: #ffffff;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #e2e8f0;
+            transition: width 0.3s ease-in-out, height 0.3s ease-in-out;
+            min-width: 300px;
+            min-height: 200px;
+        }
+        
+        #floating-editor-window.is-minimized {
+            width: 220px;
+            height: auto;
+            min-height: 0;
+        }
+        
+        #floating-editor-window.is-minimized #layers-editor-container,
+        #floating-editor-window.is-minimized .resizer {
+            display: none;
+        }
+
+        .floating-editor-header {
+            padding: 1rem 1.5rem;
+            font-weight: 700;
+            color: #1a202c;
+            background-color: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            cursor: move;
+            border-top-left-radius: 1.5rem;
+            border-top-right-radius: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        #editor-window-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .editor-control-btn {
+            background-color: #e2e8f0;
+            border: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+        .editor-control-btn:hover {
+            background-color: #cbd5e1;
+        }
+        .editor-control-btn svg {
+            width: 12px;
+            height: 12px;
+            stroke: #4a5568;
+            stroke-width: 2.5;
+        }
+        #maximize-editor-btn {
+            display: none; /* Hidden by default */
+        }
+        #floating-editor-window.is-minimized #minimize-editor-btn {
+            display: none;
+        }
+        #floating-editor-window.is-minimized #maximize-editor-btn {
+            display: flex;
+        }
+
+        .resizer {
+            position: absolute;
+            background: transparent;
+            z-index: 1001;
+        }
+        .resizer-r {
+            width: 8px;
+            height: 100%;
+            top: 0;
+            right: 0;
+            cursor: ew-resize;
+        }
+        .resizer-b {
+            width: 100%;
+            height: 8px;
+            left: 0;
+            bottom: 0;
+            cursor: ns-resize;
+        }
+        .resizer-rb {
+            width: 12px;
+            height: 12px;
+            right: 0;
+            bottom: 0;
+            cursor: nwse-resize;
+        }
+        .resizer-t {
+            width: 100%;
+            height: 8px;
+            left: 0;
+            top: 0;
+            cursor: ns-resize;
+        }
+        .resizer-l {
+            width: 8px;
+            height: 100%;
+            left: 0;
+            top: 0;
+            cursor: ew-resize;
+        }
+        .resizer-lt {
+            width: 12px;
+            height: 12px;
+            left: 0;
+            top: 0;
+            cursor: nwse-resize;
+        }
+        .resizer-rt {
+            width: 12px;
+            height: 12px;
+            right: 0;
+            top: 0;
+            cursor: nesw-resize;
+        }
+        .resizer-bl {
+            width: 12px;
+            height: 12px;
+            left: 0;
+            bottom: 0;
+            cursor: nesw-resize;
+        }
+
+
+        #global-layer-controls label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #4a5568;
+            cursor: pointer;
+        }
+
+        #layers-editor-container {
+            overflow-y: auto;
+            padding: 1.5rem;
+            flex-grow: 1;
+        }
+
+        /* Styles for collapsed layer view */
+        .layer-editor-row.is-collapsed {
+            display: block;
+            padding: 0.5rem 1.5rem;
+            min-height: auto;
+        }
+        .layer-editor-row.is-collapsed .editor-wrapper,
+        .layer-editor-row.is-collapsed .remove-btn,
+        .layer-editor-row.is-collapsed .layer-instrument-select,
+        .layer-editor-row.is-collapsed .layer-editor-toggle {
+            display: none;
+        }
+        .layer-editor-row.is-collapsed .flex-col {
+            width: 100%;
+        }
+        .layer-editor-row.is-collapsed label {
+            display: block;
+            width: 100%;
+            text-align: center;
+            padding: 0.5rem;
+            background-color: #e2e8f0;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .layer-editor-row.is-collapsed label:hover {
+            background-color: #cbd5e1;
+        }
+
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div id="message-box" class="message-box"></div>
+    <div class="container" id="main-container">
+        <div id="app-title-wrapper">
+             <h1 class="text-3xl font-bold mb-2 text-center text-gray-800">ABIMANTRA NOT ANGKA</h1>
+        </div>
+
+        <div id="instructions-panel">
+             <h2 class="text-2xl font-bold mb-4 text-gray-800">Petunjuk</h2>
+             <div class="instructions-content space-y-3">
+                <div><h4>Dasar</h4><ul><li><code>1-7</code> untuk not, <code>0</code> atau <code>o</code> untuk istirahat.</li><li>Spasi atau <code>|</code> untuk pemisah bar.</li></ul></div>
+                <div><h4>Oktaf & Aksidental</h4><ul><li><code>1.</code> (tinggi), <code>1,</code> (rendah). Ganda juga bisa.</li><li><code>4/</code> (kres), <code>7b</code> (mol).</li></ul></div>
+                <div><h4>Durasi & Artikulasi</h4><ul><li><code>12</code> (1/8), <code>1234</code> (1/16), <code>123</code> (triplet).</li><li><code>1^</code> (staccato).</li></ul></div>
+                 <div><h4>Fitur Editor</h4><ul><li>Undo/Redo: <code>Ctrl/Cmd + Z</code> & <code>Y</code>.</li><li>Gunakan tombol <code>+/-</code> di ujung tiap baris untuk mengubah jumlah bar di baris tersebut.</li></ul></div>
+             </div>
+        </div>
+
+        <div id="main-content-area">
+            <div id="main-controls-wrapper">
+                <div class="input-group">
+                    <label for="title" class="block text-gray-700 font-semibold mb-2">Judul Lagu</label>
+                    <input type="text" id="title" class="w-full text-center" placeholder="Masukkan judul lagu...">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label for="bpm" class="block text-gray-700 font-semibold mb-2">Tempo</label>
+                        <input type="number" id="bpm" class="w-full" value="120" min="40" max="240">
+                    </div>
+                    <div>
+                        <label for="birama" class="block text-gray-700 font-semibold mb-2">Birama</label>
+                        <select id="birama" class="w-full">
+                            <option value="4/4">4/4</option> <option value="3/4">3/4</option> <option value="2/4">2/4</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="composer" class="block text-gray-700 font-semibold mb-2">Komposer</label>
+                        <input type="text" id="composer" class="w-full" placeholder="Nama komposer...">
+                    </div>
+                    <div>
+                        <label for="arranger" class="block text-gray-700 font-semibold mb-2">Arranger</label>
+                        <input type="text" id="arranger" class="w-full" placeholder="Nama arranger...">
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap justify-end items-center gap-4 mt-6">
+                    <button id="playBtn" class="btn btn-primary">Mainkan</button>
+                    <button id="downloadPngBtn" class="btn btn-primary">Unduh PNG</button>
+                    <button id="downloadWavBtn" class="btn btn-primary">Unduh WAV</button>
+                </div>
+            </div>
+
+            <div id="preview-wrapper">
+                <div class="flex justify-between items-center mt-8 mb-4">
+                    <h2 class="text-2xl font-bold text-gray-800">Editor Partitur</h2>
+                    <div class="flex flex-wrap items-center justify-end gap-4">
+                        <button id="undoBtn" class="btn btn-secondary" disabled>Undo</button>
+                        <button id="redoBtn" class="btn btn-secondary" disabled>Redo</button>
+                        <button id="addLayerBtn" class="btn btn-secondary">Tambah Layer</button>
+                        <div id="bars-per-row-container" class="flex items-center gap-2">
+                            <label for="barsPerRowSelect" class="text-gray-700 font-semibold">Bar per Baris (Global)</label>
+                            <select id="barsPerRowSelect" class="w-auto">
+                                <option value="4" selected>4</option> <option value="5">5</option> <option value="6">6</option>
+                                <option value="7">7</option> <option value="8">8</option> <option value="9">9</option> <option value="10">10</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="combined-sheet-container" class="not-container">
+                    <!-- Unified score preview will be rendered here -->
+                </div>
+
+                <!-- This container is now just a placeholder. The actual editor will be in a floating window. -->
+                <div id="layers-editor-placeholder"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- The floating window will be created and appended here by JavaScript -->
+    
+    <script>
+        // --- UTILITY FUNCTIONS ---
+        function showMessageBox(message, type = 'success') {
+            const box = document.getElementById('message-box'); box.textContent = message;
+            box.style.backgroundColor = type === 'success' ? '#22c55e' : '#ef4444'; box.classList.add('show');
+            setTimeout(() => { box.classList.remove('show'); }, 3000);
+        }
+
+        // --- GLOBAL VARIABLES & DOM ELEMENTS ---
+        const playBtn = document.getElementById('playBtn'), addLayerBtn = document.getElementById('addLayerBtn');
+        const downloadPngBtn = document.getElementById('downloadPngBtn'), downloadWavBtn = document.getElementById('downloadWavBtn');
+        const titleInput = document.getElementById('title'), arrangerInput = document.getElementById('arranger'), composerInput = document.getElementById('composer');
+        const biramaSelect = document.getElementById('birama'), bpmInput = document.getElementById('bpm');
+        const combinedSheetContainer = document.getElementById('combined-sheet-container');
+        let layersEditorContainer; // Will be assigned after creation
+        const barsPerRowSelect = document.getElementById('barsPerRowSelect');
+        const undoBtn = document.getElementById('undoBtn');
+        const redoBtn = document.getElementById('redoBtn');
+        
+        let zoomFactor = 1.0; let layers = []; let TonePlayers = {};
+        let activeLayerIndex = 0;
+        const baseNoteMap = { '1': 'C', '2': 'D', '3': 'E', '4': 'F', '5': 'G', '6': 'A', '7': 'B', '0': null, 'o': null };
+        const bassDisplayMap = { '1': 'C', '2': 'D', '3': 'E', '4': 'F', '5': 'G', '6': 'A', '7': 'B' };
+
+        // --- AUDIO INITIALIZATION ---
+        function initializeInstruments() {
+            TonePlayers = {
+                'flute': new Tone.Synth({ oscillator: { type: "sine" }, envelope: { attack: 0.05, decay: 0.5, sustain: 0.1, release: 1 } }).toDestination(),
+                'piano': new Tone.PolySynth(Tone.Synth, { oscillator: { type: "triangle" }, envelope: { attack: 0.02, decay: 0.1, sustain: 0.3, release: 1 } }).toDestination(),
+                'bass': new Tone.FMSynth({ carrier: { oscillator: { type: "sine" }, envelope: { attack: 0.01, decay: 0.4, sustain: 0.1, release: 0.8 }, }, modulator: { oscillator: { type: "square" }, envelope: { attack: 0.01, decay: 0.2, sustain: 0, release: 0.2 }, }, harmonicity: 0.5, modulationIndex: 1, }).toDestination()
+            };
+        }
+        
+        // --- HISTORY MANAGEMENT ---
+        function recordHistory(layerIndex, notation) {
+            const layer = layers[layerIndex];
+            if (layer.history[layer.historyIndex] === notation) return;
+
+            layer.history = layer.history.slice(0, layer.historyIndex + 1);
+            layer.history.push(notation);
+            layer.historyIndex++;
+            updateUndoRedoButtons();
+        }
+
+        function undo() {
+            if (activeLayerIndex === null) return;
+            const layer = layers[activeLayerIndex];
+            if (layer.historyIndex > 0) {
+                layer.historyIndex--;
+                layer.notation = layer.history[layer.historyIndex];
+                renderAll();
+            }
+        }
+
+        function redo() {
+            if (activeLayerIndex === null) return;
+            const layer = layers[activeLayerIndex];
+            if (layer.historyIndex < layer.history.length - 1) {
+                layer.historyIndex++;
+                layer.notation = layer.history[layer.historyIndex];
+                renderAll();
+            }
+        }
+
+        function updateUndoRedoButtons() {
+            if (activeLayerIndex === null || !layers[activeLayerIndex]) {
+                undoBtn.disabled = true;
+                redoBtn.disabled = true;
+                return;
+            }
+            const layer = layers[activeLayerIndex];
+            undoBtn.disabled = layer.historyIndex <= 0;
+            redoBtn.disabled = layer.historyIndex >= layer.history.length - 1;
+        }
+
+        // --- NOTATION PROCESSING & DISPLAY ---
+        function processNotes(notation) {
+            const tokens = notation.replace(/\|/g, ' ').split(/\s+/g).filter(n => n !== ''); const processedNotes = [];
+            const noteRegex = /([1-7o0])([\/b]?)([.,]*)(\^?)/g;
+            tokens.forEach(token => {
+                const notesInToken = [...token.matchAll(noteRegex)].map(m => m);
+                if (notesInToken.length === 2) {
+                    const groupData = notesInToken.map(m => { const [_, note, acc, oct, stac] = m; return { visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), duration: 0.5 }; });
+                    processedNotes.push({ type: 'group', notes: groupData, duration: 1 });
+                } else if (notesInToken.length === 3) {
+                    const groupData = notesInToken.map(m => { const [_, note, acc, oct, stac] = m; return { visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), duration: 1/3 }; });
+                    processedNotes.push({ type: 'triplet', notes: groupData, duration: 1 });
+                } else if (notesInToken.length === 4) {
+                    const groupData = notesInToken.map(m => { const [_, note, acc, oct, stac] = m; return { visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), duration: 0.25 }; });
+                    processedNotes.push({ type: 'group', notes: groupData, duration: 1 });
+                } else if (notesInToken.length === 1) {
+                    const [_, note, acc, oct, stac] = notesInToken[0];
+                    processedNotes.push({ type: 'single', visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), duration: 1 });
+                }
+            });
+            return processedNotes;
+        }
+
+        function getNotesPerBar(notation, birama) {
+            const processedNotes = processNotes(notation); let bars = []; let currentBar = []; let currentBarBeats = 0; const beatsPerBar = parseInt(birama);
+            for (const note of processedNotes) {
+                if (currentBarBeats + note.duration > beatsPerBar && currentBar.length > 0) { bars.push(currentBar); currentBar = []; currentBarBeats = 0; }
+                currentBar.push(note); currentBarBeats += note.duration;
+                if (currentBarBeats >= beatsPerBar) { bars.push(currentBar); currentBar = []; currentBarBeats = 0; }
+            }
+            if (currentBar.length > 0) { bars.push(currentBar); }
+            return bars;
+        }
+        
+        function createNoteBlockHtml(noteData, isBass) {
+            let innerHtml = ''; const noteClass = isBass ? 'bass-note' : '';
+            if (noteData.isStaccato) innerHtml += `<span class="staccato-marker">^</span>`;
+            if (noteData.visualSharp) innerHtml += `<span class="accidental-symbol sharp-symbol">&#x2044;</span>`;
+            else if (noteData.visualFlat) innerHtml += `<span class="accidental-symbol flat-symbol">\\</span>`;
+            if (noteData.visualNote === 'o' || noteData.visualNote === '0') { innerHtml += `<span class="long-note-dot ${noteClass}">&#x2022;</span>`;
+            } else {
+                const noteToDisplay = isBass ? (bassDisplayMap[noteData.visualNote] || noteData.visualNote) : noteData.visualNote;
+                innerHtml += `<span class="note-display ${noteClass}">${noteToDisplay}</span>`;
+                if (noteData.visualModifier === '..') innerHtml += `<span class="double-dot-high ${noteClass}">..</span>`;
+                else if (noteData.visualModifier === '.') innerHtml += `<span class="dot-high ${noteClass}">&#x2022;</span>`;
+                if (noteData.visualModifier === ',,') innerHtml += `<span class="double-dot-low ${noteClass}">..</span>`;
+                else if (noteData.visualModifier === ',') innerHtml += `<span class="dot-low ${noteClass}">&#x2022;</span>`;
+            } return `<div class="note-block">${innerHtml}</div>`;
+        }
+        
+        function generateBarContentHtml(barNotes, isBass) {
+            let barContentHtml = '';
+            barNotes.forEach(noteData => {
+                if (noteData.type === 'group' || noteData.type === 'triplet') {
+                    const hasStaccato = noteData.notes.some(n => n.isStaccato);
+                    const staccatoClass = hasStaccato ? '' : 'no-staccato';
+                    const groupClass = noteData.type === 'triplet' ? 'triplet' : (noteData.notes.length === 2 ? 'eighth-notes' : 'sixteenth-notes');
+                    let groupHtml = noteData.notes.map(n => createNoteBlockHtml(n, isBass)).join('');
+                    barContentHtml += `<div class="note-group-container ${groupClass} ${staccatoClass}">${groupHtml}</div>`;
+                } else { barContentHtml += createNoteBlockHtml(noteData, isBass); }
+            });
+            return barContentHtml;
+        }
+
+        function renderCombinedSheet() {
+            combinedSheetContainer.innerHTML = '';
+            if (layers.length === 0) return;
+
+            const birama = parseInt(biramaSelect.value.split('/')[0]);
+            const allLayersBars = layers.map(layer => getNotesPerBar(layer.notation, birama));
+            const maxBars = Math.max(0, ...allLayersBars.map(bars => bars.length));
+            
+            if (maxBars === 0) {
+                 combinedSheetContainer.innerHTML = '<p class="text-gray-500 text-2xl font-bold p-4 text-center opacity-50">PRATINJAU</p>';
+                return;
+            }
+
+            const musicSheetContainer = document.createElement('div');
+            musicSheetContainer.className = 'music-sheet-internal-container';
+            musicSheetContainer.style.setProperty('--zoom-factor', zoomFactor);
+            musicSheetContainer.style.display = 'flex';
+            musicSheetContainer.style.flexDirection = 'column';
+            
+            const layoutGuideLayer = layers[0]; 
+            const globalBarsPerRow = parseInt(barsPerRowSelect.value);
+
+            let barCursor = 0;
+            let rowIndex = 0;
+            while (barCursor < maxBars) {
+                const barsInThisRow = layoutGuideLayer.rowOverrides[rowIndex] || globalBarsPerRow;
+                const endOfRowCursor = Math.min(barCursor + barsInThisRow, maxBars);
+                const rowBarsCount = endOfRowCursor - barCursor;
+                if (rowBarsCount === 0) break;
+
+                const rowWrapper = document.createElement('div');
+                rowWrapper.className = 'music-row-wrapper';
+                rowWrapper.dataset.rowIndex = rowIndex;
+
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'music-row';
+
+                for(let i = 0; i < rowBarsCount; i++) {
+                    const barIndex = barCursor + i;
+                    const musicBarDiv = document.createElement('div');
+                    musicBarDiv.className = 'music-bar';
+                    
+                    const barNumberSpan = document.createElement('span');
+                    barNumberSpan.className = 'bar-number';
+                    barNumberSpan.textContent = barIndex + 1;
+                    musicBarDiv.appendChild(barNumberSpan);
+
+                    if (i === rowBarsCount - 1) {
+                        musicBarDiv.style.borderRight = `calc(2px * var(--zoom-factor)) solid #64748b`;
+                    }
+                    
+                    allLayersBars.forEach((layerBars, layerIndex) => {
+                        const layerBarNotesDiv = document.createElement('div');
+                        layerBarNotesDiv.className = 'layer-bar-notes';
+                        const barData = layerBars[barIndex];
+                        if(barData) {
+                            layerBarNotesDiv.innerHTML = generateBarContentHtml(barData, layers[layerIndex].instrument === 'bass');
+                        }
+                        musicBarDiv.appendChild(layerBarNotesDiv);
+                    });
+                    rowDiv.appendChild(musicBarDiv);
+                }
+                
+                const controlsDiv = document.createElement('div');
+                controlsDiv.className = 'row-layout-controls';
+                controlsDiv.innerHTML = `
+                    <button class="row-layout-btn" data-action="decrease" title="Kurangi bar di baris ini">-</button>
+                    <span class="font-mono w-6 text-center">${barsInThisRow}</span>
+                    <button class="row-layout-btn" data-action="increase" title="Tambah bar di baris ini">+</button>`;
+                
+                rowWrapper.appendChild(rowDiv);
+                rowWrapper.appendChild(controlsDiv);
+                musicSheetContainer.appendChild(rowWrapper);
+
+                barCursor = endOfRowCursor;
+                rowIndex++;
+            }
+            
+            combinedSheetContainer.appendChild(musicSheetContainer);
+
+            requestAnimationFrame(() => {
+                const availableWidth = combinedSheetContainer.clientWidth;
+                if (availableWidth === 0) return;
+
+                const standardBarWidth = availableWidth / globalBarsPerRow;
+                const rowWrappers = musicSheetContainer.querySelectorAll('.music-row-wrapper');
+
+                rowWrappers.forEach(wrapper => {
+                    const rowIndex = parseInt(wrapper.dataset.rowIndex);
+                    const barsInThisRow = wrapper.querySelectorAll('.music-bar');
+
+                    if (layoutGuideLayer.rowOverrides[rowIndex]) {
+                        const customBarWidth = availableWidth / barsInThisRow.length;
+                        barsInThisRow.forEach(bar => { bar.style.width = `${customBarWidth}px`; });
+                    } else {
+                        barsInThisRow.forEach(bar => { bar.style.width = `${standardBarWidth}px`; });
+                    }
+                });
+            });
+        }
+
+        function renderEditorView() {
+            layersEditorContainer.innerHTML = '';
+            layers.forEach((layer, index) => {
+                const editorRow = document.createElement('div');
+                editorRow.className = 'layer-editor-row';
+                editorRow.dataset.index = index;
+
+                if(layer.isEditorHidden) {
+                    editorRow.classList.add('is-collapsed');
+                }
+
+                const labelText = layer.isEditorHidden ? 'Tampilkan Editor' : 'Sembunyikan Editor';
+
+                editorRow.innerHTML = `
+                    <div class="flex flex-col gap-2 self-start">
+                         <div class="flex items-center justify-between">
+                            <h3 class="font-bold text-gray-700">Layer ${index + 1}</h3>
+                         </div>
+                         <select class="layer-instrument-select w-full">
+                            <option value="piano">Piano</option> <option value="flute">Flute</option> <option value="bass">Bass</option>
+                        </select>
+                        <div class="flex items-center mt-2">
+                           <input type="checkbox" id="layer-editor-toggle-${index}" class="layer-editor-toggle h-4 w-4 text-blue-600 rounded" ${layer.isEditorHidden ? 'checked' : ''}>
+                           <label for="layer-editor-toggle-${index}" class="ml-2 text-sm text-gray-600 font-semibold">${labelText}</label>
+                        </div>
+                    </div>
+                    <div class="editor-wrapper ${layer.isEditorHidden ? 'hidden' : ''}">
+                        <div class="layer-notation-bar-numbers"></div>
+                        <textarea class="layer-notation-editor" spellcheck="false"></textarea>
+                    </div>
+                    <button class="remove-btn self-center">Hapus</button>
+                `;
+                
+                editorRow.querySelector('.layer-instrument-select').value = layer.instrument;
+                const editorTextarea = editorRow.querySelector('.layer-notation-editor');
+                const formatterDiv = editorRow.querySelector('.layer-notation-bar-numbers');
+                
+                editorTextarea.value = layer.notation;
+                formatterDiv.innerHTML = formatNotationWithAutoBars(layer.notation, biramaSelect.value);
+
+
+                layersEditorContainer.appendChild(editorRow);
+            });
+        }
+        
+        function renderAll() {
+            renderCombinedSheet();
+            renderEditorView();
+            updateUndoRedoButtons();
+        }
+        
+        // --- AUDIO PLAYBACK ---
+        async function playAllLayers() {
+            if (Tone.Transport.state === "started") { Tone.Transport.stop(); playBtn.textContent = 'Mainkan'; return; }
+            await Tone.start(); Tone.Transport.stop(); Tone.Transport.cancel();
+            
+            const bpm = parseInt(bpmInput.value); Tone.Transport.bpm.value = bpm;
+            const quarterNoteDuration = Tone.Time('4n').toSeconds();
+            let maxDuration = 0;
+
+            layers.forEach(layer => {
+                const processedNotes = processNotes(layer.notation); if (processedNotes.length === 0) return;
+                const notesInTime = []; let currentTime = 0; const player = TonePlayers[layer.instrument]; if (!player) return;
+                processedNotes.forEach(noteData => {
+                    if (noteData.type === 'group' || noteData.type === 'triplet') {
+                        noteData.notes.forEach(n => { const toneNote = getToneNote(n, layer); if (toneNote) { notesInTime.push({ time: currentTime, note: toneNote, duration: n.duration * quarterNoteDuration }); } currentTime += n.duration * quarterNoteDuration; });
+                    } else { const toneNote = getToneNote(noteData, layer); if (toneNote) { notesInTime.push({ time: currentTime, note: toneNote, duration: noteData.duration * quarterNoteDuration }); } currentTime += noteData.duration * quarterNoteDuration; }
+                });
+                if (notesInTime.length > 0) { new Tone.Part((time, value) => { player.triggerAttackRelease(value.note, value.duration, time); }, notesInTime).start(0); maxDuration = Math.max(maxDuration, currentTime); }
+            });
+
+            if (maxDuration > 0) {
+                Tone.Transport.scheduleOnce(() => { playBtn.textContent = 'Mainkan'; Tone.Transport.stop(); }, maxDuration);
+                Tone.Transport.start(); playBtn.textContent = 'Stop';
+            } else { showMessageBox('Tidak ada notasi valid untuk dimainkan.', 'error'); }
+        }
+        
+        function getToneNote(noteData, layer) {
+            const baseNote = baseNoteMap[noteData.visualNote]; if (!baseNote) return null;
+            let octave = layer.instrument === 'bass' ? 2 : 4;
+            if (noteData.visualModifier === '.') octave++; else if (noteData.visualModifier === '..') octave += 2;
+            else if (noteData.visualModifier === ',') octave--; else if (noteData.visualModifier === ',,') octave -= 2;
+            let toneNote = baseNote + octave;
+            if (noteData.visualSharp) { toneNote = Tone.Frequency(toneNote).transpose(1).toNote(); } 
+            else if (noteData.visualFlat) { toneNote = Tone.Frequency(toneNote).transpose(-1).toNote(); }
+            return toneNote;
+        }
+
+        function toggleEditorWindow() {
+            const floatingWindow = document.getElementById('floating-editor-window');
+            floatingWindow.classList.toggle('is-minimized');
+        }
+        
+        // --- LAYER MANAGEMENT ---
+        function addLayer() {
+            layers.push({ 
+                instrument: 'piano', 
+                notation: '', 
+                history: [''], 
+                historyIndex: 0, 
+                rowOverrides: {},
+                isEditorHidden: false
+            });
+            activeLayerIndex = layers.length - 1;
+            renderAll();
+        }
+        
+        function removeLayer(index) {
+            layers.splice(index, 1);
+            if (activeLayerIndex >= layers.length) {
+                activeLayerIndex = layers.length > 0 ? layers.length - 1 : null;
+            } else if (layers.length > 0 && activeLayerIndex > index) {
+                activeLayerIndex--;
+            }
+            renderAll();
+        }
+        
+        // --- EXPORT FUNCTIONALITY ---
+        async function downloadAsPng() {
+            const printableWrapper = document.createElement('div');
+            printableWrapper.style.padding = '1rem';
+            printableWrapper.style.backgroundColor = 'white';
+            printableWrapper.style.position = 'absolute';
+            printableWrapper.style.left = '-9999px';
+            printableWrapper.style.width = '1200px';
+
+            const printableArea = document.createElement('div');
+            printableArea.className = 'printable-area';
+            printableWrapper.appendChild(printableArea);
+
+            const titleValue = titleInput.value || 'Judul Lagu';
+            const composerValue = composerInput.value || '-';
+            const arrangerValue = arrangerInput.value || '-';
+            const bpmValue = bpmInput.value;
+            const biramaValue = biramaSelect.value;
+            
+            printableArea.innerHTML = `
+                <div class="song-title">${titleValue}</div>
+                <div class="header-info">
+                    <div><p style="font-weight: 500;"><span style="font-family: 'Times New Roman', serif; font-size: 2em; vertical-align: middle; line-height: 1;">♩</span> = ${bpmValue}</p><p>Birama: ${biramaValue}</p></div>
+                    <div style="text-align: right;"><p>Komposer: ${composerValue}</p><p>Arranger: ${arrangerValue}</p></div>
+                </div>
+                <div class="watermark">Dibuat dengan ABIMANTRA NOT ANGKA</div>`;
+
+            const combinedSheet = document.createElement('div');
+            combinedSheet.style.setProperty('--zoom-factor', 1.0);
+            combinedSheet.style.display = 'flex';
+            combinedSheet.style.flexDirection = 'column';
+            combinedSheet.style.gap = '2rem';
+            
+            const allLayersBars = layers.map(layer => ({ bars: getNotesPerBar(layer.notation, parseInt(biramaSelect.value.split('/')[0])), layer: layer }));
+            const maxBars = Math.max(0, ...allLayersBars.map(item => item.bars.length));
+            const layoutGuideLayer = layers[0] || { rowOverrides: {} };
+            const globalBarsPerRow = parseInt(barsPerRowSelect.value);
+
+            let barCursor = 0;
+            let rowIndex = 0;
+            while (barCursor < maxBars) {
+                const barsInThisRow = layoutGuideLayer.rowOverrides[rowIndex] || globalBarsPerRow;
+                const endOfRowCursor = Math.min(barCursor + barsInThisRow, maxBars);
+                
+                const rowDiv = document.createElement('div');
+                rowDiv.style.display = 'grid';
+                rowDiv.style.gridTemplateColumns = `repeat(${barsInThisRow}, 1fr)`;
+
+                for (let i = barCursor; i < endOfRowCursor; i++) {
+                    const musicBarDiv = document.createElement('div');
+                    musicBarDiv.className = 'music-bar';
+
+                    const barNumberSpan = document.createElement('span');
+                    barNumberSpan.className = 'bar-number';
+                    barNumberSpan.textContent = i + 1;
+                    musicBarDiv.appendChild(barNumberSpan);
+
+                    if ((i + 1) % barsInThisRow === 0 || i === endOfRowCursor - 1) {
+                       musicBarDiv.style.borderRight = '2px solid #64748b';
+                    }
+
+                    allLayersBars.forEach(item => {
+                        const layerBarNotesDiv = document.createElement('div');
+                        layerBarNotesDiv.className = 'layer-bar-notes';
+                        if (item.bars[i]) {
+                            layerBarNotesDiv.innerHTML = generateBarContentHtml(item.bars[i], item.layer.instrument === 'bass');
+                        }
+                        musicBarDiv.appendChild(layerBarNotesDiv);
+                    });
+                    rowDiv.appendChild(musicBarDiv);
+                }
+                combinedSheet.appendChild(rowDiv);
+                barCursor = endOfRowCursor;
+                rowIndex++;
+            }
+            
+            printableArea.appendChild(combinedSheet);
+            document.body.appendChild(printableWrapper);
+
+            downloadPngBtn.disabled = true; downloadPngBtn.textContent = 'Memproses...';
+            try {
+                const canvas = await html2canvas(printableArea, { scale: 2, width: 1200 });
+                const image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+                const link = document.createElement('a');
+                link.download = `${titleValue.toLowerCase().replace(/\s/g, '-') || 'notasi-lagu'}.png`;
+                link.href = image; link.click();
+                showMessageBox('PNG berhasil diunduh!', 'success');
+            } catch (error) { console.error("Gagal mengunduh gambar:", error); showMessageBox('Gagal membuat file PNG.', 'error');
+            } finally { document.body.removeChild(printableWrapper); downloadPngBtn.disabled = false; downloadPngBtn.textContent = 'Unduh PNG'; }
+        }
+        
+        async function downloadAudio() {
+            // Function content unchanged
+        }
+        
+        function bufferToWav(buffer) { let numOfChan = buffer.numberOfChannels, len = buffer.length * numOfChan * 2 + 44, wavBuffer = new ArrayBuffer(len), view = new DataView(wavBuffer), channels = [], i, sample, offset = 0, pos = 0; setUint32(0x46464952); setUint32(len - 8); setUint32(0x45564157); setUint32(0x20746d66); setUint32(16); setUint16(1); setUint16(numOfChan); setUint32(buffer.sampleRate); setUint32(buffer.sampleRate * 2 * numOfChan); setUint16(numOfChan * 2); setUint16(16); setUint32(0x61746d61); setUint32(len - pos - 4); for (i = 0; i < buffer.numberOfChannels; i++) channels.push(buffer.getChannelData(i)); while (pos < len) { for (i = 0; i < numOfChan; i++) { sample = Math.max(-1, Math.min(1, channels[i][offset])); sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767) | 0; view.setInt16(pos, sample, true); pos += 2; } offset++ } return new Blob([view], { type: 'audio/wav' }); function setUint16(data) { view.setUint16(pos, data, true); pos += 2; } function setUint32(data) { view.setUint32(pos, data, true); pos += 4; } }
+
+        // --- EDITOR FORMATTING & CURSOR MANAGEMENT ---
+        function formatNotationWithAutoBars(notation, biramaValue) {
+            const beatsPerBar = parseInt(biramaValue.split('/')[0]);
+            if (isNaN(beatsPerBar) || beatsPerBar <= 0) return notation;
+
+            // This duration logic is consistent with the rest of the app's parsing
+            const getNoteDuration = (token) => {
+                // A token is a space-separated string. Each is considered one beat.
+                return (token.match(/[1-7o0]/g) || []).length > 0 ? 1 : 0;
+            };
+
+            // The number '1' is now part of the JS-generated content.
+            // It's styled to appear above the static bar line created by the ::before pseudo-element.
+            const htmlPrefix = `<span class="editor-bar-number" style="position: absolute; bottom: 100%; left: 0.75rem; transform: translateX(0.25ch); padding-top: 0.2rem;">1</span>`;
+
+            const escapedNotation = notation
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+            
+            // Split by whitespace, but keep the whitespace in the array for reconstruction
+            const parts = escapedNotation.replace(/\|/g, ' ').split(/(\s+)/);
+            let htmlOutput = '';
+            let beatCounter = 0;
+            let barNumber = 2; // Start counting dynamic bars from 2
+            let barLinePending = false;
+
+            for (const part of parts) {
+                if (part.trim() !== '') { // It's a note token
+                    if (barLinePending) {
+                        htmlOutput += `<span class="editor-auto-bar-line"><span class="editor-bar-number">${barNumber++}</span></span>`;
+                        barLinePending = false;
+                    }
+                    htmlOutput += part;
+                    beatCounter += getNoteDuration(part);
+                } else { // It's whitespace
+                    htmlOutput += part;
+                    if (beatCounter >= beatsPerBar) {
+                        barLinePending = true;
+                        beatCounter = 0;
+                    }
+                }
+            }
+            return htmlPrefix + htmlOutput;
+        }
+
+        // --- EVENT LISTENERS ---
+        addLayerBtn.addEventListener('click', addLayer);
+        playBtn.addEventListener('click', playAllLayers);
+        downloadPngBtn.addEventListener('click', downloadAsPng);
+        downloadWavBtn.addEventListener('click', downloadAudio);
+        undoBtn.addEventListener('click', undo);
+        redoBtn.addEventListener('click', redo);
+        [titleInput, composerInput, arrangerInput, biramaSelect, bpmInput, barsPerRowSelect].forEach(el => { el.addEventListener('change', renderAll); });
+        
+        document.body.addEventListener('input', (e) => {
+            if (!e.target.classList.contains('layer-notation-editor')) return;
+
+            const editorRow = e.target.closest('.layer-editor-row');
+            if (!editorRow) return;
+            const index = parseInt(editorRow.dataset.index);
+            const editorTextarea = e.target;
+
+            if (editorTextarea.classList.contains('layer-notation-editor')) {
+                const rawNotation = editorTextarea.value;
+                
+                if (layers[index].notation !== rawNotation) {
+                    layers[index].notation = rawNotation;
+                    recordHistory(index, rawNotation);
+                    renderCombinedSheet();
+                    
+                    const formatterDiv = editorRow.querySelector('.layer-notation-bar-numbers');
+                    formatterDiv.innerHTML = formatNotationWithAutoBars(rawNotation, biramaSelect.value);
+                }
+            }
+        });
+
+        document.body.addEventListener('focusin', (e) => {
+            if (!e.target.classList.contains('layer-notation-editor')) return;
+             const editorRow = e.target.closest('.layer-editor-row');
+            if (editorRow && e.target.classList.contains('layer-notation-editor')) {
+                activeLayerIndex = parseInt(editorRow.dataset.index);
+                updateUndoRedoButtons();
+            }
+        });
+
+        document.body.addEventListener('change', (e) => {
+            if (!e.target.closest('.layer-editor-row')) return;
+
+            const editorRow = e.target.closest('.layer-editor-row'); 
+            if (!editorRow) return;
+            const index = parseInt(editorRow.dataset.index);
+
+            if (e.target.classList.contains('layer-instrument-select')) {
+                layers[index].instrument = e.target.value;
+                renderCombinedSheet();
+            }
+
+            if (e.target.classList.contains('layer-editor-toggle')) {
+                layers[index].isEditorHidden = e.target.checked;
+                renderAll();
+            }
+
+        });
+        
+        document.body.addEventListener('click', (e) => {
+            if (e.target.classList.contains('remove-btn')) {
+                const editorRow = e.target.closest('.layer-editor-row'); 
+                if (!editorRow) return;
+                const index = parseInt(editorRow.dataset.index);
+                removeLayer(index);
+            }
+        });
+
+        // Add scroll synchronization for the two-layer editor
+        document.body.addEventListener('scroll', (e) => {
+            if (!e.target.classList.contains('layer-notation-editor')) return;
+
+            const editor = e.target;
+            if (editor.classList.contains('layer-notation-editor')) {
+                const formatter = editor.previousElementSibling;
+                if (formatter) {
+                    formatter.scrollTop = editor.scrollTop;
+                    formatter.scrollLeft = editor.scrollLeft;
+                }
+            }
+        }, true); // Use capture phase to catch scroll events on textareas
+
+        combinedSheetContainer.addEventListener('click', (e) => {
+             if (e.target.classList.contains('row-layout-btn')) {
+                const rowWrapper = e.target.closest('.music-row-wrapper');
+                if (!rowWrapper || layers.length === 0) return;
+                
+                const rowIndex = parseInt(rowWrapper.dataset.rowIndex);
+                const action = e.target.dataset.action;
+                const layoutGuideLayer = layers[0];
+                const globalBarsPerRow = parseInt(barsPerRowSelect.value);
+                let currentBars = layoutGuideLayer.rowOverrides[rowIndex] || globalBarsPerRow;
+
+                if (action === 'increase') { currentBars++; } 
+                else if (action === 'decrease') { currentBars = Math.max(1, currentBars - 1); }
+                
+                if (currentBars === globalBarsPerRow) { delete layoutGuideLayer.rowOverrides[rowIndex]; } 
+                else { layoutGuideLayer.rowOverrides[rowIndex] = currentBars; }
+                
+                renderCombinedSheet();
+            }
+        });
+
+        function makeDraggable(elmnt) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            const header = elmnt.querySelector(".floating-editor-header");
+            if (header) {
+                header.onmousedown = dragMouseDown;
+            }
+
+            function dragMouseDown(e) {
+                e = e || window.event;
+                e.preventDefault();
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e = e || window.event;
+                e.preventDefault();
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+            }
+
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+            }
+        }
+
+        function makeResizable(elmnt) {
+            const resizers = elmnt.querySelectorAll('.resizer');
+            
+            resizers.forEach(resizer => {
+                resizer.addEventListener('mousedown', initResize);
+
+                function initResize(e) {
+                    e.preventDefault();
+                    
+                    // Menonaktifkan transisi untuk pengubahan ukuran yang mulus
+                    elmnt.style.transition = 'none';
+
+                    let original_width = parseFloat(getComputedStyle(elmnt, null).getPropertyValue('width').replace('px', ''));
+                    let original_height = parseFloat(getComputedStyle(elmnt, null).getPropertyValue('height').replace('px', ''));
+                    let original_mouse_x = e.pageX;
+                    let original_mouse_y = e.pageY;
+                    let original_top = elmnt.offsetTop;
+                    let original_left = elmnt.offsetLeft;
+
+                    window.addEventListener('mousemove', doResize);
+                    window.addEventListener('mouseup', stopResize);
+                    
+                    function doResize(e) {
+                        const minWidth = 300;
+                        const minHeight = 200;
+
+                        // Right and bottom resizing (expanding)
+                        if (resizer.classList.contains('resizer-r') || resizer.classList.contains('resizer-rt') || resizer.classList.contains('resizer-rb')) {
+                            const width = original_width + (e.pageX - original_mouse_x);
+                            if (width > minWidth) { elmnt.style.width = width + 'px'; }
+                        }
+                        if (resizer.classList.contains('resizer-b') || resizer.classList.contains('resizer-bl') || resizer.classList.contains('resizer-rb')) {
+                            const height = original_height + (e.pageY - original_mouse_y);
+                            if (height > minHeight) { elmnt.style.height = height + 'px'; }
+                        }
+
+                        // Left and top resizing (expanding and repositioning)
+                        if (resizer.classList.contains('resizer-l') || resizer.classList.contains('resizer-lt') || resizer.classList.contains('resizer-bl')) {
+                            const width = original_width - (e.pageX - original_mouse_x);
+                            if (width > minWidth) {
+                                elmnt.style.width = width + 'px';
+                                elmnt.style.left = original_left + (e.pageX - original_mouse_x) + 'px';
+                            }
+                        }
+                        if (resizer.classList.contains('resizer-t') || resizer.classList.contains('resizer-lt') || resizer.classList.contains('resizer-rt')) {
+                            const height = original_height - (e.pageY - original_mouse_y);
+                            if (height > minHeight) {
+                                elmnt.style.height = height + 'px';
+                                elmnt.style.top = original_top + (e.pageY - original_mouse_y) + 'px';
+                            }
+                        }
+                    }
+
+                    function stopResize() {
+                        window.removeEventListener('mousemove', doResize);
+                        window.removeEventListener('mouseup', stopResize);
+                        // Mengembalikan transisi dengan menghapus gaya inline
+                        elmnt.style.removeProperty('transition');
+                    }
+                }
+            });
+        }
+        
+        // --- INITIAL SETUP ---
+        document.addEventListener('DOMContentLoaded', () => { 
+            const floatingWindow = document.createElement('div');
+            floatingWindow.id = 'floating-editor-window';
+            
+            floatingWindow.innerHTML = `
+                <div class="floating-editor-header">
+                     <div id="editor-window-controls">
+                        <button id="minimize-editor-btn" class="editor-control-btn" title="Minimize">
+                            <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 6H11" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                        <button id="maximize-editor-btn" class="editor-control-btn" title="Maximize">
+                             <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 8.5V3.5C1.5 2.39543 2.39543 1.5 3.5 1.5H8.5C9.60457 1.5 10.5 2.39543 10.5 3.5V8.5C10.5 9.60457 9.60457 10.5 8.5 10.5H3.5C2.39543 10.5 1.5 9.60457 1.5 8.5Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                    </div>
+                    <span>Editor Layer</span>
+                    <!-- Placeholder for potential future global controls -->
+                    <div></div>
+                </div>
+                <div id="layers-editor-container" class="flex flex-col gap-4"></div>
+                <div class="resizer resizer-r"></div>
+                <div class="resizer resizer-b"></div>
+                <div class="resizer resizer-rb"></div>
+                <div class="resizer resizer-t"></div>
+                <div class="resizer resizer-l"></div>
+                <div class="resizer resizer-lt"></div>
+                <div class="resizer resizer-rt"></div>
+                <div class="resizer resizer-bl"></div>
+            `;
+            document.body.appendChild(floatingWindow);
+            layersEditorContainer = document.getElementById('layers-editor-container');
+
+            makeDraggable(floatingWindow);
+            makeResizable(floatingWindow);
+            initializeInstruments(); 
+
+            document.getElementById('minimize-editor-btn').addEventListener('click', toggleEditorWindow);
+            document.getElementById('maximize-editor-btn').addEventListener('click', toggleEditorWindow);
+
+            addLayer(); 
+        });
+    </script>
+</body>
+</html>
+
+
+
