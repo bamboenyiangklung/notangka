@@ -340,6 +340,67 @@
             right: 1rem;
             z-index: 1001;
         }
+        
+        /* Repeat and Annotation Styles */
+        .music-bar.repeat-start {
+            border-left-style: double;
+            border-left-width: calc(4px * var(--zoom-factor));
+            padding-left: calc(0.5em * var(--zoom-factor));
+        }
+        .music-bar.repeat-end {
+            border-right-style: double;
+            border-right-width: calc(4px * var(--zoom-factor));
+            padding-right: calc(0.5em * var(--zoom-factor));
+        }
+        .music-bar.repeat-start::before, .music-bar.repeat-start::after {
+            content: '•';
+            position: absolute;
+            font-size: calc(1.2em * var(--zoom-factor));
+            color: #1a202c;
+            line-height: 1;
+            left: calc(0.1em * var(--zoom-factor));
+            transform: translateY(-50%);
+        }
+        .music-bar.repeat-end::before, .music-bar.repeat-end::after {
+            content: '•';
+            position: absolute;
+            font-size: calc(1.2em * var(--zoom-factor));
+            color: #1a202c;
+            line-height: 1;
+            right: calc(0.1em * var(--zoom-factor));
+            transform: translateY(-50%);
+        }
+        .music-bar.repeat-start::before, .music-bar.repeat-end::before {
+            top: 40%;
+        }
+        .music-bar.repeat-start::after, .music-bar.repeat-end::after {
+            top: 60%;
+        }
+
+        .volta-bracket {
+            position: absolute;
+            top: calc(-2.4em * var(--zoom-factor)); /* Moved higher, above bar number */
+            left: 0;
+            height: calc(1em * var(--zoom-factor));
+            border-top: calc(1.5px * var(--zoom-factor)) solid #1a202c;
+            border-left: calc(1.5px * var(--zoom-factor)) solid #1a202c;
+            padding-left: calc(0.4em * var(--zoom-factor));
+            font-size: calc(0.9em * var(--zoom-factor));
+            font-weight: 700;
+            color: #1a202c;
+            z-index: 50;
+        }
+        .volta-bracket.is-end {
+             border-right: calc(1.5px * var(--zoom-factor)) solid #1a202c;
+        }
+        .volta-bracket-end-hook {
+            position: absolute;
+            top: 0;
+            right: calc(-1.5px * var(--zoom-factor));
+            height: calc(0.6em * var(--zoom-factor)); /* Slightly longer hook */
+            width: calc(1.5px * var(--zoom-factor));
+            background-color: #1a202c;
+        }
 
     </style>
 </head>
@@ -374,6 +435,7 @@
                 <div><h4>Dasar</h4><ul><li><code>1-7</code> untuk not.</li><li><code>0</code> untuk istirahat (diam), <code>o</code> untuk istirahat panjang (titik).</li><li>Spasi atau <code>|</code> untuk pemisah ketukan/bar.</li></ul></div>
                 <div><h4>Oktaf & Aksidental</h4><ul><li><code>1.</code> (tinggi), <code>1,</code> (rendah). Ganda juga bisa.</li><li><code>4/</code> (kres), <code>7b</code> (mol).</li></ul></div>
                 <div><h4>Durasi & Artikulasi</h4><ul><li><code>12</code> (1/8), <code>1234</code> (1/16), <code>123</code> (triplet).</li><li><code>1^</code> (staccato).</li><li><code>1~</code> (fermata/tahan).</li></ul></div>
+                 <div><h4>Pengulangan (Layer 1)</h4><ul><li><code>[</code> untuk mulai ulang, <code>]</code> untuk akhir ulang.</li><li><code>_a, _b, _c, _d</code> untuk ending 1-4.</li><li>Contoh: <code>[ 1 2 | _a 3 4 ] | _b 5 0 |</code></li></ul></div>
                  <div><h4>Fitur Editor</h4><ul><li>Undo/Redo: <code>Ctrl/Cmd + Z</code> & <code>Y</code>.</li><li>Gunakan tombol <code>+/-</code> di ujung tiap baris untuk mengubah jumlah bar di baris tersebut.</li></ul></div>
              </div>
         </div>
@@ -540,37 +602,88 @@
 
         // --- NOTATION PROCESSING & DISPLAY ---
         function processNotes(notation) {
-            const tokens = notation.replace(/\|/g, ' ').split(/\s+/g).filter(n => n !== ''); const processedNotes = [];
+            const tokens = notation.replace(/\|/g, ' ').split(/\s+/g).filter(n => n !== '');
+            const processed = { notes: [], annotations: [] };
             const noteRegex = /([1-7o0])([\/b]?)([.,]*)(\^?)(\~?)/g;
+
             tokens.forEach(token => {
+                if (['[', ']', '_a', '_b', '_c', '_d'].includes(token)) {
+                    processed.annotations.push(token);
+                    return;
+                }
                 const notesInToken = [...token.matchAll(noteRegex)].map(m => m);
                 if (notesInToken.length > 0) {
                     if (notesInToken.length === 2) {
                         const groupData = notesInToken.map(m => { const [_, note, acc, oct, stac, fermata] = m; return { visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), isFermata: fermata.includes('~'), duration: 0.5 }; });
-                        processedNotes.push({ type: 'group', notes: groupData, duration: 1 });
+                        processed.notes.push({ type: 'group', notes: groupData, duration: 1 });
                     } else if (notesInToken.length === 3) {
                         const groupData = notesInToken.map(m => { const [_, note, acc, oct, stac, fermata] = m; return { visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), isFermata: fermata.includes('~'), duration: 1/3 }; });
-                        processedNotes.push({ type: 'triplet', notes: groupData, duration: 1 });
+                        processed.notes.push({ type: 'triplet', notes: groupData, duration: 1 });
                     } else if (notesInToken.length === 4) {
                         const groupData = notesInToken.map(m => { const [_, note, acc, oct, stac, fermata] = m; return { visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), isFermata: fermata.includes('~'), duration: 0.25 }; });
-                        processedNotes.push({ type: 'group', notes: groupData, duration: 1 });
+                        processed.notes.push({ type: 'group', notes: groupData, duration: 1 });
                     } else if (notesInToken.length === 1) {
                         const [_, note, acc, oct, stac, fermata] = notesInToken[0];
-                        processedNotes.push({ type: 'single', visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), isFermata: fermata.includes('~'), duration: 1 });
+                        processed.notes.push({ type: 'single', visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), isFermata: fermata.includes('~'), duration: 1 });
                     }
                 }
             });
-            return processedNotes;
+            return processed;
         }
 
-        function getNotesPerBar(notation, birama) {
-            const processedNotes = processNotes(notation); let bars = []; let currentBar = []; let currentBarBeats = 0; const beatsPerBar = parseInt(birama);
-            for (const note of processedNotes) {
-                if (currentBarBeats + note.duration > beatsPerBar && currentBar.length > 0) { bars.push(currentBar); currentBar = []; currentBarBeats = 0; }
-                currentBar.push(note); currentBarBeats += note.duration;
-                if (currentBarBeats >= beatsPerBar) { bars.push(currentBar); currentBar = []; currentBarBeats = 0; }
+        function getBars(layerNotation, birama) {
+            const beatsPerBar = parseInt(birama);
+            const tokens = layerNotation.replace(/\|/g, ' | ').split(/\s+/g).filter(n => n !== '');
+
+            let bars = [];
+            let currentBar = { notes: [], annotations: [] };
+            let currentBarBeats = 0;
+
+            const noteRegex = /([1-7o0])([\/b]?)([.,]*)(\^?)(\~?)/g;
+
+            const pushBar = () => {
+                if (currentBar.notes.length > 0 || currentBar.annotations.length > 0) {
+                    bars.push(currentBar);
+                }
+                currentBar = { notes: [], annotations: [] };
+                currentBarBeats = 0;
+            };
+
+            for (const token of tokens) {
+                if (token === '|') {
+                    pushBar();
+                    continue;
+                }
+                
+                if (['[', ']', '_a', '_b', '_c', '_d'].includes(token)) {
+                    currentBar.annotations.push(token);
+                    continue;
+                }
+
+                const notesInToken = [...token.matchAll(noteRegex)];
+                if (notesInToken.length > 0) {
+                    let noteData;
+                    if (notesInToken.length === 2) {
+                        const groupData = notesInToken.map(m => { const [_, note, acc, oct, stac, fermata] = m; return { visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), isFermata: fermata.includes('~'), duration: 0.5 }; });
+                        noteData = { type: 'group', notes: groupData, duration: 1 };
+                    } else if (notesInToken.length === 3) {
+                        const groupData = notesInToken.map(m => { const [_, note, acc, oct, stac, fermata] = m; return { visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), isFermata: fermata.includes('~'), duration: 1/3 }; });
+                        noteData = { type: 'triplet', notes: groupData, duration: 1 };
+                    } else if (notesInToken.length === 4) {
+                        const groupData = notesInToken.map(m => { const [_, note, acc, oct, stac, fermata] = m; return { visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), isFermata: fermata.includes('~'), duration: 0.25 }; });
+                        noteData = { type: 'group', notes: groupData, duration: 1 };
+                    } else {
+                        const [_, note, acc, oct, stac, fermata] = notesInToken[0];
+                        noteData = { type: 'single', visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), isFermata: fermata.includes('~'), duration: 1 };
+                    }
+
+                    if (currentBarBeats + noteData.duration > beatsPerBar) { pushBar(); }
+                    currentBar.notes.push(noteData);
+                    currentBarBeats += noteData.duration;
+                    if (currentBarBeats >= beatsPerBar) { pushBar(); }
+                }
             }
-            if (currentBar.length > 0) { bars.push(currentBar); }
+            if (currentBar.notes.length > 0 || currentBar.annotations.length > 0) { pushBar(); }
             return bars;
         }
         
@@ -578,9 +691,9 @@
             let innerHtml = ''; const noteClass = isBass ? 'bass-note' : '';
 
             if (noteData.isFermata) {
-                let topOffset = -1.8;
+                let topOffset = -1.6;
                 if (!noteData.isStaccato && !noteData.visualModifier.includes('.')) {
-                    topOffset = -1.2;
+                    topOffset = -1.0;
                 }
                 innerHtml += `<span style="position: absolute; font-size: calc(1.8em * var(--zoom-factor)); top: calc(${topOffset}em * var(--zoom-factor)); left: 50%; transform: translateX(-50%); z-index: 51; color: #1a202c; line-height: 1;">𝄐</span>`;
             }
@@ -627,7 +740,6 @@
                     placeholder.textContent = 'PRATINJAU KOSONG';
                     combinedSheetContainer.appendChild(placeholder);
                 }
-                 // Make sure fullscreen button is not removed
                 combinedSheetContainer.appendChild(fullscreenBtn);
                 return;
             } else {
@@ -636,7 +748,8 @@
             }
 
             const birama = parseInt(biramaSelect.value.split('/')[0]);
-            const allLayersBars = layers.map(layer => getNotesPerBar(layer.notation, birama));
+            const allLayersBars = layers.map(layer => getBars(layer.notation, birama));
+            const annotationBars = layers.length > 0 ? allLayersBars[0] : [];
             const maxBars = Math.max(0, ...allLayersBars.map(bars => bars.length));
 
             if (maxBars === 0) {
@@ -650,7 +763,6 @@
                 return;
             }
 
-            // --- 1. Generate all row wrappers in memory ---
             const allRowWrappers = [];
             const layoutGuideLayer = layers[0];
             const globalBarsPerRow = parseInt(barsPerRowSelect.value);
@@ -674,13 +786,49 @@
                     const barIndex = barCursor + i;
                     const musicBarDiv = document.createElement('div');
                     musicBarDiv.className = 'music-bar';
+                    musicBarDiv.dataset.barIndex = barIndex;
+
+                    const annotationData = annotationBars[barIndex];
+                    if (annotationData && annotationData.annotations.length > 0) {
+                        if (annotationData.annotations.includes('[')) musicBarDiv.classList.add('repeat-start');
+                        if (annotationData.annotations.includes(']')) musicBarDiv.classList.add('repeat-end');
+                        
+                        let voltaType = null;
+                        if (annotationData.annotations.includes('_a')) voltaType = '_a';
+                        else if (annotationData.annotations.includes('_b')) voltaType = '_b';
+                        else if (annotationData.annotations.includes('_c')) voltaType = '_c';
+                        else if (annotationData.annotations.includes('_d')) voltaType = '_d';
+
+                        if (voltaType) {
+                             const voltaDiv = document.createElement('div');
+                             voltaDiv.className = 'volta-bracket';
+                             
+                             let voltaText = '';
+                             switch (voltaType) {
+                                case '_a': voltaText = '1.'; break;
+                                case '_b': voltaText = '2.'; break;
+                                case '_c': voltaText = '3.'; break;
+                                case '_d': voltaText = '4.'; break;
+                             }
+                             voltaDiv.textContent = voltaText;
+                             
+                             const nextBarAnnotation = annotationBars[barIndex + 1];
+                             if (!nextBarAnnotation || !nextBarAnnotation.annotations.includes(voltaType)) {
+                                 voltaDiv.classList.add('is-end');
+                                 const endHook = document.createElement('div');
+                                 endHook.className = 'volta-bracket-end-hook';
+                                 voltaDiv.appendChild(endHook);
+                             }
+                             musicBarDiv.appendChild(voltaDiv);
+                        }
+                    }
                     
                     const barNumberSpan = document.createElement('span');
                     barNumberSpan.className = 'bar-number';
                     barNumberSpan.textContent = barIndex + 1;
                     musicBarDiv.appendChild(barNumberSpan);
 
-                    if (i === rowBarsCount - 1) {
+                    if (i === rowBarsCount - 1 && !musicBarDiv.classList.contains('repeat-end')) {
                         musicBarDiv.style.borderRight = `calc(2px * var(--zoom-factor)) solid #64748b`;
                     }
                     
@@ -689,7 +837,7 @@
                         layerBarNotesDiv.className = 'layer-bar-notes';
                         const barData = layerBars[barIndex];
                         if(barData) {
-                            layerBarNotesDiv.innerHTML = generateBarContentHtml(barData, layers[layerIndex].instrument === 'bass');
+                            layerBarNotesDiv.innerHTML = generateBarContentHtml(barData.notes, layers[layerIndex].instrument === 'bass');
                         }
                         musicBarDiv.appendChild(layerBarNotesDiv);
                     });
@@ -711,7 +859,6 @@
                 rowIndex++;
             }
 
-            // --- 2. Paginate the generated rows ---
             let currentPage;
             let currentPageContent;
             let pageNumber = 0;
@@ -758,7 +905,6 @@
                 }
             });
             
-            // --- Tambahkan Watermark ke halaman terakhir ---
             const allRenderedPages = combinedSheetContainer.querySelectorAll('.page');
             if (allRenderedPages.length > 0) {
                 const lastPage = allRenderedPages[allRenderedPages.length - 1];
@@ -770,7 +916,6 @@
                 }
             }
             
-            // --- 3. Resize bars within each row ---
             requestAnimationFrame(() => {
                 const allPages = combinedSheetContainer.querySelectorAll('.page');
                 allPages.forEach(page => {
@@ -859,9 +1004,10 @@
             let maxDuration = 0;
 
             layers.forEach(layer => {
-                const processedNotes = processNotes(layer.notation); if (processedNotes.length === 0) return;
+                const processed = processNotes(layer.notation);
+                if (processed.notes.length === 0) return;
                 const notesInTime = []; let currentTime = 0; const player = TonePlayers[layer.instrument]; if (!player) return;
-                processedNotes.forEach(noteData => {
+                processed.notes.forEach(noteData => {
                     if (noteData.type === 'group' || noteData.type === 'triplet') {
                         noteData.notes.forEach(n => { const toneNote = getToneNote(n, layer); if (toneNote) { notesInTime.push({ time: currentTime, note: toneNote, duration: n.duration * quarterNoteDuration }); } currentTime += n.duration * quarterNoteDuration; });
                     } else { const toneNote = getToneNote(noteData, layer); if (toneNote) { notesInTime.push({ time: currentTime, note: toneNote, duration: noteData.duration * quarterNoteDuration }); } currentTime += noteData.duration * quarterNoteDuration; }
@@ -920,7 +1066,7 @@
             renderAll();
         }
         
-        // --- EXPORT & VIEW FUNCTIONALITY ---
+        // --- VIEW & EXPORT FUNCTIONALITY ---
         function togglePseudoFullscreen() {
             const body = document.body;
             const iconEnter = document.getElementById('fullscreen-enter-icon');
@@ -1118,7 +1264,7 @@
             return htmlPrefix + htmlOutput;
         }
 
-        // --- EVENT LISTENERS ---
+        // --- EVENT LISTENERS & INITIAL SETUP ---
         function addEventListeners() {
             addLayerBtn.addEventListener('click', addLayer);
             playBtn.addEventListener('click', playAllLayers);
@@ -1183,7 +1329,7 @@
                 }
             }, true);
 
-            combinedSheetContainer.addEventListener('click', (e) => {
+             combinedSheetContainer.addEventListener('click', (e) => {
                  if (e.target.classList.contains('row-layout-btn')) {
                     const rowWrapper = e.target.closest('.music-row-wrapper');
                     if (!rowWrapper || layers.length === 0) return;
