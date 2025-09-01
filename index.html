@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://tonejs.github.io/build/Tone.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -147,6 +148,7 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.15);
             display: flex;
             flex-direction: column;
+            position: relative; /* Diperlukan untuk watermark */
         }
 
         .page-content {
@@ -234,6 +236,18 @@
         .row-layout-btn { border: none; background: #eaf0f6; color: #64748b; width: 1.2rem; height: 1.2rem; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; line-height: 1; transition: background-color 0.2s; }
         .row-layout-btn:hover { background: #dde5ed; }
         
+        .page-watermark {
+            position: absolute;
+            bottom: 1.5rem;
+            right: 2rem;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #a0aec0;
+            opacity: 0.9;
+            pointer-events: none;
+            z-index: 100;
+        }
+
         #floating-editor-window {
             position: fixed; top: 150px; right: 40px; width: 600px; max-width: 90vw; max-height: 70vh; background-color: var(--bg-secondary); border-radius: 1.5rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1); z-index: 1000; display: flex; flex-direction: column; border: 1px solid var(--border-color); transition: width 0.3s ease-in-out, height 0.3s ease-in-out; min-width: 300px; min-height: 200px;
         }
@@ -361,7 +375,7 @@
                 <div class="flex flex-wrap justify-end items-center gap-4 mt-6">
                     <button id="playBtn" class="btn btn-primary">Mainkan</button>
                     <button id="downloadPngBtn" class="btn btn-primary">Unduh PNG</button>
-                    <button id="downloadWavBtn" class="btn btn-primary">Unduh WAV</button>
+                    <button id="downloadPdfBtn" class="btn btn-primary">Unduh PDF</button>
                 </div>
             </div>
 
@@ -401,12 +415,12 @@
         }
 
         // --- GLOBAL VARIABLES & DOM ELEMENTS ---
-        let playBtn, addLayerBtn, downloadPngBtn, downloadWavBtn, titleInput, arrangerInput, composerInput, biramaSelect, bpmInput, combinedSheetContainer, layersEditorContainer, barsPerRowSelect, undoBtn, redoBtn;
+        let playBtn, addLayerBtn, downloadPngBtn, downloadPdfBtn, titleInput, arrangerInput, composerInput, biramaSelect, bpmInput, combinedSheetContainer, layersEditorContainer, barsPerRowSelect, undoBtn, redoBtn;
 
         function assignGlobalDOMElements() {
             playBtn = document.getElementById('playBtn');
             downloadPngBtn = document.getElementById('downloadPngBtn');
-            downloadWavBtn = document.getElementById('downloadWavBtn');
+            downloadPdfBtn = document.getElementById('downloadPdfBtn');
             titleInput = document.getElementById('title');
             arrangerInput = document.getElementById('arranger');
             composerInput = document.getElementById('composer');
@@ -546,10 +560,19 @@
         }
 
         function renderCombinedSheet() {
-            combinedSheetContainer.innerHTML = '';
-            if (layers.length === 0) {
-                combinedSheetContainer.innerHTML = '<p class="text-gray-500 text-2xl font-bold p-4 text-center opacity-50">PRATINJAU KOSONG</p>';
+            combinedSheetContainer.querySelectorAll('.page, .music-row-wrapper').forEach(el => el.remove());
+            
+            if (layers.length === 0 || layers.every(l => l.notation.trim() === '')) {
+                if(!combinedSheetContainer.querySelector('.placeholder-text')) {
+                    const placeholder = document.createElement('p');
+                    placeholder.className = 'placeholder-text text-gray-500 text-2xl font-bold p-4 text-center opacity-50';
+                    placeholder.textContent = 'PRATINJAU KOSONG';
+                    combinedSheetContainer.appendChild(placeholder);
+                }
                 return;
+            } else {
+                 const placeholder = combinedSheetContainer.querySelector('.placeholder-text');
+                 if(placeholder) placeholder.remove();
             }
 
             const birama = parseInt(biramaSelect.value.split('/')[0]);
@@ -557,7 +580,12 @@
             const maxBars = Math.max(0, ...allLayersBars.map(bars => bars.length));
 
             if (maxBars === 0) {
-                combinedSheetContainer.innerHTML = '<p class="text-gray-500 text-2xl font-bold p-4 text-center opacity-50">PRATINJAU KOSONG</p>';
+                 if(!combinedSheetContainer.querySelector('.placeholder-text')) {
+                    const placeholder = document.createElement('p');
+                    placeholder.className = 'placeholder-text text-gray-500 text-2xl font-bold p-4 text-center opacity-50';
+                    placeholder.textContent = 'PRATINJAU KOSONG';
+                    combinedSheetContainer.appendChild(placeholder);
+                }
                 return;
             }
 
@@ -668,6 +696,18 @@
                     currentPageContent.appendChild(row);
                 }
             });
+            
+            // --- Tambahkan Watermark ke halaman terakhir ---
+            const allRenderedPages = combinedSheetContainer.querySelectorAll('.page');
+            if (allRenderedPages.length > 0) {
+                const lastPage = allRenderedPages[allRenderedPages.length - 1];
+                if (!lastPage.querySelector('.page-watermark')) {
+                    const watermarkDiv = document.createElement('div');
+                    watermarkDiv.className = 'page-watermark';
+                    watermarkDiv.textContent = 'Dibuat dengan ABIMANTRA NOT ANGKA | by Yoga Andika';
+                    lastPage.appendChild(watermarkDiv);
+                }
+            }
             
             // --- 3. Resize bars within each row ---
             requestAnimationFrame(() => {
@@ -819,10 +859,13 @@
             renderAll();
         }
         
-        // --- EXPORT FUNCTIONALITY ---
         async function downloadAsPng() {
             downloadPngBtn.disabled = true;
             downloadPngBtn.textContent = 'Memproses...';
+
+            // Sembunyikan kontrol +/- agar tidak ikut tercapture
+            const allControls = document.querySelectorAll('.row-layout-controls');
+            allControls.forEach(c => c.style.visibility = 'hidden');
 
             try {
                 const pages = document.querySelectorAll('#combined-sheet-container .page');
@@ -831,30 +874,54 @@
                     return;
                 }
 
-                const canvases = [];
-                for (const page of pages) {
-                    const canvas = await html2canvas(page, { scale: 2 });
-                    canvases.push(canvas);
-                }
+                // Langkah 1: Tangkap setiap halaman sebagai canvas terpisah
+                const pageCanvases = await Promise.all(
+                    Array.from(pages).map(page => html2canvas(page, {
+                        scale: 3, // Resolusi tinggi
+                        useCORS: true,
+                        backgroundColor: null // Gunakan background dari elemen itu sendiri
+                    }))
+                );
 
-                const totalHeight = canvases.reduce((sum, canvas) => sum + canvas.height, 0);
-                const maxWidth = Math.max(...canvases.map(c => c.width));
+                // Langkah 2: Hitung dimensi gambar akhir
+                const margin = 30; // Jarak antar halaman
+                const totalHeight = pageCanvases.reduce((sum, canvas) => sum + canvas.height, 0) + (margin * (pageCanvases.length - 1));
+                const maxWidth = Math.max(...pageCanvases.map(c => c.width));
 
+                // Langkah 3: Buat canvas akhir dan gabungkan semua halaman
                 const finalCanvas = document.createElement('canvas');
                 finalCanvas.width = maxWidth;
                 finalCanvas.height = totalHeight;
                 const ctx = finalCanvas.getContext('2d');
-                ctx.fillStyle = 'white';
+                
+                // Isi latar belakang dengan warna tema
+                ctx.fillStyle = getComputedStyle(document.getElementById('combined-sheet-container')).getPropertyValue('background-color');
                 ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
 
                 let currentY = 0;
-                canvases.forEach(canvas => {
-                    ctx.drawImage(canvas, 0, currentY);
-                    currentY += canvas.height;
+                pageCanvases.forEach(canvas => {
+                    const xOffset = (maxWidth - canvas.width) / 2; // Pusatkan halaman
+                    ctx.drawImage(canvas, xOffset, currentY);
+                    currentY += canvas.height + margin;
                 });
+
+                // Langkah 4: Tambahkan watermark dengan teks yang diminta
+                const watermarkText = "Dibuat dengan ABIMANTRA NOT ANGKA | by Yoga Andika";
+                const fontSize = finalCanvas.width * 0.015; // Sedikit lebih besar
+                ctx.font = `600 ${fontSize}px Poppins, sans-serif`;
                 
+                const isDarkMode = document.body.classList.contains('dark');
+                ctx.fillStyle = isDarkMode ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)'; // Lebih jelas
+                
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'bottom';
+                
+                const padding = finalCanvas.width * 0.02;
+                ctx.fillText(watermarkText, finalCanvas.width - padding, finalCanvas.height - padding);
+
+                // Langkah 5: Picu unduhan
                 const titleValue = titleInput.value || 'notasi-lagu';
-                const image = finalCanvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+                const image = finalCanvas.toDataURL("image/png");
                 const link = document.createElement('a');
                 link.download = `${titleValue.toLowerCase().replace(/\s/g, '-')}.png`;
                 link.href = image;
@@ -867,15 +934,90 @@
             } finally {
                 downloadPngBtn.disabled = false;
                 downloadPngBtn.textContent = 'Unduh PNG';
+                // Tampilkan kembali kontrol
+                allControls.forEach(c => c.style.visibility = '');
+            }
+        }
+
+        async function downloadAsPdf() {
+            downloadPdfBtn.disabled = true;
+            downloadPdfBtn.textContent = 'Memproses...';
+
+            const allControls = document.querySelectorAll('.row-layout-controls');
+            allControls.forEach(c => c.style.visibility = 'hidden');
+
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('p', 'mm', 'a4');
+
+                const pages = document.querySelectorAll('#combined-sheet-container .page');
+                if (pages.length === 0) {
+                    showMessageBox('Tidak ada notasi untuk diunduh.', 'error');
+                    return;
+                }
+
+                for (let i = 0; i < pages.length; i++) {
+                    const page = pages[i];
+                    const canvas = await html2canvas(page, {
+                        scale: 3,
+                        useCORS: true,
+                        backgroundColor: '#ffffff' // Force white background for PDF
+                    });
+
+                    const imgData = canvas.toDataURL('image/png');
+                    const imgProps = doc.getImageProperties(imgData);
+                    const pdfWidth = doc.internal.pageSize.getWidth();
+                    const pdfHeight = doc.internal.pageSize.getHeight();
+                    const margin = 10;
+                    
+                    const availableWidth = pdfWidth - margin * 2;
+                    const availableHeight = pdfHeight - margin * 2;
+
+                    const imgRatio = imgProps.width / imgProps.height;
+                    const pageRatio = availableWidth / availableHeight;
+
+                    let finalWidth, finalHeight;
+                    if(imgRatio > pageRatio){
+                        finalWidth = availableWidth;
+                        finalHeight = availableWidth / imgRatio;
+                    } else {
+                        finalHeight = availableHeight;
+                        finalWidth = availableHeight * imgRatio;
+                    }
+
+                    const x = (pdfWidth - finalWidth) / 2;
+                    const y = (pdfHeight - finalHeight) / 2;
+                    
+                    if (i > 0) {
+                        doc.addPage();
+                    }
+                    doc.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
+                }
+                
+                // Add watermark to the last page
+                const watermarkText = 'Dibuat dengan ABIMANTRA NOT ANGKA | by Yoga Andika';
+                doc.setPage(doc.internal.getNumberOfPages());
+                doc.setFontSize(8);
+                doc.setTextColor(150);
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                doc.text(watermarkText, pageWidth - 10, pageHeight - 10, { align: 'right' });
+
+
+                const titleValue = titleInput.value || 'notasi-lagu';
+                doc.save(`${titleValue.toLowerCase().replace(/\s/g, '-')}.pdf`);
+                showMessageBox('PDF berhasil diunduh!', 'success');
+
+            } catch (error) {
+                console.error("Gagal mengunduh PDF:", error);
+                showMessageBox('Gagal membuat file PDF.', 'error');
+            } finally {
+                downloadPdfBtn.disabled = false;
+                downloadPdfBtn.textContent = 'Unduh PDF';
+                allControls.forEach(c => c.style.visibility = '');
             }
         }
         
-        async function downloadAudio() {
-            // Function content unchanged
-        }
-        
-        function bufferToWav(buffer) { let numOfChan = buffer.numberOfChannels, len = buffer.length * numOfChan * 2 + 44, wavBuffer = new ArrayBuffer(len), view = new DataView(wavBuffer), channels = [], i, sample, offset = 0, pos = 0; setUint32(0x46464952); setUint32(len - 8); setUint32(0x45564157); setUint32(0x20746d66); setUint32(16); setUint16(1); setUint16(numOfChan); setUint32(buffer.sampleRate); setUint32(buffer.sampleRate * 2 * numOfChan); setUint16(numOfChan * 2); setUint16(16); setUint32(0x61746d61); setUint32(len - pos - 4); for (i = 0; i < buffer.numberOfChannels; i++) channels.push(buffer.getChannelData(i)); while (pos < len) { for (i = 0; i < numOfChan; i++) { sample = Math.max(-1, Math.min(1, channels[i][offset])); sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767) | 0; view.setInt16(pos, sample, true); pos += 2; } offset++ } return new Blob([view], { type: 'audio/wav' }); function setUint16(data) { view.setUint16(pos, data, true); pos += 2; } function setUint32(data) { view.setUint32(pos, data, true); pos += 4; } }
-
         // --- EDITOR FORMATTING & CURSOR MANAGEMENT ---
         function formatNotationWithAutoBars(notation, biramaValue) {
             const beatsPerBar = parseInt(biramaValue.split('/')[0]);
@@ -914,7 +1056,7 @@
             addLayerBtn.addEventListener('click', addLayer);
             playBtn.addEventListener('click', playAllLayers);
             downloadPngBtn.addEventListener('click', downloadAsPng);
-            downloadWavBtn.addEventListener('click', downloadAudio);
+            downloadPdfBtn.addEventListener('click', downloadAsPdf);
             undoBtn.addEventListener('click', undo);
             redoBtn.addEventListener('click', redo);
             [titleInput, composerInput, arrangerInput, biramaSelect, bpmInput, barsPerRowSelect].forEach(el => { el.addEventListener('change', renderAll); });
@@ -1134,5 +1276,4 @@
     </script>
 </body>
 </html>
-
 
