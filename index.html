@@ -299,6 +299,48 @@
             border-color: var(--accent-color);
         }
 
+        /* Custom Fullscreen Mode Styles */
+        body.fullscreen-mode {
+            padding: 0;
+            overflow: hidden;
+        }
+        body.fullscreen-mode .container {
+            max-width: 100%;
+            height: 100vh;
+            padding: 0;
+            border-radius: 0;
+            display: block;
+        }
+        body.fullscreen-mode #app-title-wrapper,
+        body.fullscreen-mode #instructions-panel,
+        body.fullscreen-mode #main-controls-wrapper,
+        body.fullscreen-mode #floating-editor-window,
+        body.fullscreen-mode .main-watermark,
+        body.fullscreen-mode #preview-wrapper > .flex {
+            display: none;
+        }
+        body.fullscreen-mode #main-content-area,
+        body.fullscreen-mode #preview-wrapper {
+            height: 100%;
+            margin: 0;
+        }
+        body.fullscreen-mode #combined-sheet-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 0;
+            padding-top: 5rem;
+            padding-bottom: 2rem;
+        }
+        body.fullscreen-mode #fullscreen-btn {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1001;
+        }
+
     </style>
 </head>
 <body class="bg-gray-100">
@@ -331,7 +373,7 @@
              <div class="instructions-content space-y-3">
                 <div><h4>Dasar</h4><ul><li><code>1-7</code> untuk not.</li><li><code>0</code> untuk istirahat (diam), <code>o</code> untuk istirahat panjang (titik).</li><li>Spasi atau <code>|</code> untuk pemisah ketukan/bar.</li></ul></div>
                 <div><h4>Oktaf & Aksidental</h4><ul><li><code>1.</code> (tinggi), <code>1,</code> (rendah). Ganda juga bisa.</li><li><code>4/</code> (kres), <code>7b</code> (mol).</li></ul></div>
-                <div><h4>Durasi & Artikulasi</h4><ul><li><code>12</code> (1/8), <code>1234</code> (1/16), <code>123</code> (triplet).</li><li><code>1^</code> (staccato).</li></ul></div>
+                <div><h4>Durasi & Artikulasi</h4><ul><li><code>12</code> (1/8), <code>1234</code> (1/16), <code>123</code> (triplet).</li><li><code>1^</code> (staccato).</li><li><code>1~</code> (fermata/tahan).</li></ul></div>
                  <div><h4>Fitur Editor</h4><ul><li>Undo/Redo: <code>Ctrl/Cmd + Z</code> & <code>Y</code>.</li><li>Gunakan tombol <code>+/-</code> di ujung tiap baris untuk mengubah jumlah bar di baris tersebut.</li></ul></div>
              </div>
         </div>
@@ -393,6 +435,10 @@
                 </div>
                 
                 <div id="combined-sheet-container" class="not-container">
+                     <button id="fullscreen-btn" class="absolute top-4 right-4 z-50 p-2 rounded-full bg-white/60 backdrop-blur-sm hover:bg-white/90 dark:bg-black/40 dark:hover:bg-black/70 transition-colors duration-200" title="Layar Penuh">
+                        <svg id="fullscreen-enter-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+                        <svg id="fullscreen-exit-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 0-2-2h-3M3 16h3a2 2 0 0 0 2-2v-3"/></svg>
+                    </button>
                     <!-- Unified score preview will be rendered here -->
                 </div>
 
@@ -415,12 +461,13 @@
         }
 
         // --- GLOBAL VARIABLES & DOM ELEMENTS ---
-        let playBtn, addLayerBtn, downloadPngBtn, downloadPdfBtn, titleInput, arrangerInput, composerInput, biramaSelect, bpmInput, combinedSheetContainer, layersEditorContainer, barsPerRowSelect, undoBtn, redoBtn;
+        let playBtn, addLayerBtn, downloadPngBtn, downloadPdfBtn, titleInput, arrangerInput, composerInput, biramaSelect, bpmInput, combinedSheetContainer, layersEditorContainer, barsPerRowSelect, undoBtn, redoBtn, fullscreenBtn;
 
         function assignGlobalDOMElements() {
             playBtn = document.getElementById('playBtn');
             downloadPngBtn = document.getElementById('downloadPngBtn');
             downloadPdfBtn = document.getElementById('downloadPdfBtn');
+            fullscreenBtn = document.getElementById('fullscreen-btn');
             titleInput = document.getElementById('title');
             arrangerInput = document.getElementById('arranger');
             composerInput = document.getElementById('composer');
@@ -494,21 +541,23 @@
         // --- NOTATION PROCESSING & DISPLAY ---
         function processNotes(notation) {
             const tokens = notation.replace(/\|/g, ' ').split(/\s+/g).filter(n => n !== ''); const processedNotes = [];
-            const noteRegex = /([1-7o0])([\/b]?)([.,]*)(\^?)/g;
+            const noteRegex = /([1-7o0])([\/b]?)([.,]*)(\^?)(\~?)/g;
             tokens.forEach(token => {
                 const notesInToken = [...token.matchAll(noteRegex)].map(m => m);
-                if (notesInToken.length === 2) {
-                    const groupData = notesInToken.map(m => { const [_, note, acc, oct, stac] = m; return { visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), duration: 0.5 }; });
-                    processedNotes.push({ type: 'group', notes: groupData, duration: 1 });
-                } else if (notesInToken.length === 3) {
-                    const groupData = notesInToken.map(m => { const [_, note, acc, oct, stac] = m; return { visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), duration: 1/3 }; });
-                    processedNotes.push({ type: 'triplet', notes: groupData, duration: 1 });
-                } else if (notesInToken.length === 4) {
-                    const groupData = notesInToken.map(m => { const [_, note, acc, oct, stac] = m; return { visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), duration: 0.25 }; });
-                    processedNotes.push({ type: 'group', notes: groupData, duration: 1 });
-                } else if (notesInToken.length === 1) {
-                    const [_, note, acc, oct, stac] = notesInToken[0];
-                    processedNotes.push({ type: 'single', visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), duration: 1 });
+                if (notesInToken.length > 0) {
+                    if (notesInToken.length === 2) {
+                        const groupData = notesInToken.map(m => { const [_, note, acc, oct, stac, fermata] = m; return { visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), isFermata: fermata.includes('~'), duration: 0.5 }; });
+                        processedNotes.push({ type: 'group', notes: groupData, duration: 1 });
+                    } else if (notesInToken.length === 3) {
+                        const groupData = notesInToken.map(m => { const [_, note, acc, oct, stac, fermata] = m; return { visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), isFermata: fermata.includes('~'), duration: 1/3 }; });
+                        processedNotes.push({ type: 'triplet', notes: groupData, duration: 1 });
+                    } else if (notesInToken.length === 4) {
+                        const groupData = notesInToken.map(m => { const [_, note, acc, oct, stac, fermata] = m; return { visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), isFermata: fermata.includes('~'), duration: 0.25 }; });
+                        processedNotes.push({ type: 'group', notes: groupData, duration: 1 });
+                    } else if (notesInToken.length === 1) {
+                        const [_, note, acc, oct, stac, fermata] = notesInToken[0];
+                        processedNotes.push({ type: 'single', visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), isFermata: fermata.includes('~'), duration: 1 });
+                    }
                 }
             });
             return processedNotes;
@@ -527,6 +576,15 @@
         
         function createNoteBlockHtml(noteData, isBass) {
             let innerHtml = ''; const noteClass = isBass ? 'bass-note' : '';
+
+            if (noteData.isFermata) {
+                let topOffset = -1.8;
+                if (!noteData.isStaccato && !noteData.visualModifier.includes('.')) {
+                    topOffset = -1.2;
+                }
+                innerHtml += `<span style="position: absolute; font-size: calc(1.8em * var(--zoom-factor)); top: calc(${topOffset}em * var(--zoom-factor)); left: 50%; transform: translateX(-50%); z-index: 51; color: #1a202c; line-height: 1;">𝄐</span>`;
+            }
+
             if (noteData.isStaccato) innerHtml += `<span class="staccato-marker">^</span>`;
             if (noteData.visualSharp) innerHtml += `<span class="accidental-symbol sharp-symbol">&#x2044;</span>`;
             else if (noteData.visualFlat) innerHtml += `<span class="accidental-symbol flat-symbol">\\</span>`;
@@ -569,6 +627,8 @@
                     placeholder.textContent = 'PRATINJAU KOSONG';
                     combinedSheetContainer.appendChild(placeholder);
                 }
+                 // Make sure fullscreen button is not removed
+                combinedSheetContainer.appendChild(fullscreenBtn);
                 return;
             } else {
                  const placeholder = combinedSheetContainer.querySelector('.placeholder-text');
@@ -586,6 +646,7 @@
                     placeholder.textContent = 'PRATINJAU KOSONG';
                     combinedSheetContainer.appendChild(placeholder);
                 }
+                combinedSheetContainer.appendChild(fullscreenBtn);
                 return;
             }
 
@@ -680,7 +741,7 @@
                 contentDiv.className = 'page-content';
                 pageDiv.appendChild(contentDiv);
                 
-                combinedSheetContainer.appendChild(pageDiv);
+                combinedSheetContainer.insertBefore(pageDiv, fullscreenBtn);
                 currentPage = pageDiv;
                 currentPageContent = contentDiv;
                 void currentPage.offsetHeight;
@@ -859,12 +920,28 @@
             renderAll();
         }
         
+        // --- EXPORT & VIEW FUNCTIONALITY ---
+        function togglePseudoFullscreen() {
+            const body = document.body;
+            const iconEnter = document.getElementById('fullscreen-enter-icon');
+            const iconExit = document.getElementById('fullscreen-exit-icon');
+
+            body.classList.toggle('fullscreen-mode');
+
+            if (body.classList.contains('fullscreen-mode')) {
+                iconEnter.classList.add('hidden');
+                iconExit.classList.remove('hidden');
+            } else {
+                iconEnter.classList.remove('hidden');
+                iconExit.classList.add('hidden');
+            }
+        }
+
         async function downloadAsPng() {
             downloadPngBtn.disabled = true;
             downloadPngBtn.textContent = 'Memproses...';
 
-            // Sembunyikan kontrol +/- agar tidak ikut tercapture
-            const allControls = document.querySelectorAll('.row-layout-controls');
+            const allControls = document.querySelectorAll('.row-layout-controls, #fullscreen-btn');
             allControls.forEach(c => c.style.visibility = 'hidden');
 
             try {
@@ -874,44 +951,37 @@
                     return;
                 }
 
-                // Langkah 1: Tangkap setiap halaman sebagai canvas terpisah
                 const pageCanvases = await Promise.all(
                     Array.from(pages).map(page => html2canvas(page, {
-                        scale: 3, // Resolusi tinggi
-                        useCORS: true,
-                        backgroundColor: null // Gunakan background dari elemen itu sendiri
+                        scale: 3, useCORS: true, backgroundColor: null
                     }))
                 );
 
-                // Langkah 2: Hitung dimensi gambar akhir
-                const margin = 30; // Jarak antar halaman
+                const margin = 30;
                 const totalHeight = pageCanvases.reduce((sum, canvas) => sum + canvas.height, 0) + (margin * (pageCanvases.length - 1));
                 const maxWidth = Math.max(...pageCanvases.map(c => c.width));
 
-                // Langkah 3: Buat canvas akhir dan gabungkan semua halaman
                 const finalCanvas = document.createElement('canvas');
                 finalCanvas.width = maxWidth;
                 finalCanvas.height = totalHeight;
                 const ctx = finalCanvas.getContext('2d');
                 
-                // Isi latar belakang dengan warna tema
                 ctx.fillStyle = getComputedStyle(document.getElementById('combined-sheet-container')).getPropertyValue('background-color');
                 ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
 
                 let currentY = 0;
                 pageCanvases.forEach(canvas => {
-                    const xOffset = (maxWidth - canvas.width) / 2; // Pusatkan halaman
+                    const xOffset = (maxWidth - canvas.width) / 2;
                     ctx.drawImage(canvas, xOffset, currentY);
                     currentY += canvas.height + margin;
                 });
 
-                // Langkah 4: Tambahkan watermark dengan teks yang diminta
                 const watermarkText = "Dibuat dengan ABIMANTRA NOT ANGKA | by Yoga Andika";
-                const fontSize = finalCanvas.width * 0.015; // Sedikit lebih besar
+                const fontSize = finalCanvas.width * 0.015;
                 ctx.font = `600 ${fontSize}px Poppins, sans-serif`;
                 
                 const isDarkMode = document.body.classList.contains('dark');
-                ctx.fillStyle = isDarkMode ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)'; // Lebih jelas
+                ctx.fillStyle = isDarkMode ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)';
                 
                 ctx.textAlign = 'right';
                 ctx.textBaseline = 'bottom';
@@ -919,7 +989,6 @@
                 const padding = finalCanvas.width * 0.02;
                 ctx.fillText(watermarkText, finalCanvas.width - padding, finalCanvas.height - padding);
 
-                // Langkah 5: Picu unduhan
                 const titleValue = titleInput.value || 'notasi-lagu';
                 const image = finalCanvas.toDataURL("image/png");
                 const link = document.createElement('a');
@@ -934,7 +1003,6 @@
             } finally {
                 downloadPngBtn.disabled = false;
                 downloadPngBtn.textContent = 'Unduh PNG';
-                // Tampilkan kembali kontrol
                 allControls.forEach(c => c.style.visibility = '');
             }
         }
@@ -943,7 +1011,7 @@
             downloadPdfBtn.disabled = true;
             downloadPdfBtn.textContent = 'Memproses...';
 
-            const allControls = document.querySelectorAll('.row-layout-controls');
+            const allControls = document.querySelectorAll('.row-layout-controls, #fullscreen-btn');
             allControls.forEach(c => c.style.visibility = 'hidden');
 
             try {
@@ -961,7 +1029,7 @@
                     const canvas = await html2canvas(page, {
                         scale: 3,
                         useCORS: true,
-                        backgroundColor: '#ffffff' // Force white background for PDF
+                        backgroundColor: '#ffffff'
                     });
 
                     const imgData = canvas.toDataURL('image/png');
@@ -994,7 +1062,6 @@
                     doc.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
                 }
                 
-                // Add watermark to the last page
                 const watermarkText = 'Dibuat dengan ABIMANTRA NOT ANGKA | by Yoga Andika';
                 doc.setPage(doc.internal.getNumberOfPages());
                 doc.setFontSize(8);
@@ -1057,6 +1124,7 @@
             playBtn.addEventListener('click', playAllLayers);
             downloadPngBtn.addEventListener('click', downloadAsPng);
             downloadPdfBtn.addEventListener('click', downloadAsPdf);
+            fullscreenBtn.addEventListener('click', togglePseudoFullscreen);
             undoBtn.addEventListener('click', undo);
             redoBtn.addEventListener('click', redo);
             [titleInput, composerInput, arrangerInput, biramaSelect, bpmInput, barsPerRowSelect].forEach(el => { el.addEventListener('change', renderAll); });
