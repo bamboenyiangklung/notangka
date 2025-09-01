@@ -377,15 +377,19 @@
             top: 60%;
         }
 
+        .music-bar.has-volta .bar-number {
+            opacity: 0.15; /* Membuat nomor bar di bawah volta menjadi sangat samar */
+        }
+
         .volta-bracket {
             position: absolute;
-            top: calc(-2.4em * var(--zoom-factor)); /* Moved higher, above bar number */
+            top: calc(-1.8em * var(--zoom-factor)); /* Disesuaikan agar lebih kecil */
             left: 0;
-            height: calc(1em * var(--zoom-factor));
+            height: calc(0.8em * var(--zoom-factor)); /* Disesuaikan agar lebih kecil */
             border-top: calc(1.5px * var(--zoom-factor)) solid #1a202c;
             border-left: calc(1.5px * var(--zoom-factor)) solid #1a202c;
-            padding-left: calc(0.4em * var(--zoom-factor));
-            font-size: calc(0.9em * var(--zoom-factor));
+            padding-left: calc(0.3em * var(--zoom-factor));
+            font-size: calc(0.7em * var(--zoom-factor)); /* Disesuaikan agar lebih kecil */
             font-weight: 700;
             color: #1a202c;
             z-index: 50;
@@ -397,7 +401,7 @@
             position: absolute;
             top: 0;
             right: calc(-1.5px * var(--zoom-factor));
-            height: calc(0.6em * var(--zoom-factor)); /* Slightly longer hook */
+            height: calc(0.5em * var(--zoom-factor)); /* Disesuaikan agar lebih kecil */
             width: calc(1.5px * var(--zoom-factor));
             background-color: #1a202c;
         }
@@ -820,6 +824,7 @@
                                  voltaDiv.appendChild(endHook);
                              }
                              musicBarDiv.appendChild(voltaDiv);
+                             musicBarDiv.classList.add('has-volta');
                         }
                     }
                     
@@ -1490,4 +1495,6 @@
     </script>
 </body>
 </html>
+
+
 
