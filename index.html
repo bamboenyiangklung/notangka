@@ -144,7 +144,7 @@
             width: 800px;
             max-width: 100%;
             aspect-ratio: 210 / 297;
-            padding: 1rem; /* Reduced padding for more content space */
+            padding: 1.5rem; /* Reduced padding for more content space */
             box-shadow: 0 2px 8px rgba(0,0,0,0.15);
             display: flex;
             flex-direction: column;
@@ -155,7 +155,6 @@
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* Important for accurate height calculation */
         }
 
         .page .song-title { text-align: center; font-size: 1.8rem; font-weight: 700; margin-bottom: 1rem; }
@@ -991,8 +990,10 @@
                 rowIndex++;
             }
 
-            // --- PAGINATION LOGIC ---
+            let currentPage;
+            let currentPageContent;
             let pageNumber = 0;
+
             const createNewPage = () => {
                 pageNumber++;
                 const pageDiv = document.createElement('div');
@@ -1029,65 +1030,56 @@
                 pageDiv.appendChild(contentDiv);
                 
                 combinedSheetContainer.insertBefore(pageDiv, fullscreenBtn);
-                
-                const watermarkDiv = document.createElement('div');
-                watermarkDiv.className = 'page-watermark';
-                watermarkDiv.textContent = 'Dibuat dengan ABIMANTRA NOT ANGKA | by Yoga Andika';
-                pageDiv.appendChild(watermarkDiv);
-                
-                return { page: pageDiv, content: contentDiv };
+                currentPage = pageDiv;
+                currentPageContent = contentDiv;
+                void currentPage.offsetHeight;
             };
 
-            let initialPage = createNewPage();
-            let currentPage = initialPage.page;
-            let currentPageContent = initialPage.content;
+            createNewPage();
 
-            allRowWrappers.forEach(row => currentPageContent.appendChild(row));
-
-            setTimeout(() => {
-                let pages = [currentPage];
-                
-                while (pages[pages.length - 1].scrollHeight > pages[pages.length - 1].clientHeight) {
-                    let overflowingPage = pages[pages.length - 1];
-                    let overflowingContent = overflowingPage.querySelector('.page-content');
-                    
-                    let newPageData = createNewPage();
-                    let newPage = newPageData.page;
-                    let newContent = newPageData.content;
-                    pages.push(newPage);
-                    
-                    const rowsToMove = [];
-                    while (overflowingPage.scrollHeight > overflowingPage.clientHeight && overflowingContent.lastElementChild) {
-                        let lastRow = overflowingContent.lastElementChild;
-                        rowsToMove.unshift(lastRow);
-                        overflowingContent.removeChild(lastRow);
-                    }
-                    rowsToMove.forEach(row => newContent.appendChild(row));
+            allRowWrappers.forEach(row => {
+                currentPageContent.appendChild(row);
+                if (currentPage.scrollHeight > currentPage.clientHeight && currentPageContent.childElementCount > 1) {
+                    row.remove();
+                    createNewPage();
+                    currentPageContent.appendChild(row);
                 }
-                
-                // Final layout scaling after pagination is complete
-                setTimeout(() => {
-                    const allPages = combinedSheetContainer.querySelectorAll('.page');
-                    allPages.forEach(page => {
-                        const pageContent = page.querySelector('.page-content');
-                        if (!pageContent) return;
-                        const availableWidth = pageContent.clientWidth;
-                        if (availableWidth === 0) return;
+            });
+            
+            const allRenderedPages = combinedSheetContainer.querySelectorAll('.page');
+            allRenderedPages.forEach(page => {
+                if (!page.querySelector('.page-watermark')) {
+                    const watermarkDiv = document.createElement('div');
+                    watermarkDiv.className = 'page-watermark';
+                    watermarkDiv.textContent = 'Dibuat dengan ABIMANTRA NOT ANGKA | by Yoga Andika';
+                    page.appendChild(watermarkDiv);
+                }
+            });
+            
+            setTimeout(() => {
+                const allPages = combinedSheetContainer.querySelectorAll('.page');
+                allPages.forEach(page => {
+                    const pageContent = page.querySelector('.page-content');
+                    if (!pageContent) return;
+                    const availableWidth = pageContent.clientWidth;
+                    if (availableWidth === 0) return;
 
-                        const rowWrappers = page.querySelectorAll('.music-row-wrapper');
-                        rowWrappers.forEach(wrapper => {
-                            const rowIndex = parseInt(wrapper.dataset.rowIndex);
-                            const barsInThisRow = wrapper.querySelectorAll('.music-bar');
-                            const barsCount = layoutGuideLayer.rowOverrides[rowIndex] || globalBarsPerRow;
-                            const barWidth = availableWidth / barsCount;
-                            
-                            wrapper.querySelectorAll('.music-bar').forEach(bar => {
-                                bar.style.width = `${barWidth}px`;
-                            });
-                        });
+                    const standardBarWidth = availableWidth / globalBarsPerRow;
+                    const rowWrappers = page.querySelectorAll('.music-row-wrapper');
+
+                    rowWrappers.forEach(wrapper => {
+                        const rowIndex = parseInt(wrapper.dataset.rowIndex);
+                        const barsInThisRow = wrapper.querySelectorAll('.music-bar');
+
+                        if (layers[0].rowOverrides[rowIndex]) {
+                            const customBarWidth = availableWidth / barsInThisRow.length;
+                            barsInThisRow.forEach(bar => { bar.style.width = `${customBarWidth}px`; });
+                        } else {
+                            barsInThisRow.forEach(bar => { bar.style.width = `${standardBarWidth}px`; });
+                        }
                     });
-                }, 0);
-            }, 50);
+                });
+            }, 0);
         }
 
         function renderEditorView() {
