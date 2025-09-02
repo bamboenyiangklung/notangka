@@ -144,7 +144,7 @@
             width: 800px;
             max-width: 100%;
             aspect-ratio: 210 / 297;
-            padding: 2rem;
+            padding: 1rem; /* Reduced padding for more content space */
             box-shadow: 0 2px 8px rgba(0,0,0,0.15);
             display: flex;
             flex-direction: column;
@@ -155,6 +155,7 @@
             flex-grow: 1;
             display: flex;
             flex-direction: column;
+            overflow: hidden; /* Important for accurate height calculation */
         }
 
         .page .song-title { text-align: center; font-size: 1.8rem; font-weight: 700; margin-bottom: 1rem; }
@@ -247,6 +248,9 @@
             opacity: 0.9;
             pointer-events: none;
             z-index: 100;
+        }
+        .page-watermark.pdf-export-hidden {
+            color: white !important;
         }
 
         #floating-editor-window {
@@ -471,7 +475,7 @@
             </div>
              <div class="instructions-content space-y-3">
                 <div><h4>Dasar</h4><ul><li><code>1-7</code> untuk not.</li><li><code>0</code> untuk istirahat (diam), <code>o</code> untuk istirahat panjang (titik).</li><li>Spasi atau <code>|</code> untuk pemisah ketukan/bar.</li></ul></div>
-                <div><h4>Oktaf & Aksidental</h4><ul><li><code>1.</code> (tinggi), <code>1,</code> (rendah). Ganda juga bisa.</li><li><code>4/</code> (kres), <code>7b</code> (mol).</li></ul></div>
+                <div><h4>Oktaf & Aksidental</h4><ul><li><code>1.</code> (tinggi), <code>1,</code> (rendah). Ganda juga bisa.</li><li><code>4/</code> (kres), <code>7b</code> (mol). Nada ini akan menimpa Tonalitas.</li></ul></div>
                 <div><h4>Durasi & Artikulasi</h4><ul><li><code>12</code> (1/8), <code>1234</code> (1/16), <code>123</code> (triplet).</li><li><code>1^</code> (staccato).</li><li><code>1~</code> (fermata/tahan).</li></ul></div>
                  <div><h4>Pengulangan (Layer 1)</h4><ul><li><code>[</code> untuk mulai ulang, <code>]</code> untuk akhir ulang.</li><li><code>_a, _b, _c, _d</code> untuk ending 1-4.</li><li>Contoh: <code>[ 1 2 | _a 3 4 ] | _b 5 0 |</code></li></ul></div>
                  <div><h4>Layer Accomp</h4><ul><li>Pilih instrumen "Accomp". Layer ini akan selalu di atas pada pratinjau.</li><li>Tulis nama chord (misal: <code>C G Am F</code>).</li><li>Gunakan <code>z</code> untuk istirahat 1 ketuk (tidak terlihat).</li></ul></div>
@@ -487,10 +491,30 @@
                     <input type="text" id="title" class="w-full text-center" placeholder="Masukkan judul lagu...">
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
                     <div>
                         <label for="bpm" class="block font-semibold mb-2">Tempo</label>
                         <input type="number" id="bpm" class="w-full" value="120" min="40" max="240">
+                    </div>
+                    <div>
+                        <label for="tonalitas" class="block font-semibold mb-2">Tonalitas</label>
+                        <select id="tonalitas" class="w-full">
+                            <option value="C">Do = C</option>
+                            <optgroup label="Kres (♯)">
+                                <option value="G">Do = G (1♯)</option>
+                                <option value="D">Do = D (2♯)</option>
+                                <option value="A">Do = A (3♯)</option>
+                                <option value="E">Do = E (4♯)</option>
+                                <option value="B">Do = B (5♯)</option>
+                            </optgroup>
+                            <optgroup label="Mol (♭)">
+                                <option value="F">Do = F (1♭)</option>
+                                <option value="Bb">Do = B♭ (2♭)</option>
+                                <option value="Eb">Do = E♭ (3♭)</option>
+                                <option value="Ab">Do = A♭ (4♭)</option>
+                                <option value="Db">Do = D♭ (5♭)</option>
+                            </optgroup>
+                        </select>
                     </div>
                     <div>
                         <label for="birama" class="block font-semibold mb-2">Birama</label>
@@ -504,11 +528,11 @@
                             <option value="9/8">9/8</option>
                         </select>
                     </div>
-                    <div>
+                    <div class="sm:col-span-1">
                         <label for="composer" class="block font-semibold mb-2">Komposer</label>
                         <input type="text" id="composer" class="w-full" placeholder="Nama komposer...">
                     </div>
-                    <div>
+                    <div class="sm:col-span-2">
                         <label for="arranger" class="block font-semibold mb-2">Arranger</label>
                         <input type="text" id="arranger" class="w-full" placeholder="Nama arranger...">
                     </div>
@@ -581,7 +605,7 @@
         }
 
         // --- GLOBAL VARIABLES & DOM ELEMENTS ---
-        let playBtn, addLayerBtn, downloadPngBtn, downloadPdfBtn, titleInput, arrangerInput, composerInput, biramaSelect, bpmInput, combinedSheetContainer, layersEditorContainer, barsPerRowSelect, undoBtn, redoBtn, fullscreenBtn, saveProjectBtn, loadProjectBtn, loadProjectInput;
+        let playBtn, addLayerBtn, downloadPngBtn, downloadPdfBtn, titleInput, arrangerInput, composerInput, biramaSelect, tonalitasSelect, bpmInput, combinedSheetContainer, layersEditorContainer, barsPerRowSelect, undoBtn, redoBtn, fullscreenBtn, saveProjectBtn, loadProjectBtn, loadProjectInput;
 
         function assignGlobalDOMElements() {
             playBtn = document.getElementById('playBtn');
@@ -592,6 +616,7 @@
             arrangerInput = document.getElementById('arranger');
             composerInput = document.getElementById('composer');
             biramaSelect = document.getElementById('birama');
+            tonalitasSelect = document.getElementById('tonalitas');
             bpmInput = document.getElementById('bpm');
             combinedSheetContainer = document.getElementById('combined-sheet-container');
             barsPerRowSelect = document.getElementById('barsPerRowSelect');
@@ -609,7 +634,7 @@
         let activeLayerIndex = 0;
         const baseNoteMap = { '1': 'C', '2': 'D', '3': 'E', '4': 'F', '5': 'G', '6': 'A', '7': 'B', '0': null, 'o': null };
         const bassDisplayMap = { '1': 'C', '2': 'D', '3': 'E', '4': 'F', '5': 'G', '6': 'A', '7': 'B' };
-
+        
         // --- AUDIO INITIALIZATION ---
         function initializeInstruments() {
             TonePlayers = {
@@ -723,6 +748,30 @@
             return bars;
         }
 
+        function getTransposedBassNoteName(noteData) {
+            const scaleIntervals = { '1': 0, '2': 2, '3': 4, '4': 5, '5': 7, '6': 9, '7': 11 };
+            const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+            const rootNoteIndexes = { 'C': 0, 'G': 7, 'D': 2, 'A': 9, 'E': 4, 'B': 11, 'F': 5, 'Bb': 10, 'Eb': 3, 'Ab': 8, 'Db': 1 };
+            
+            const key = tonalitasSelect.value;
+            const rootIndex = rootNoteIndexes[key];
+            
+            let interval = scaleIntervals[noteData.visualNote];
+            if (interval === undefined) {
+                return noteData.visualNote;
+            }
+
+            // Apply explicit accidentals from notation
+            if (noteData.visualSharp) {
+                interval += 1;
+            } else if (noteData.visualFlat) {
+                interval -= 1;
+            }
+            
+            const finalNoteIndex = (rootIndex + interval + 12) % 12;
+            return noteNames[finalNoteIndex];
+        }
+
         function createNoteBlockHtml(noteData, isBass) {
             let innerHtml = '';
             const noteClass = isBass ? 'bass-note' : '';
@@ -746,12 +795,7 @@
             } else {
                 let noteToDisplay;
                 if (isBass) {
-                    noteToDisplay = bassDisplayMap[noteData.visualNote] || noteData.visualNote;
-                    if (noteData.visualSharp) {
-                        noteToDisplay += '#';
-                    } else if (noteData.visualFlat) {
-                        noteToDisplay += 'b';
-                    }
+                    noteToDisplay = getTransposedBassNoteName(noteData);
                 } else {
                     noteToDisplay = noteData.visualNote;
                     if (noteData.visualSharp) {
@@ -947,10 +991,8 @@
                 rowIndex++;
             }
 
-            let currentPage;
-            let currentPageContent;
+            // --- PAGINATION LOGIC ---
             let pageNumber = 0;
-
             const createNewPage = () => {
                 pageNumber++;
                 const pageDiv = document.createElement('div');
@@ -962,12 +1004,22 @@
                     const arrangerValue = arrangerInput.value || '-';
                     const bpmValue = bpmInput.value;
                     const biramaValue = biramaSelect.value;
+                    const tonalitasText = `Do = ${tonalitasSelect.value}`;
 
                     pageDiv.innerHTML = `
                         <div class="song-title">${titleValue}</div>
                         <div class="header-info">
-                            <div><p style="font-weight: 500;"><span style="font-family: 'Times New Roman', serif; font-size: 1.5em; vertical-align: middle; line-height: 1;">♩</span> = ${bpmValue}</p><p>Birama: ${biramaValue}</p></div>
-                            <div style="text-align: right;"><p>Komposer: ${composerValue}</p><p>Arranger: ${arrangerValue}</p></div>
+                             <div>
+                                <p style="font-weight: 600;">${tonalitasText}</p>
+                                <p>Birama: ${biramaValue}</p>
+                            </div>
+                            <div style="text-align: center; flex-grow: 1;">
+                                <p style="font-weight: 500;"><span style="font-family: 'Times New Roman', serif; font-size: 1.5em; vertical-align: middle; line-height: 1;">♩</span> = ${bpmValue}</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <p>Komposer: ${composerValue}</p>
+                                <p>Arranger: ${arrangerValue}</p>
+                            </div>
                         </div>
                     `;
                 }
@@ -977,57 +1029,65 @@
                 pageDiv.appendChild(contentDiv);
                 
                 combinedSheetContainer.insertBefore(pageDiv, fullscreenBtn);
-                currentPage = pageDiv;
-                currentPageContent = contentDiv;
-                void currentPage.offsetHeight;
+                
+                const watermarkDiv = document.createElement('div');
+                watermarkDiv.className = 'page-watermark';
+                watermarkDiv.textContent = 'Dibuat dengan ABIMANTRA NOT ANGKA | by Yoga Andika';
+                pageDiv.appendChild(watermarkDiv);
+                
+                return { page: pageDiv, content: contentDiv };
             };
 
-            createNewPage();
+            let initialPage = createNewPage();
+            let currentPage = initialPage.page;
+            let currentPageContent = initialPage.content;
 
-            allRowWrappers.forEach(row => {
-                currentPageContent.appendChild(row);
-                if (currentPage.scrollHeight > currentPage.clientHeight && currentPageContent.childElementCount > 1) {
-                    row.remove();
-                    createNewPage();
-                    currentPageContent.appendChild(row);
+            allRowWrappers.forEach(row => currentPageContent.appendChild(row));
+
+            setTimeout(() => {
+                let pages = [currentPage];
+                
+                while (pages[pages.length - 1].scrollHeight > pages[pages.length - 1].clientHeight) {
+                    let overflowingPage = pages[pages.length - 1];
+                    let overflowingContent = overflowingPage.querySelector('.page-content');
+                    
+                    let newPageData = createNewPage();
+                    let newPage = newPageData.page;
+                    let newContent = newPageData.content;
+                    pages.push(newPage);
+                    
+                    const rowsToMove = [];
+                    while (overflowingPage.scrollHeight > overflowingPage.clientHeight && overflowingContent.lastElementChild) {
+                        let lastRow = overflowingContent.lastElementChild;
+                        rowsToMove.unshift(lastRow);
+                        overflowingContent.removeChild(lastRow);
+                    }
+                    rowsToMove.forEach(row => newContent.appendChild(row));
                 }
-            });
-            
-            const allRenderedPages = combinedSheetContainer.querySelectorAll('.page');
-            if (allRenderedPages.length > 0) {
-                const lastPage = allRenderedPages[allRenderedPages.length - 1];
-                if (!lastPage.querySelector('.page-watermark')) {
-                    const watermarkDiv = document.createElement('div');
-                    watermarkDiv.className = 'page-watermark';
-                    watermarkDiv.textContent = 'Dibuat dengan ABIMANTRA NOT ANGKA | by Yoga Andika';
-                    lastPage.appendChild(watermarkDiv);
-                }
-            }
-            
-            requestAnimationFrame(() => {
-                const allPages = combinedSheetContainer.querySelectorAll('.page');
-                allPages.forEach(page => {
-                    const pageContent = page.querySelector('.page-content');
-                    if (!pageContent) return;
-                    const availableWidth = pageContent.clientWidth;
-                    if (availableWidth === 0) return;
+                
+                // Final layout scaling after pagination is complete
+                setTimeout(() => {
+                    const allPages = combinedSheetContainer.querySelectorAll('.page');
+                    allPages.forEach(page => {
+                        const pageContent = page.querySelector('.page-content');
+                        if (!pageContent) return;
+                        const availableWidth = pageContent.clientWidth;
+                        if (availableWidth === 0) return;
 
-                    const standardBarWidth = availableWidth / globalBarsPerRow;
-                    const rowWrappers = page.querySelectorAll('.music-row-wrapper');
-
-                    rowWrappers.forEach(wrapper => {
-                        const rowIndex = parseInt(wrapper.dataset.rowIndex);
-                        const barsInThisRow = wrapper.querySelectorAll('.music-bar');
-
-                        if (layers[0].rowOverrides[rowIndex]) {
-                            const customBarWidth = availableWidth / barsInThisRow.length;
-                            barsInThisRow.forEach(bar => { bar.style.width = `${customBarWidth}px`; });
-                        } else {
-                            barsInThisRow.forEach(bar => { bar.style.width = `${standardBarWidth}px`; });
-                        }
+                        const rowWrappers = page.querySelectorAll('.music-row-wrapper');
+                        rowWrappers.forEach(wrapper => {
+                            const rowIndex = parseInt(wrapper.dataset.rowIndex);
+                            const barsInThisRow = wrapper.querySelectorAll('.music-bar');
+                            const barsCount = layoutGuideLayer.rowOverrides[rowIndex] || globalBarsPerRow;
+                            const barWidth = availableWidth / barsCount;
+                            
+                            wrapper.querySelectorAll('.music-bar').forEach(bar => {
+                                bar.style.width = `${barWidth}px`;
+                            });
+                        });
                     });
-                });
-            });
+                }, 0);
+            }, 50);
         }
 
         function renderEditorView() {
@@ -1141,15 +1201,39 @@
         }
         
         function getToneNote(noteData, layer) {
-            const baseNote = baseNoteMap[noteData.visualNote]; if (!baseNote) return null;
-            let octave = layer.instrument === 'bass' ? 2 : 4;
-            if (noteData.visualModifier === '.') octave++; else if (noteData.visualModifier === '..') octave += 2;
-            else if (noteData.visualModifier === ',') octave--; else if (noteData.visualModifier === ',,') octave -= 2;
-            let toneNote = baseNote + octave;
-            if (noteData.visualSharp) { toneNote = Tone.Frequency(toneNote).transpose(1).toNote(); } 
-            else if (noteData.visualFlat) { toneNote = Tone.Frequency(toneNote).transpose(-1).toNote(); }
-            return toneNote;
+            const majorScaleIntervals = {
+                '1': 0,  // Do
+                '2': 2,  // Re
+                '3': 4,  // Mi
+                '4': 5,  // Fa
+                '5': 7,  // So
+                '6': 9,  // La
+                '7': 11  // Ti
+            };
+
+            let interval = majorScaleIntervals[noteData.visualNote];
+            if (interval === undefined) return null;
+
+            let octave = layer.instrument === 'bass' ? 3 : 4; 
+            if (noteData.visualModifier === '.') octave++;
+            else if (noteData.visualModifier === '..') octave += 2;
+            else if (noteData.visualModifier === ',') octave--;
+            else if (noteData.visualModifier === ',,') octave -= 2;
+            
+            const key = tonalitasSelect.value;
+            const tonic = key + octave;
+
+            // Apply explicit accidentals to the interval *before* transposing
+            if (noteData.visualSharp) {
+                interval += 1;
+            } else if (noteData.visualFlat) {
+                interval -= 1;
+            }
+            
+            const finalNote = Tone.Frequency(tonic).transpose(interval).toNote();
+            return finalNote;
         }
+
 
         function toggleEditorWindow() {
             const floatingWindow = document.getElementById('floating-editor-window');
@@ -1198,6 +1282,7 @@
                     title: titleInput.value,
                     bpm: bpmInput.value,
                     birama: biramaSelect.value,
+                    tonalitas: tonalitasSelect.value,
                     composer: composerInput.value,
                     arranger: arrangerInput.value,
                     globalBarsPerRow: barsPerRowSelect.value,
@@ -1243,6 +1328,7 @@
                     titleInput.value = projectData.title || '';
                     bpmInput.value = projectData.bpm || '120';
                     biramaSelect.value = projectData.birama || '4/4';
+                    tonalitasSelect.value = projectData.tonalitas || 'C';
                     composerInput.value = projectData.composer || '';
                     arrangerInput.value = projectData.arranger || '';
                     barsPerRowSelect.value = projectData.globalBarsPerRow || '4';
@@ -1373,6 +1459,7 @@
 
             const allControls = document.querySelectorAll('.row-layout-controls, #fullscreen-btn');
             allControls.forEach(c => c.style.visibility = 'hidden');
+            document.querySelectorAll('.page-watermark').forEach(wm => wm.classList.add('pdf-export-hidden'));
 
             try {
                 const { jsPDF } = window.jspdf;
@@ -1442,6 +1529,7 @@
                 downloadPdfBtn.disabled = false;
                 downloadPdfBtn.textContent = 'Unduh PDF';
                 allControls.forEach(c => c.style.visibility = '');
+                document.querySelectorAll('.page-watermark').forEach(wm => wm.classList.remove('pdf-export-hidden'));
             }
         }
         
@@ -1487,7 +1575,7 @@
             fullscreenBtn.addEventListener('click', togglePseudoFullscreen);
             undoBtn.addEventListener('click', undo);
             redoBtn.addEventListener('click', redo);
-            [titleInput, composerInput, arrangerInput, biramaSelect, bpmInput, barsPerRowSelect].forEach(el => { el.addEventListener('change', renderAll); });
+            [titleInput, composerInput, arrangerInput, biramaSelect, tonalitasSelect, bpmInput, barsPerRowSelect].forEach(el => { el.addEventListener('change', renderAll); });
             
             saveProjectBtn.addEventListener('click', saveProject);
             loadProjectBtn.addEventListener('click', () => loadProjectInput.click());
