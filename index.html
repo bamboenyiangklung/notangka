@@ -51,6 +51,7 @@
             align-items: flex-start;
             min-height: 100vh;
             padding: 2rem;
+            transition: all 0.3s ease-in-out;
         }
 
         .container {
@@ -66,8 +67,8 @@
         @media (min-width: 1024px) {
             .container {
                 display: grid;
-                grid-template-columns: 1fr;
-                grid-template-rows: auto auto 1fr auto;
+                grid-template-columns: 2fr;
+                grid-template-rows: auto auto 2fr auto;
                 grid-template-areas: 
                     "title"
                     "instructions"
@@ -162,9 +163,36 @@
         .page .header-info p { margin: 0 0 0.25rem 0; }
 
         .layer-editor-row {
-            display: grid; grid-template-columns: 200px 1fr 100px; gap: 1.5rem; align-items: center; border: 2px solid var(--border-color); border-radius: 1rem; padding: 1.5rem; background-color: var(--bg-tertiary); transition: padding 0.3s ease, min-height 0.3s ease;
+            display: grid; grid-template-columns: flex; 1000px 1fr 1000px; gap: 1.5rem; align-items: center; border: 2px solid var(--border-color); border-radius: 1rem; padding: 1.5rem; background-color: var(--bg-tertiary); transition: padding 0.3s ease, min-height 0.3s ease;
         }
         
+        .layer-editor-row.is-collapsed {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 0.5rem 1.5rem;
+            min-height: auto;
+            cursor: pointer;
+        }
+
+        .layer-editor-row.is-collapsed .editor-wrapper, .layer-editor-row.is-collapsed .remove-btn, .layer-editor-row.is-collapsed .layer-instrument-select {
+            display: none;
+        }
+        .layer-editor-row.is-collapsed .layer-header {
+             flex-grow: 1;
+        }
+        .layer-editor-row .layer-header h3 {
+             font-weight: 600;
+             transition: color 0.2s;
+        }
+        .layer-editor-row.is-collapsed:hover .layer-header h3 {
+             color: var(--accent-color);
+        }
+        .layer-editor-row.is-collapsed .instrument-name {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
         .editor-wrapper {
             position: relative; border: 1px solid var(--border-color); background-color: var(--bg-primary); border-radius: 0.5rem; min-height: 120px;
         }
@@ -199,7 +227,7 @@
 
         .music-bar { display: inline-flex; flex-direction: column; justify-content: flex-start; position: relative; padding: 0 calc(0.25em * var(--zoom-factor)); border-left: calc(2px * var(--zoom-factor)) solid #64748b; height: fit-content; gap: calc(0.5rem * var(--zoom-factor)); }
         .layer-bar-notes { display: flex; justify-content: space-around; align-items: center; position: relative; padding: 0.25rem 0; width: 100%; min-height: 2em; }
-        .note-block { display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; padding: 0 calc(0.2rem * var(--zoom-factor)); min-width: 0; z-index: 40; }
+        .note-block { display: flex; flex-direction: column; margin: 0.002cm ; justify-content: center; align-items: center; position: relative; padding: 0 calc(0.2rem * var(--zoom-factor)); min-width: 0; z-index: 40; }
         .note-display { font-size: calc(1.2rem * var(--zoom-factor)); font-weight: 500; line-height: 1; font-family: 'Inter', sans-serif; z-index: 40; }
         .accidental-symbol, .dot-high, .dot-low, .double-dot-high, .double-dot-low, .staccato-marker { color: #333; position: absolute; line-height: 1; font-weight: 500; }
         .accidental-symbol { font-size: calc(1.2rem * var(--zoom-factor) * 1.2); z-index: 41; top: 50%; left: 50%; transform: translate(-50%, -50%); }
@@ -213,8 +241,9 @@
         .note-group-container { display: flex; flex-direction: row; position: relative; align-items: center; min-width: 0; }
         .note-group-container.eighth-notes::before, .note-group-container.sixteenth-notes::before, .note-group-container.sixteenth-notes::after { background-color: #333; z-index: 48; }
         .note-group-container.eighth-notes::before { content: ''; position: absolute; top: calc(-0.6em * var(--zoom-factor)); left: 0; right: 0; height: calc(1.5px * var(--zoom-factor)); }
-        .note-group-container.sixteenth-notes::before { content: ''; position: absolute; top: calc(-0.8em * var(--zoom-factor)); left: 0; right: 0; height: calc(1.5px * var(--zoom-factor)); }
-        .note-group-container.sixteenth-notes::after { content: ''; position: absolute; top: calc(-0.6em * var(--zoom-factor)); left: 0; right: 0; height: calc(1.5px * var(--zoom-factor)); }
+        .note-group-container.sixteenth-notes { display: flex; flex-direction: row; position: relative; align-items: center; width: 1.13cm; }
+        .note-group-container.sixteenth-notes::before { content: ''; position: absolute; top: calc(-0.8em * var(--zoom-factor)); left: 0; right: 0; height: calc(1.5px * var(--zoom-factor)); background-color: #333; z-index: 48;  padding: 0 1em; }
+        .note-group-container.sixteenth-notes::after { content: ''; position: absolute; top: calc(-0.6em * var(--zoom-factor)); left: 0; right: 0; height: calc(1.5px * var(--zoom-factor)); background-color: #333; z-index: 48; padding: 0 1em; }
         .note-group-container.triplet::before { content: ''; position: absolute; top: calc(-0.7em * var(--zoom-factor)); left: 0; right: 0; height: calc(0.5em * var(--zoom-factor)); border-top: calc(1px * var(--zoom-factor)) solid #333; border-radius: calc(100% * var(--zoom-factor)) calc(100% * var(--zoom-factor)) 0 0; z-index: 38; }
         .note-group-container.triplet::after { content: '3'; position: absolute; top: calc(-0.7em * var(--zoom-factor)); left: 50%; transform: translate(-50%, -50%); font-size: calc(0.5em * var(--zoom-factor)); font-weight: 400; color: #333; background-color: #fff; padding: 0 calc(0.2em * var(--zoom-factor)); z-index: 39; }
         .note-group-container.eighth-notes.no-staccato::before { top: calc(-0.3em * var(--zoom-factor)); }
@@ -222,12 +251,12 @@
         .note-group-container.sixteenth-notes.no-staccato::after { top: calc(-0.3em * var(--zoom-factor)); }
         .note-group-container.triplet.no-staccato::before { top: calc(-0.4em * var(--zoom-factor)); }
         .note-group-container.triplet.no-staccato::after { top: calc(-0.4em * var(--zoom-factor)); }
-        .message-box { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: #22c55e; color: white; padding: 1rem 2rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); z-index: 1000; opacity: 0; transition: opacity 0.5s, top 0.5s; }
+        .message-box { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: #22c55e; color: white; padding: 1rem 2rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1-px rgba(0, 0, 0, 0.06); z-index: 1000; opacity: 0; transition: opacity 0.5s, top 0.5s; }
         .message-box.show { opacity: 1; top: 30px; }
-        .bar-number { position: absolute; top: calc(-1.6em * var(--zoom-factor)); left: calc(0.25em * var(--zoom-factor)); font-size: calc(0.6rem * var(--zoom-factor)); color: #3b82f6; font-weight: 600; font-style: italic; opacity: 0.7; }
+        .bar-number { position: absolute; top: calc(-1.6em * var(--zoom-factor)); left: calc(0.25em * var(--zoom-factor)); font-size: calc(0.6rem * var(--zoom-factor)); color: #3b82f6; font-weight: 600; font-style: italic; opacity: 0.7; user-select: none; }
         .remove-btn { background-color: #ef4444; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 600; transition: background-color 0.2s; border: none; }
         .remove-btn:hover { background-color: #dc2626; }
-        .bass-note { color: #9333ea; }
+        .bass-note { color: #0354f4; font-size: calc(0.9rem * var(--zoom-factor)); }
         .chord-note-display { color: #ec4899; font-weight: 600; font-size: calc(0.9rem * var(--zoom-factor)); font-family: 'Poppins', sans-serif; }
         .music-row-wrapper { display: flex; align-items: center; position: relative; margin-bottom: 2.5rem; }
         .music-row { display: flex; transform-origin: top left; width: 100%; }
@@ -252,38 +281,6 @@
             color: white !important;
         }
 
-        #floating-editor-window {
-            position: fixed; top: 150px; right: 40px; width: 600px; max-width: 90vw; max-height: 70vh; background-color: var(--bg-secondary); border-radius: 1.5rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1); z-index: 1000; display: flex; flex-direction: column; border: 1px solid var(--border-color); transition: width 0.3s ease-in-out, height 0.3s ease-in-out; min-width: 300px; min-height: 200px;
-        }
-        #floating-editor-window.is-minimized { width: 220px; height: auto; min-height: 0; }
-        #floating-editor-window.is-minimized #layers-editor-container, #floating-editor-window.is-minimized .resizer, #floating-editor-window.is-minimized .editor-header-actions { display: none; }
-        #floating-editor-window.is-minimized .floating-editor-header { justify-content: flex-start; gap: 1rem; }
-        .floating-editor-header { padding: 1rem 1.5rem; font-weight: 700; color: var(--text-headings); background-color: var(--bg-tertiary); border-bottom: 1px solid var(--border-color); cursor: move; border-top-left-radius: 1.5rem; border-top-right-radius: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
-        #editor-window-controls { display: flex; align-items: center; gap: 0.5rem; }
-        .editor-control-btn { background-color: var(--border-color); border: none; width: 20px; height: 20px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s; }
-        .editor-control-btn:hover { background-color: var(--text-muted); }
-        .editor-control-btn svg { width: 12px; height: 12px; stroke: var(--text-primary); stroke-width: 2.5; }
-        #maximize-editor-btn { display: none; }
-        #floating-editor-window.is-minimized #minimize-editor-btn { display: none; }
-        #floating-editor-window.is-minimized #maximize-editor-btn { display: flex; }
-        
-        .resizer { position: absolute; background: transparent; z-index: 1001; }
-        .resizer-r { width: 8px; height: 100%; top: 0; right: 0; cursor: ew-resize; }
-        .resizer-b { width: 100%; height: 8px; left: 0; bottom: 0; cursor: ns-resize; }
-        .resizer-rb { width: 12px; height: 12px; right: 0; bottom: 0; cursor: nwse-resize; }
-        .resizer-t { width: 100%; height: 8px; left: 0; top: 0; cursor: ns-resize; }
-        .resizer-l { width: 8px; height: 100%; left: 0; top: 0; cursor: ew-resize; }
-        .resizer-lt { width: 12px; height: 12px; left: 0; top: 0; cursor: nwse-resize; }
-        .resizer-rt { width: 12px; height: 12px; right: 0; top: 0; cursor: nesw-resize; }
-        .resizer-bl { width: 12px; height: 12px; left: 0; bottom: 0; cursor: nesw-resize; }
-
-        #layers-editor-container { overflow-y: auto; padding: 1.5rem; flex-grow: 1; }
-        .layer-editor-row.is-collapsed { display: block; padding: 0.5rem 1.5rem; min-height: auto; }
-        .layer-editor-row.is-collapsed .editor-wrapper, .layer-editor-row.is-collapsed .remove-btn, .layer-editor-row.is-collapsed .layer-instrument-select, .layer-editor-row.is-collapsed .layer-editor-toggle { display: none; }
-        .layer-editor-row.is-collapsed .flex-col { width: 100%; }
-        .layer-editor-row.is-collapsed label { display: block; width: 100%; text-align: center; padding: 0.5rem; background-color: var(--border-color); border-radius: 0.5rem; cursor: pointer; transition: background-color 0.2s; }
-        .layer-editor-row.is-collapsed label:hover { background-color: var(--text-muted); }
-        .editor-header-actions .btn { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
         .main-watermark { text-align: center; margin-top: 1rem; font-size: 0.8rem; font-weight: 500; color: var(--text-muted); }
 
         #theme-switcher .theme-btn {
@@ -352,7 +349,6 @@
         body.fullscreen-mode #app-title-wrapper,
         body.fullscreen-mode #instructions-panel,
         body.fullscreen-mode #main-controls-wrapper,
-        body.fullscreen-mode #floating-editor-window,
         body.fullscreen-mode .main-watermark,
         body.fullscreen-mode #preview-wrapper > .flex {
             display: none;
@@ -443,6 +439,99 @@
             width: calc(1.5px * var(--zoom-factor));
             background-color: #1a202c;
         }
+        
+        #floating-editor-window {
+            position: fixed; top: 150px; right: 40px; width: 600px; max-width: 90vw; max-height: 70vh; background-color: var(--bg-secondary); border-radius: 1.5rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1); z-index: 1000; display: flex; flex-direction: column; border: 1px solid var(--border-color); transition: width 0.3s ease-in-out, height 0.3s ease-in-out; min-width: 300px; min-height: 200px;
+        }
+        #floating-editor-window.is-minimized { 
+            display: none; 
+        }
+        .floating-editor-header { padding: 1rem 1.5rem; font-weight: 700; color: var(--text-headings); background-color: var(--bg-tertiary); border-bottom: 1px solid var(--border-color); cursor: move; border-top-left-radius: 1.5rem; border-top-right-radius: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+        #editor-window-controls { display: flex; align-items: center; gap: 0.5rem; }
+        .editor-control-btn { background-color: var(--border-color); border: none; width: 20px; height: 20px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s; }
+        .editor-control-btn:hover { background-color: var(--text-muted); }
+        .editor-control-btn svg { width: 12px; height: 12px; stroke: var(--text-primary); stroke-width: 2.5; }
+        #maximize-editor-btn { display: none; }
+        #floating-editor-window.is-minimized #minimize-editor-btn { display: none; }
+        #floating-editor-window.is-minimized #maximize-editor-btn { display: flex; }
+        
+        .resizer { position: absolute; background: transparent; z-index: 1001; }
+        .resizer-r { width: 8px; height: 100%; top: 0; right: 0; cursor: ew-resize; }
+        .resizer-b { width: 100%; height: 8px; left: 0; bottom: 0; cursor: ns-resize; }
+        .resizer-rb { width: 12px; height: 12px; right: 0; bottom: 0; cursor: nwse-resize; }
+        .resizer-t { width: 100%; height: 8px; left: 0; top: 0; cursor: ns-resize; }
+        .resizer-l { width: 8px; height: 100%; left: 0; top: 0; cursor: ew-resize; }
+        .resizer-lt { width: 12px; height: 12px; left: 0; top: 0; cursor: nwse-resize; }
+        .resizer-rt { width: 12px; height: 12px; right: 0; top: 0; cursor: nesw-resize; }
+        .resizer-bl { width: 12px; height: 12px; left: 0; bottom: 0; cursor: nesw-resize; }
+
+        #layers-editor-container { overflow-y: auto; padding: 1.5rem; flex-grow: 1; }
+        
+        .layer-editor-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            cursor: pointer;
+            width: 100%;
+            padding: 0.5rem 0;
+        }
+
+        .layer-editor-header.is-expanded {
+             border-bottom: 1px solid var(--border-color);
+             margin-bottom: 1rem;
+        }
+        
+        .editor-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .layer-editor-row.is-collapsed .editor-wrapper, .layer-editor-row.is-collapsed .remove-btn, .layer-editor-row.is-collapsed .layer-controls {
+            display: none;
+        }
+        .layer-editor-row.is-collapsed .layer-editor-header {
+            padding: 0.5rem 1.5rem;
+        }
+        .layer-editor-row:not(.is-collapsed) .layer-editor-header {
+            display: none;
+        }
+        .layer-editor-row:not(.is-collapsed) .editor-and-controls {
+            display: grid;
+            grid-template-columns: 200px 1fr 100px;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        .layer-editor-row:not(.is-collapsed) .flex-col {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        #show-editor-button {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 999;
+            display: none;
+            background-color: var(--accent-color);
+            color: white;
+            padding: 1rem;
+            border-radius: 9999px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, background-color 0.2s;
+        }
+
+        #show-editor-button:hover {
+            transform: scale(1.05);
+            background-color: var(--accent-hover);
+        }
+
+        #show-editor-button.is-visible {
+            display: flex;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -460,7 +549,7 @@
              <h1 class="text-3xl font-bold text-center flex-grow text-gray-50" style="color: var(--text-headings);">ABIMANTRA NOT ANGKA</h1>
         </div>
 
-        <div id="instructions-panel">
+        <div id="instructions-panel" class="is-minimized">
             <div class="instructions-header">
                  <h2 class="text-lg font-bold text-gray-200" style="color: var(--text-headings);">Petunjuk</h2>
                  <div id="instructions-window-controls">
@@ -592,6 +681,10 @@
 
         <div class="main-watermark">Dibuat dengan ABIMANTRA NOT ANGKA | by Yoga Andika</div>
     </div>
+    
+    <button id="show-editor-button" title="Tampilkan Editor">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+    </button>
 
     <!-- The floating window will be created and appended here by JavaScript -->
     
@@ -601,6 +694,24 @@
             const box = document.getElementById('message-box'); box.textContent = message;
             box.style.backgroundColor = type === 'success' ? '#22c55e' : '#ef4444'; box.classList.add('show');
             setTimeout(() => { box.classList.remove('show'); }, 3000);
+        }
+
+        function playSingleNote(noteChar, layerIndex) {
+            const layer = layers[layerIndex];
+            if (!layer || layer.instrument === 'accomp') return;
+
+            // Ambil nada dasar saat ini untuk pitch yang benar
+            const currentKey = tonalitasSelect.value;
+    
+            // Proses karakter not untuk mendapatkan pitch
+            const noteData = { visualNote: noteChar, visualModifier: '', isStaccato: false, isFermata: false };
+            const toneNote = getToneNote(noteData, layer, currentKey);
+
+            if (toneNote) {
+                const player = TonePlayers[layer.instrument];
+                // Mainkan not untuk durasi pendek (misalnya, not seperdelapan)
+                player.triggerAttackRelease(toneNote, '8n');
+                }
         }
 
         // --- GLOBAL VARIABLES & DOM ELEMENTS ---
@@ -627,6 +738,7 @@
             undoBtn = document.getElementById('undoBtn');
             redoBtn = document.getElementById('redoBtn');
             addLayerBtn = document.getElementById('addLayerBtn');
+            layersEditorContainer = document.getElementById('layers-editor-container');
         }
         
         let zoomFactor = 1.0; let layers = []; let TonePlayers = {};
@@ -849,7 +961,6 @@
             }
             return barContentHtml;
         }
-
 
         function renderCombinedSheet() {
             combinedSheetContainer.querySelectorAll('.page, .music-row-wrapper').forEach(el => el.remove());
@@ -1086,42 +1197,48 @@
             layersEditorContainer.innerHTML = '';
             layers.forEach((layer, index) => {
                 const editorRow = document.createElement('div');
-                editorRow.className = 'layer-editor-row';
+                editorRow.className = `layer-editor-row ${layer.isEditorHidden ? 'is-collapsed' : ''}`;
                 editorRow.dataset.index = index;
-
-                if(layer.isEditorHidden) {
-                    editorRow.classList.add('is-collapsed');
-                }
-                const labelText = layer.isEditorHidden ? 'Tampilkan Editor' : 'Sembunyikan Editor';
-                const removeButtonHtml = index > 0 || (layers.length > 1) ? `<button class="remove-btn self-center">Hapus</button>` : '';
+                
+                const removeButtonHtml = index > 0 || layers.length > 1 ? `
+                    <button class="remove-btn">Hapus</button>
+                ` : '';
 
                 editorRow.innerHTML = `
-                    <div class="flex flex-col gap-2 self-start">
-                        <div class="flex items-center justify-between">
-                            <h3 class="font-bold text-gray-200" style="color: var(--text-headings)">Layer ${index + 1}</h3>
+                    <div class="layer-editor-header flex items-center justify-between gap-4 py-2 px-4 cursor-pointer w-full">
+                        <div class="flex items-center gap-2">
+                           <h3 class="font-bold text-gray-200" style="color: var(--text-headings)">Layer ${index + 1}</h3>
+                           <span class="instrument-name text-sm text-gray-600" style="color: var(--text-secondary)">(${layer.instrument})</span>
                         </div>
-                        <select class="layer-instrument-select w-full">
-                            <option value="piano">Piano</option> 
-                            <option value="flute">Flute</option> 
-                            <option value="bass">Bass</option>
-                            <option value="accomp">Accomp</option>
-                        </select>
-                        <div class="flex items-center mt-2">
-                           <input type="checkbox" id="layer-editor-toggle-${index}" class="layer-editor-toggle h-4 w-4 rounded" style="color: var(--accent-color)" ${layer.isEditorHidden ? 'checked' : ''}>
-                           <label for="layer-editor-toggle-${index}" class="ml-2 text-sm font-semibold">${labelText}</label>
+                        <svg class="h-4 w-4 text-gray-500 transition-transform duration-200" style="transform: rotate(${layer.isEditorHidden ? '-90deg' : '0deg'});" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                    <div class="editor-and-controls flex flex-col sm:flex-row gap-4 w-full">
+                        <div class="flex flex-col gap-2 self-start w-full sm:w-auto">
+                            <label class="font-semibold text-gray-500" style="color: var(--text-secondary)">Instrumen</label>
+                            <select class="layer-instrument-select w-full">
+                                <option value="piano">Piano</option> 
+                                <option value="flute">Flute</option> 
+                                <option value="bass">Bass</option>
+                                <option value="accomp">Accomp</option>
+                            </select>
                         </div>
+                        <div class="editor-wrapper">
+                            <div class="layer-notation-bar-numbers"></div>
+                            <textarea class="layer-notation-editor" spellcheck="false" placeholder="${layer.instrument === 'accomp' ? 'C G Am F z...' : '1 2 3 4...'}"></textarea>
+                        </div>
+                        ${removeButtonHtml}
                     </div>
-                    <div class="editor-wrapper ${layer.isEditorHidden ? 'hidden' : ''}">
-                        <div class="layer-notation-bar-numbers"></div>
-                        <textarea class="layer-notation-editor" spellcheck="false" placeholder="${layer.instrument === 'accomp' ? 'C G Am F z...' : '1 2 3 4...'}"></textarea>
-                    </div>
-                    ${removeButtonHtml}
                 `;
-                editorRow.querySelector('.layer-instrument-select').value = layer.instrument;
+                
+                const instrumentSelect = editorRow.querySelector('.layer-instrument-select');
+                instrumentSelect.value = layer.instrument;
+                
                 const editorTextarea = editorRow.querySelector('.layer-notation-editor');
                 const formatterDiv = editorRow.querySelector('.layer-notation-bar-numbers');
-                editorTextarea.value = layer.notation;
-                formatterDiv.innerHTML = formatNotationWithAutoBars(layer.notation, biramaSelect.value);
+                if (editorTextarea) {
+                    editorTextarea.value = layer.notation;
+                    formatterDiv.innerHTML = formatNotationWithAutoBars(layer.notation, biramaSelect.value);
+                }
                 
                 layersEditorContainer.appendChild(editorRow);
             });
@@ -1227,14 +1344,31 @@
         }
 
 
-        function toggleEditorWindow() {
+        function toggleEditorWindow(action) {
             const floatingWindow = document.getElementById('floating-editor-window');
-            floatingWindow.classList.toggle('is-minimized');
+            const showEditorButton = document.getElementById('show-editor-button');
+            if (action === 'minimize') {
+                floatingWindow.style.display = 'none';
+                showEditorButton.classList.add('is-visible');
+            } else if (action === 'maximize') {
+                floatingWindow.style.display = 'flex';
+                showEditorButton.classList.remove('is-visible');
+            }
         }
         
         function toggleInstructionsWindow() {
             const instructionsPanel = document.getElementById('instructions-panel');
             instructionsPanel.classList.toggle('is-minimized');
+            const showBtn = document.getElementById('maximize-instructions-btn');
+            const hideBtn = document.getElementById('minimize-instructions-btn');
+
+            if (instructionsPanel.classList.contains('is-minimized')) {
+                showBtn.style.display = 'flex';
+                hideBtn.style.display = 'none';
+            } else {
+                showBtn.style.display = 'none';
+                hideBtn.style.display = 'flex';
+            }
         }
         
         // --- LAYER MANAGEMENT ---
@@ -1245,7 +1379,7 @@
                 history: [''], 
                 historyIndex: 0, 
                 rowOverrides: {},
-                isEditorHidden: false
+                isEditorHidden: true
             });
             activeLayerIndex = layers.length - 1;
             renderAll();
@@ -1363,15 +1497,23 @@
             const body = document.body;
             const iconEnter = document.getElementById('fullscreen-enter-icon');
             const iconExit = document.getElementById('fullscreen-exit-icon');
+            const floatingEditorWindow = document.getElementById('floating-editor-window');
+            const showEditorButton = document.getElementById('show-editor-button');
 
             body.classList.toggle('fullscreen-mode');
 
             if (body.classList.contains('fullscreen-mode')) {
                 iconEnter.classList.add('hidden');
                 iconExit.classList.remove('hidden');
+                // Editor should be hidden by default in fullscreen mode, showing the pen button instead
+                floatingEditorWindow.style.display = 'none';
+                showEditorButton.classList.add('is-visible');
             } else {
                 iconEnter.classList.remove('hidden');
                 iconExit.classList.add('hidden');
+                // When exiting fullscreen, hide the pen button and show the editor
+                showEditorButton.classList.remove('is-visible');
+                floatingEditorWindow.style.display = 'flex';
             }
         }
 
@@ -1379,7 +1521,7 @@
             downloadPngBtn.disabled = true;
             downloadPngBtn.textContent = 'Memproses...';
 
-            const allControls = document.querySelectorAll('.row-layout-controls, #fullscreen-btn');
+            const allControls = document.querySelectorAll('.row-layout-controls, #fullscreen-btn, #floating-editor-window, #show-editor-button');
             allControls.forEach(c => c.style.visibility = 'hidden');
 
             try {
@@ -1446,84 +1588,82 @@
         }
 
         async function downloadAsPdf() {
-            downloadPdfBtn.disabled = true;
-            downloadPdfBtn.textContent = 'Memproses...';
+    downloadPdfBtn.disabled = true;
+    downloadPdfBtn.textContent = 'Memproses...';
 
-            const allControls = document.querySelectorAll('.row-layout-controls, #fullscreen-btn');
-            allControls.forEach(c => c.style.visibility = 'hidden');
-            document.querySelectorAll('.page-watermark').forEach(wm => wm.classList.add('pdf-export-hidden'));
+    const allControls = document.querySelectorAll('.row-layout-controls, #fullscreen-btn, #floating-editor-window, #show-editor-button');
+    allControls.forEach(c => c.style.visibility = 'hidden');
+    document.querySelectorAll('.page-watermark').forEach(wm => wm.classList.add('pdf-export-hidden'));
 
-            try {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF('p', 'mm', 'a4');
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
 
-                const pages = document.querySelectorAll('#combined-sheet-container .page');
-                if (pages.length === 0) {
-                    showMessageBox('Tidak ada notasi untuk diunduh.', 'error');
-                    return;
-                }
-
-                for (let i = 0; i < pages.length; i++) {
-                    const page = pages[i];
-                    const canvas = await html2canvas(page, {
-                        scale: 3,
-                        useCORS: true,
-                        backgroundColor: '#ffffff'
-                    });
-
-                    const imgData = canvas.toDataURL('image/png');
-                    const imgProps = doc.getImageProperties(imgData);
-                    const pdfWidth = doc.internal.pageSize.getWidth();
-                    const pdfHeight = doc.internal.pageSize.getHeight();
-                    const margin = 10;
-                    
-                    const availableWidth = pdfWidth - margin * 2;
-                    const availableHeight = pdfHeight - margin * 2;
-
-                    const imgRatio = imgProps.width / imgProps.height;
-                    const pageRatio = availableWidth / availableHeight;
-
-                    let finalWidth, finalHeight;
-                    if(imgRatio > pageRatio){
-                        finalWidth = availableWidth;
-                        finalHeight = availableWidth / imgRatio;
-                    } else {
-                        finalHeight = availableHeight;
-                        finalWidth = availableHeight * imgRatio;
-                    }
-
-                    const x = (pdfWidth - finalWidth) / 2;
-                    const y = (pdfHeight - finalHeight) / 2;
-                    
-                    if (i > 0) {
-                        doc.addPage();
-                    }
-                    doc.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
-                }
-                
-                const watermarkText = 'Dibuat dengan ABIMANTRA NOT ANGKA | by Yoga Andika';
-                doc.setPage(doc.internal.getNumberOfPages());
-                doc.setFontSize(8);
-                doc.setTextColor(150);
-                const pageWidth = doc.internal.pageSize.getWidth();
-                const pageHeight = doc.internal.pageSize.getHeight();
-                doc.text(watermarkText, pageWidth - 10, pageHeight - 10, { align: 'right' });
-
-
-                const titleValue = titleInput.value || 'notasi-lagu';
-                doc.save(`${titleValue.toLowerCase().replace(/\s/g, '-')}.pdf`);
-                showMessageBox('PDF berhasil diunduh!', 'success');
-
-            } catch (error) {
-                console.error("Gagal mengunduh PDF:", error);
-                showMessageBox('Gagal membuat file PDF.', 'error');
-            } finally {
-                downloadPdfBtn.disabled = false;
-                downloadPdfBtn.textContent = 'Unduh PDF';
-                allControls.forEach(c => c.style.visibility = '');
-                document.querySelectorAll('.page-watermark').forEach(wm => wm.classList.remove('pdf-export-hidden'));
-            }
+        const pages = document.querySelectorAll('#combined-sheet-container .page');
+        if (pages.length === 0) {
+            showMessageBox('Tidak ada notasi untuk diunduh.', 'error');
+            return;
         }
+
+        const watermarkText = 'Dibuat dengan ABIMANTRA NOT ANGKA | by Yoga Andika';
+        const fontSize = 8;
+        const watermarkColor = 150;
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const margin = 10;
+        
+        for (let i = 0; i < pages.length; i++) {
+            const page = pages[i];
+            const canvas = await html2canvas(page, {
+                scale: 3,
+                useCORS: true,
+                backgroundColor: '#ffffff'
+            });
+
+            const imgData = canvas.toDataURL('image/png');
+            const imgProps = doc.getImageProperties(imgData);
+            
+            const availableWidth = pageWidth - margin * 2;
+            const availableHeight = pageHeight - margin * 2;
+            const imgRatio = imgProps.width / imgProps.height;
+            const pageRatio = availableWidth / availableHeight;
+            let finalWidth, finalHeight;
+            
+            if (imgRatio > pageRatio) {
+                finalWidth = availableWidth;
+                finalHeight = availableWidth / imgRatio;
+            } else {
+                finalHeight = availableHeight;
+                finalWidth = availableHeight * imgRatio;
+            }
+
+            const x = (pageWidth - finalWidth) / 2;
+            const y = (pageHeight - finalHeight) / 2;
+
+            if (i > 0) {
+                doc.addPage();
+            }
+            doc.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
+            
+            doc.setFontSize(fontSize);
+            doc.setTextColor(watermarkColor);
+            doc.text(watermarkText, pageWidth - margin, pageHeight - margin, { align: 'right' });
+        }
+        
+        const titleValue = titleInput.value || 'notasi-lagu';
+        doc.save(`${titleValue.toLowerCase().replace(/\s/g, '-')}.pdf`);
+        showMessageBox('PDF berhasil diunduh!', 'success');
+
+    } catch (error) {
+        console.error("Gagal mengunduh PDF:", error);
+        showMessageBox('Gagal membuat file PDF.', 'error');
+    } finally {
+        downloadPdfBtn.disabled = false;
+        downloadPdfBtn.textContent = 'Unduh PDF';
+        allControls.forEach(c => c.style.visibility = '');
+        document.querySelectorAll('.page-watermark').forEach(wm => wm.classList.remove('pdf-export-hidden'));
+    }
+}
         
         // --- EDITOR FORMATTING & CURSOR MANAGEMENT ---
         function formatNotationWithAutoBars(notation, biramaValue) {
@@ -1601,6 +1741,22 @@
                     recordHistory(index, editorTextarea.value);
                     renderCombinedSheet();
                     editorRow.querySelector('.layer-notation-bar-numbers').innerHTML = formatNotationWithAutoBars(editorTextarea.value, biramaSelect.value);
+                
+                }
+            });
+
+             // Pendengar acara baru untuk pemutaran not secara real-time
+            document.body.addEventListener('keyup', (e) => {
+                if (!e.target.classList.contains('layer-notation-editor')) return;
+
+                // Kita hanya ingin memutar not musik, bukan tombol lainnya
+                const musicalNotes = ['1', '2', '3', '4', '5', '6', '7', 'o'];
+                if (musicalNotes.includes(e.key)) {
+                    const editorRow = e.target.closest('.layer-editor-row');
+                    if (editorRow) {
+                        const index = parseInt(editorRow.dataset.index);
+                        playSingleNote(e.key, index);
+                    }
                 }
             });
 
@@ -1621,13 +1777,18 @@
                     const newInstrument = e.target.value;
                     layers[index].instrument = newInstrument;
                     renderAll();
-                } else if (e.target.classList.contains('layer-editor-toggle')) {
-                    layers[index].isEditorHidden = e.target.checked;
-                    renderAll();
                 }
             });
             
             document.body.addEventListener('click', (e) => {
+                 const header = e.target.closest('.layer-editor-header');
+                 if (header) {
+                     const editorRow = header.closest('.layer-editor-row');
+                     const index = parseInt(editorRow.dataset.index);
+                     layers[index].isEditorHidden = !layers[index].isEditorHidden;
+                     renderAll();
+                 }
+
                 const removeBtn = e.target.closest('.remove-btn');
                 if (removeBtn) {
                     const editorRow = removeBtn.closest('.layer-editor-row'); 
@@ -1740,19 +1901,14 @@
             
             floatingWindow.innerHTML = `
                 <div class="floating-editor-header">
-                     <div id="editor-window-controls">
-                        <button id="minimize-editor-btn" class="editor-control-btn" title="Minimize">
-                            <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 6H11" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        </button>
-                        <button id="maximize-editor-btn" class="editor-control-btn" title="Maximize">
-                             <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 8.5V3.5C1.5 2.39543 2.39543 1.5 3.5 1.5H8.5C9.60457 1.5 10.5 2.39543 10.5 3.5V8.5C10.5 9.60457 9.60457 10.5 8.5 10.5H3.5C2.39543 10.5 1.5 9.60457 1.5 8.5Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        </button>
-                    </div>
                     <span>Editor Layer</span>
-                    <div class="editor-header-actions flex items-center gap-2">
+                    <div class="editor-header-actions">
                         <button id="undoBtn" class="btn btn-secondary" disabled>Undo</button>
                         <button id="redoBtn" class="btn btn-secondary" disabled>Redo</button>
-                        <button id="addLayerBtn" class="btn btn-secondary">Tambah Layer</button>
+                        <button id="addLayerBtn" class="btn btn-primary">Tambah Layer</button>
+                        <button id="minimize-editor-btn" class="editor-control-btn" title="Sembunyikan Editor">
+                            <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 6H11" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
                     </div>
                 </div>
                 <div id="layers-editor-container" class="flex flex-col gap-4"></div>
@@ -1774,8 +1930,8 @@
             makeResizable(floatingWindow);
             initializeInstruments(); 
 
-            document.getElementById('minimize-editor-btn').addEventListener('click', toggleEditorWindow);
-            document.getElementById('maximize-editor-btn').addEventListener('click', toggleEditorWindow);
+            document.getElementById('minimize-editor-btn').addEventListener('click', () => toggleEditorWindow('minimize'));
+            document.getElementById('show-editor-button').addEventListener('click', () => toggleEditorWindow('maximize'));
             document.getElementById('minimize-instructions-btn').addEventListener('click', toggleInstructionsWindow);
             document.getElementById('maximize-instructions-btn').addEventListener('click', toggleInstructionsWindow);
 
@@ -1806,4 +1962,3 @@
     </script>
 </body>
 </html>
-
