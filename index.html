@@ -492,7 +492,8 @@
             position: fixed; top: 150px; right: 40px; width: 600px; max-width: 90vw; max-height: 70vh; background-color: var(--bg-secondary); border-radius: 1.5rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1); z-index: 1000; display: flex; flex-direction: column; border: 1px solid var(--border-color); transition: width 0.3s ease-in-out, height 0.3s ease-in-out; min-width: 300px; min-height: 200px;
         }
         #floating-editor-window.is-minimized { 
-            display: none; 
+            opacity: 0;
+            pointer-events: none;
         }
         .floating-editor-header { padding: 1rem 1.5rem; font-weight: 700; color: var(--text-headings); background-color: var(--bg-tertiary); border-bottom: 1px solid var(--border-color); cursor: move; border-top-left-radius: 1.5rem; border-top-right-radius: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
         #editor-window-controls { display: flex; align-items: center; gap: 0.5rem; }
@@ -579,6 +580,88 @@
 
         #show-editor-button.is-visible {
             display: flex;
+        }
+
+        #floating-keyboard-window {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            width: 500px;
+            max-width: 95vw;
+            background-color: var(--bg-secondary);
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+            z-index: 990;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border-color);
+            transition: width 0.3s ease-in-out;
+            min-width: 300px;
+        }
+
+        #keyboard-layout {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.75rem;
+            padding: 1rem;
+        }
+
+        .keyboard-btn {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 0.5rem 0;
+            font-size: 0.5rem;
+            font-weight: 50;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            line-height: 1;
+        }
+
+        .keyboard-btn:hover {
+            background-color: var(--accent-color);
+            color: var(--accent-text);
+            transform: translateY(-2px);
+        }
+
+        .keyboard-btn:active {
+            transform: scale(0.95);
+        }
+
+        .keyboard-btn.w-2 {
+            grid-column: span 2;
+        }
+        .keyboard-btn.w-3 {
+            grid-column: span 3;
+        }
+
+        #show-keyboard-button {
+            position: fixed;
+            bottom: 3rem;
+            right: 3rem;
+            z-index: 999;
+            display: none;
+            background-color: none;
+            color: white;
+            padding: 1rem;
+            border-radius: 9999px;
+            box-shadow: 0 4px 6px -1px rgb(255, 255, 255), 0 2px 4px -1px rgba(255, 255, 255, 0.996);
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, background-color 0.2s;
+        }
+        
+        #show-keyboard-button:hover {
+             transform: scale(1.05);
+             background-color: var(--accent-hover);
+        }
+        
+        #show-keyboard-button.is-visible {
+             display: flex;
         }
     </style>
 </head>
@@ -676,6 +759,7 @@
 
                 <div class="flex flex-wrap justify-end items-center gap-4 mt-6">
                     <button id="saveProjectBtn" class="btn btn-secondary">Simpan Proyek</button>
+                    <button id="newProjectBtn" class="btn btn-secondary">Proyek Baru</button>
                     <button id="loadProjectBtn" class="btn btn-secondary">Buka Proyek</button>
                     <input type="file" id="loadProjectInput" class="hidden" accept=".abimantra,.json">
                     <button id="playBtn" class="btn btn-primary">Mainkan</button>
@@ -732,6 +816,10 @@
     
     <button id="show-editor-button" title="Tampilkan Editor">
         𓂃🖊
+    </button>
+
+    <button id="show-keyboard-button" title="Tampilkan Keyboard">
+        🎹
     </button>
     
     <!-- New control panel for fullscreen mode -->
@@ -807,6 +895,7 @@
         
         let zoomFactor = 1.0; let layers = []; let TonePlayers = {};
         let activeLayerIndex = 0;
+        let activeEditorElement = null; // New global variable to track focused textarea
         const baseNoteMap = { '1': 'C', '2': 'D', '3': 'E', '4': 'F', '5': 'G', '6': 'A', '7': 'B', '0': null, 'o': null };
         const bassDisplayMap = { '1': 'C', '2': 'D', '3': 'E', '4': 'F', '5': 'G', '6': 'A', '7': 'B' };
         
@@ -1442,11 +1531,23 @@
             const floatingWindow = document.getElementById('floating-editor-window');
             const showEditorButton = document.getElementById('show-editor-button');
             if (action === 'minimize') {
-                floatingWindow.style.display = 'none';
+                floatingWindow.classList.add('is-minimized');
                 showEditorButton.classList.add('is-visible');
             } else if (action === 'maximize') {
-                floatingWindow.style.display = 'flex';
+                floatingWindow.classList.remove('is-minimized');
                 showEditorButton.classList.remove('is-visible');
+            }
+        }
+
+        function toggleKeyboardWindow(action) {
+            const keyboardWindow = document.getElementById('floating-keyboard-window');
+            const showKeyboardButton = document.getElementById('show-keyboard-button');
+            if (action === 'minimize') {
+                keyboardWindow.style.display = 'none';
+                showKeyboardButton.classList.add('is-visible');
+            } else if (action === 'maximize') {
+                keyboardWindow.style.display = 'flex';
+                showKeyboardButton.classList.remove('is-visible');
             }
         }
         
@@ -1593,6 +1694,8 @@
             const iconExit = document.getElementById('fullscreen-exit-icon');
             const floatingEditorWindow = document.getElementById('floating-editor-window');
             const showEditorButton = document.getElementById('show-editor-button');
+            const floatingKeyboardWindow = document.getElementById('floating-keyboard-window');
+            const showKeyboardButton = document.getElementById('show-keyboard-button');
             const fullscreenControls = document.getElementById('fullscreen-controls');
 
             body.classList.toggle('fullscreen-mode');
@@ -1600,14 +1703,18 @@
             if (body.classList.contains('fullscreen-mode')) {
                 iconEnter.classList.add('hidden');
                 iconExit.classList.remove('hidden');
-                floatingEditorWindow.style.display = 'none';
+                floatingEditorWindow.style.display = 'is-minimized';
                 showEditorButton.classList.add('is-visible');
+                floatingKeyboardWindow.style.display = 'none';
+                showKeyboardButton.classList.add('is-visible');
                 fullscreenControls.style.display = 'flex';
             } else {
                 iconEnter.classList.remove('hidden');
                 iconExit.classList.add('hidden');
                 showEditorButton.classList.remove('is-visible');
                 floatingEditorWindow.style.display = 'flex';
+                showKeyboardButton.classList.remove('is-visible');
+                floatingKeyboardWindow.style.display = 'flex';
                 fullscreenControls.style.display = 'none';
                 stopPlayback();
             }
@@ -1618,7 +1725,7 @@
             downloadPngBtn.textContent = 'Memproses...';
             stopPlayback();
 
-            const allControls = document.querySelectorAll('.row-layout-controls, #fullscreen-btn, #floating-editor-window, #show-editor-button, #fullscreen-controls, #playBtn');
+            const allControls = document.querySelectorAll('.row-layout-controls, #fullscreen-btn, #floating-editor-window, #show-editor-button, #fullscreen-controls, #playBtn, #floating-keyboard-window, #show-keyboard-button');
             allControls.forEach(c => c.style.visibility = 'hidden');
 
             try {
@@ -1689,7 +1796,7 @@
             downloadPdfBtn.textContent = 'Memproses...';
             stopPlayback();
 
-            const allControls = document.querySelectorAll('.row-layout-controls, #fullscreen-btn, #floating-editor-window, #show-editor-button, #fullscreen-controls, #playBtn');
+            const allControls = document.querySelectorAll('.row-layout-controls, #fullscreen-btn, #floating-editor-window, #show-editor-button, #fullscreen-controls, #playBtn, #floating-keyboard-window, #show-keyboard-button');
             allControls.forEach(c => c.style.visibility = 'hidden');
             document.querySelectorAll('.page-watermark').forEach(wm => wm.classList.add('pdf-export-hidden'));
 
@@ -1796,6 +1903,37 @@
             return htmlPrefix + htmlOutput;
         }
 
+        // --- KEYBOARD INPUT LOGIC ---
+        function insertCharacter(char) {
+            if (!activeEditorElement) {
+                showMessageBox('Pilih editor terlebih dahulu!', 'error');
+                return;
+            }
+            
+            const start = activeEditorElement.selectionStart;
+            const end = activeEditorElement.selectionEnd;
+            const currentValue = activeEditorElement.value;
+            
+            if (char === 'delete') {
+                if (start === end && start > 0) {
+                    activeEditorElement.value = currentValue.substring(0, start - 1) + currentValue.substring(end);
+                    activeEditorElement.selectionStart = activeEditorElement.selectionEnd = start - 1;
+                } else {
+                    activeEditorElement.value = currentValue.substring(0, start) + currentValue.substring(end);
+                    activeEditorElement.selectionStart = activeEditorElement.selectionEnd = start;
+                }
+            } else {
+                activeEditorElement.value = currentValue.substring(0, start) + char + currentValue.substring(end);
+                activeEditorElement.selectionStart = activeEditorElement.selectionEnd = start + char.length;
+            }
+            
+            // Manually dispatch input event to update everything
+            const event = new Event('input', { bubbles: true });
+            activeEditorElement.dispatchEvent(event);
+            
+            activeEditorElement.focus();
+        }
+
         // --- EVENT LISTENERS & INITIAL SETUP ---
         function addEventListeners() {
             playBtn.addEventListener('click', togglePlayback);
@@ -1858,11 +1996,13 @@
             });
 
             document.body.addEventListener('focusin', (e) => {
-                if (!e.target.classList.contains('layer-notation-editor')) return;
-                 const editorRow = e.target.closest('.layer-editor-row');
-                if (editorRow) {
-                    activeLayerIndex = parseInt(editorRow.dataset.index);
-                    updateUndoRedoButtons();
+                if (e.target.classList.contains('layer-notation-editor')) {
+                    const editorRow = e.target.closest('.layer-editor-row');
+                    if (editorRow) {
+                        activeLayerIndex = parseInt(editorRow.dataset.index);
+                        updateUndoRedoButtons();
+                        activeEditorElement = e.target;
+                    }
                 }
             });
 
@@ -2011,6 +2151,7 @@
                             <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 6H11" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </button>
                     </div>
+                
                 </div>
                 <div id="layers-editor-container" class="flex flex-col gap-4"></div>
                 <div class="resizer resizer-r"></div>
@@ -2025,16 +2166,72 @@
             document.body.appendChild(floatingWindow);
             layersEditorContainer = document.getElementById('layers-editor-container');
 
+            const floatingKeyboardWindow = document.createElement('div');
+            floatingKeyboardWindow.id = 'floating-keyboard-window';
+            floatingKeyboardWindow.innerHTML = `
+                <div class="floating-editor-header">
+                    <span>Keyboard Not Angka</span>
+                    <div id="keyboard-window-controls" class="editor-header-actions">
+                         <button id="minimize-keyboard-btn" class="editor-control-btn" title="Sembunyikan Keyboard">
+                            <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 6H11" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                    </div>
+                </div>
+                <div id="keyboard-layout">
+                    <button class="keyboard-btn" data-value="1">1</button>
+                    <button class="keyboard-btn" data-value="2">2</button>
+                    <button class="keyboard-btn" data-value="3">3</button>
+                    <button class="keyboard-btn" data-value="4">4</button>
+                    <button class="keyboard-btn" data-value="5">5</button>
+                    <button class="keyboard-btn" data-value="6">6</button>
+                    <button class="keyboard-btn" data-value="7">7</button>
+                    <button class="keyboard-btn" data-value="0">0</button>
+                    <button class="keyboard-btn" data-value="o">o</button>
+                    <button class="keyboard-btn" data-value=" ">Spasi</button>
+                    <button class="keyboard-btn" data-value=".">Tinggi</button>
+                    <button class="keyboard-btn" data-value=",">Rendah</button>
+                    <button class="keyboard-btn" data-value="/">Kres (♯)</button>
+                    <button class="keyboard-btn" data-value="b">Mol (♭)</button>
+                    <button class="keyboard-btn" data-value="^">Stac.</button>
+                    <button class="keyboard-btn" data-value="~">Fermata</button>
+                    <button class="keyboard-btn" data-value="|">Bar (|)</button>
+                    <button class="keyboard-btn" data-value="delete" class="w-2">Del</button>
+                </div>
+                <div class="resizer resizer-r"></div>
+                <div class="resizer resizer-b"></div>
+                <div class="resizer resizer-rb"></div>
+                <div class="resizer resizer-t"></div>
+                <div class="resizer resizer-l"></div>
+                <div class="resizer resizer-lt"></div>
+                <div class="resizer resizer-rt"></div>
+                <div class="resizer resizer-bl"></div>
+            `;
+            document.body.appendChild(floatingKeyboardWindow);
+
+
             assignGlobalDOMElements();
             addEventListeners();
             makeDraggable(floatingWindow);
             makeResizable(floatingWindow);
+            makeDraggable(floatingKeyboardWindow);
+            makeResizable(floatingKeyboardWindow);
             initializeInstruments(); 
 
             document.getElementById('minimize-editor-btn').addEventListener('click', () => toggleEditorWindow('minimize'));
             document.getElementById('show-editor-button').addEventListener('click', () => toggleEditorWindow('maximize'));
             document.getElementById('minimize-instructions-btn').addEventListener('click', toggleInstructionsWindow);
             document.getElementById('maximize-instructions-btn').addEventListener('click', toggleInstructionsWindow);
+            document.getElementById('minimize-keyboard-btn').addEventListener('click', () => toggleKeyboardWindow('minimize'));
+            document.getElementById('show-keyboard-button').addEventListener('click', () => toggleKeyboardWindow('maximize'));
+
+            // Keyboard buttons logic
+            document.getElementById('keyboard-layout').addEventListener('click', (e) => {
+                const btn = e.target.closest('.keyboard-btn');
+                if (btn) {
+                    const value = btn.dataset.value;
+                    insertCharacter(value);
+                }
+            });
 
             const lightThemeBtn = document.getElementById('light-theme-btn');
             const darkThemeBtn = document.getElementById('dark-theme-btn');
