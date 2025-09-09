@@ -375,6 +375,48 @@
             z-index: 1001;
         }
         
+        body.fullscreen-mode #fullscreen-controls {
+            display: flex;
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1002;
+            gap: 1.5rem;
+        }
+        
+        body:not(.fullscreen-mode) #fullscreen-controls {
+            display: none;
+        }
+        
+        #fullscreen-controls button {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            font-weight: 600;
+            border-radius: 9999px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        
+        #fullscreen-controls button:hover {
+            transform: scale(1.05);
+            background: var(--bg-tertiary);
+        }
+        
+        #fullscreen-controls #fullscreen-play-pause-btn .play-icon,
+        #fullscreen-controls #fullscreen-play-pause-btn .pause-icon {
+            display: none;
+        }
+        
+        #fullscreen-controls #fullscreen-play-pause-btn.playing .pause-icon {
+            display: block;
+        }
+        #fullscreen-controls #fullscreen-play-pause-btn:not(.playing) .play-icon {
+            display: block;
+        }
+
         /* Repeat and Annotation Styles */
         .music-bar.repeat-start {
             border-left-style: double;
@@ -555,10 +597,10 @@
                  <h2 class="text-lg font-bold text-gray-200" style="color: var(--text-headings);">Petunjuk</h2>
                  <div id="instructions-window-controls">
                     <button id="minimize-instructions-btn" class="editor-control-btn" title="Minimize">
-                        <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 6H11" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 6H11" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </button>
                     <button id="maximize-instructions-btn" class="editor-control-btn" title="Maximize">
-                         <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 8.5V3.5C1.5 2.39543 2.39543 1.5 3.5 1.5H8.5C9.60457 1.5 10.5 2.39543 10.5 3.5V8.5C10.5 9.60457 9.60457 10.5 8.5 10.5H3.5C2.39543 10.5 1.5 9.60457 1.5 8.5Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                         <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 8.5V3.5C1.5 2.39543 2.39543 1.5 3.5 1.5H8.5C9.60457 1.5 10.5 2.39543 10.5 3.5V8.5C10.5 9.60457 9.60457 10.5 8.5 10.5H3.5C2.39543 10.5 1.5 9.60457 1.5 8.5Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </button>
                 </div>
             </div>
@@ -686,6 +728,16 @@
     <button id="show-editor-button" title="Tampilkan Editor">
         𓂃🖊
     </button>
+    
+    <div id="fullscreen-controls" class="hidden">
+        <button id="fullscreen-play-pause-btn">
+            <svg class="play-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            <svg class="pause-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+        </button>
+        <button id="fullscreen-stop-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12"></rect></svg>
+        </button>
+    </div>
 
     <!-- The floating window will be created and appended here by JavaScript -->
     
@@ -717,6 +769,7 @@
 
         // --- GLOBAL VARIABLES & DOM ELEMENTS ---
         let playBtn, addLayerBtn, downloadPngBtn, downloadPdfBtn, titleInput, arrangerInput, composerInput, biramaSelect, tonalitasSelect, bpmInput, combinedSheetContainer, layersEditorContainer, barsPerRowSelect, undoBtn, redoBtn, fullscreenBtn, saveProjectBtn, loadProjectBtn, loadProjectInput;
+        let fullscreenPlayPauseBtn, fullscreenStopBtn;
 
         function assignGlobalDOMElements() {
             playBtn = document.getElementById('playBtn');
@@ -740,10 +793,17 @@
             redoBtn = document.getElementById('redoBtn');
             addLayerBtn = document.getElementById('addLayerBtn');
             layersEditorContainer = document.getElementById('layers-editor-container');
+            
+            // New fullscreen controls
+            fullscreenPlayPauseBtn = document.getElementById('fullscreen-play-pause-btn');
+            fullscreenStopBtn = document.getElementById('fullscreen-stop-btn');
         }
         
         let zoomFactor = 1.0; let layers = []; let TonePlayers = {};
         let activeLayerIndex = 0;
+        let highlightBarIntervalId = null;
+        let currentBarHighlight = 0;
+        
         const baseNoteMap = { '1': 'C', '2': 'D', '3': 'E', '4': 'F', '5': 'G', '6': 'A', '7': 'B', '0': null, 'o': null };
         const bassDisplayMap = { '1': 'C', '2': 'D', '3': 'E', '4': 'F', '5': 'G', '6': 'A', '7': 'B' };
         
@@ -1283,13 +1343,13 @@
         }
 
         async function playAllLayers() {
-            if (Tone.Transport.state === "started") { Tone.Transport.stop(); playBtn.textContent = 'Mainkan'; return; }
+            if (Tone.Transport.state === "started") { Tone.Transport.stop(); playBtn.textContent = 'Mainkan'; fullscreenPlayPauseBtn.classList.remove('playing'); return; }
             await Tone.start(); Tone.Transport.stop(); Tone.Transport.cancel();
             
             const bpm = parseInt(bpmInput.value); Tone.Transport.bpm.value = bpm;
             const quarterNoteDuration = Tone.Time('4n').toSeconds();
             let maxDuration = 0;
-
+            
             layers.forEach(layer => {
                 if (layer.instrument === 'accomp') return; 
 
@@ -1305,9 +1365,21 @@
             });
 
             if (maxDuration > 0) {
-                Tone.Transport.scheduleOnce(() => { playBtn.textContent = 'Mainkan'; Tone.Transport.stop(); }, maxDuration);
-                Tone.Transport.start(); playBtn.textContent = 'Stop';
+                Tone.Transport.scheduleOnce(() => { playBtn.textContent = 'Mainkan'; fullscreenPlayPauseBtn.classList.remove('playing'); Tone.Transport.stop(); stopHighlight(); }, maxDuration);
+                Tone.Transport.start(); playBtn.textContent = 'Stop'; fullscreenPlayPauseBtn.classList.add('playing'); startHighlight();
             } else { showMessageBox('Tidak ada notasi valid untuk dimainkan.', 'error'); }
+        }
+
+        function stopPlayback() {
+            if (Tone.Transport.state === "started") {
+                Tone.Transport.stop();
+                playBtn.textContent = 'Mainkan';
+                fullscreenPlayPauseBtn.classList.remove('playing');
+                stopHighlight();
+                showMessageBox('Pemutaran dihentikan.', 'success');
+            } else {
+                showMessageBox('Tidak ada musik yang sedang dimainkan.', 'error');
+            }
         }
         
         function getToneNote(noteData, layer) {
@@ -1344,6 +1416,30 @@
             return finalNote;
         }
 
+        function startHighlight() {
+             stopHighlight();
+             currentBarHighlight = 0;
+             const birama = parseInt(biramaSelect.value.split('/')[0]);
+             
+             Tone.Transport.scheduleRepeat(time => {
+                 Tone.Draw.schedule(() => {
+                    document.querySelectorAll('.music-bar').forEach(bar => bar.style.backgroundColor = 'transparent');
+                    const barToHighlight = document.querySelector(`.music-bar[data-bar-index="${currentBarHighlight}"]`);
+                    if (barToHighlight) {
+                         barToHighlight.style.backgroundColor = 'rgba(59, 130, 246, 0.2)';
+                         const barParent = barToHighlight.parentElement;
+                         barParent.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                    currentBarHighlight++;
+                 }, time);
+             }, `${birama}n`); // Highlight every 'birama' beats
+        }
+        
+        function stopHighlight() {
+            Tone.Transport.clear(highlightBarIntervalId);
+            document.querySelectorAll('.music-bar').forEach(bar => bar.style.backgroundColor = 'transparent');
+            currentBarHighlight = 0;
+        }
 
         function toggleEditorWindow(action) {
             const floatingWindow = document.getElementById('floating-editor-window');
@@ -1507,15 +1603,9 @@
             if (body.classList.contains('fullscreen-mode')) {
                 iconEnter.classList.add('hidden');
                 iconExit.classList.remove('hidden');
-                floatingEditorWindow.style.display = 'is-minimized';
-                showEditorButton.classList.add('is-visible');
-                fullscreenControls.style.display = 'flex';
             } else {
                 iconEnter.classList.remove('hidden');
                 iconExit.classList.add('hidden');
-                showEditorButton.classList.remove('is-visible');
-                floatingEditorWindow.style.display = 'flex';
-                fullscreenControls.style.display = 'none';
                 stopPlayback();
             }
         }
@@ -1524,7 +1614,7 @@
             downloadPngBtn.disabled = true;
             downloadPngBtn.textContent = 'Memproses...';
 
-            const allControls = document.querySelectorAll('.row-layout-controls, #fullscreen-btn, #floating-editor-window, #show-editor-button');
+            const allControls = document.querySelectorAll('.row-layout-controls, #fullscreen-btn, #floating-editor-window, #show-editor-button, #fullscreen-controls');
             allControls.forEach(c => c.style.visibility = 'hidden');
 
             try {
@@ -1594,7 +1684,7 @@
     downloadPdfBtn.disabled = true;
     downloadPdfBtn.textContent = 'Memproses...';
 
-    const allControls = document.querySelectorAll('.row-layout-controls, #fullscreen-btn, #floating-editor-window, #show-editor-button');
+    const allControls = document.querySelectorAll('.row-layout-controls, #fullscreen-btn, #floating-editor-window, #show-editor-button, #fullscreen-controls');
     allControls.forEach(c => c.style.visibility = 'hidden');
     document.querySelectorAll('.page-watermark').forEach(wm => wm.classList.add('pdf-export-hidden'));
 
@@ -1710,6 +1800,11 @@
             fullscreenBtn.addEventListener('click', togglePseudoFullscreen);
             undoBtn.addEventListener('click', undo);
             redoBtn.addEventListener('click', redo);
+            
+            // New fullscreen controls listeners
+            fullscreenPlayPauseBtn.addEventListener('click', () => playAllLayers());
+            fullscreenStopBtn.addEventListener('click', () => stopPlayback());
+            
             [titleInput, composerInput, arrangerInput, biramaSelect, tonalitasSelect, bpmInput, barsPerRowSelect].forEach(el => { el.addEventListener('change', renderAll); });
             
             saveProjectBtn.addEventListener('click', saveProject);
