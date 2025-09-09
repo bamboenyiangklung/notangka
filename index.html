@@ -349,7 +349,8 @@
         body.fullscreen-mode #app-title-wrapper,
         body.fullscreen-mode #instructions-panel,
         body.fullscreen-mode #main-controls-wrapper,
-        body.fullscreen-mode .main-watermark {
+        body.fullscreen-mode .main-watermark,
+        body.fullscreen-mode #preview-wrapper > .flex {
             display: none;
         }
         body.fullscreen-mode #main-content-area,
@@ -366,8 +367,6 @@
             border-radius: 0;
             padding-top: 5rem;
             padding-bottom: 2rem;
-            padding-left: 2rem;
-            padding-right: 2rem;
         }
         body.fullscreen-mode #fullscreen-btn {
             position: fixed;
@@ -376,53 +375,6 @@
             z-index: 1001;
         }
         
-        /* New Styles for Fullscreen Controls */
-        #fullscreen-controls {
-            position: fixed;
-            top: 2rem;
-            left: 2rem;
-            z-index: 1001;
-            display: none; /* Hide by default */
-            gap: 1rem;
-            background-color: var(--bg-secondary);
-            padding: 0.75rem 1rem;
-            border-radius: 999px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-
-        .fullscreen-mode #fullscreen-controls {
-            display: flex; /* Show only in fullscreen mode */
-        }
-
-        .control-btn {
-            background-color: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: 9999px;
-            width: 3rem;
-            height: 3rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            color: var(--text-primary);
-        }
-
-        .control-btn:hover {
-            background-color: var(--accent-color);
-            border-color: var(--accent-color);
-            color: var(--accent-text);
-        }
-
-        .control-btn:active {
-            transform: scale(0.95);
-        }
-
-        .control-btn svg {
-            width: 1.5rem;
-            height: 1.5rem;
-        }
-
         /* Repeat and Annotation Styles */
         .music-bar.repeat-start {
             border-left-style: double;
@@ -560,11 +512,11 @@
 
         #show-editor-button {
             position: fixed;
-            top: 3rem;
-            right: 3rem;
+            top: 4rem;
+            right: 2rem;
             z-index: 999;
             display: none;
-            background-color: none;
+            background-color: 'none';
             color: white;
             padding: 1rem;
             border-radius: 9999px;
@@ -575,93 +527,11 @@
 
         #show-editor-button:hover {
             transform: scale(1.05);
-            background-color: var(--accent-hover);
+            background-color: var(--border-color);
         }
 
         #show-editor-button.is-visible {
             display: flex;
-        }
-
-        #floating-keyboard-window {
-            position: fixed;
-            bottom: 40px;
-            right: 40px;
-            width: 500px;
-            max-width: 95vw;
-            background-color: var(--bg-secondary);
-            border-radius: 1.5rem;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
-            z-index: 990;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid var(--border-color);
-            transition: width 0.3s ease-in-out;
-            min-width: 300px;
-        }
-
-        #keyboard-layout {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 0.75rem;
-            padding: 1rem;
-        }
-
-        .keyboard-btn {
-            background-color: var(--bg-tertiary);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-            border-radius: 0.5rem;
-            padding: 0.5rem 0;
-            font-size: 0.5rem;
-            font-weight: 50;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            user-select: none;
-            line-height: 1;
-        }
-
-        .keyboard-btn:hover {
-            background-color: var(--accent-color);
-            color: var(--accent-text);
-            transform: translateY(-2px);
-        }
-
-        .keyboard-btn:active {
-            transform: scale(0.95);
-        }
-
-        .keyboard-btn.w-2 {
-            grid-column: span 2;
-        }
-        .keyboard-btn.w-3 {
-            grid-column: span 3;
-        }
-
-        #show-keyboard-button {
-            position: fixed;
-            bottom: 3rem;
-            right: 3rem;
-            z-index: 999;
-            display: none;
-            background-color: none;
-            color: white;
-            padding: 1rem;
-            border-radius: 9999px;
-            box-shadow: 0 4px 6px -1px rgb(255, 255, 255), 0 2px 4px -1px rgba(255, 255, 255, 0.996);
-            cursor: pointer;
-            transition: transform 0.2s ease-in-out, background-color 0.2s;
-        }
-        
-        #show-keyboard-button:hover {
-             transform: scale(1.05);
-             background-color: var(--accent-hover);
-        }
-        
-        #show-keyboard-button.is-visible {
-             display: flex;
         }
     </style>
 </head>
@@ -685,10 +555,10 @@
                  <h2 class="text-lg font-bold text-gray-200" style="color: var(--text-headings);">Petunjuk</h2>
                  <div id="instructions-window-controls">
                     <button id="minimize-instructions-btn" class="editor-control-btn" title="Minimize">
-                        <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 6H11" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 6H11" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </button>
                     <button id="maximize-instructions-btn" class="editor-control-btn" title="Maximize">
-                         <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 8.5V3.5C1.5 2.39543 2.39543 1.5 3.5 1.5H8.5C9.60457 1.5 10.5 2.39543 10.5 3.5V8.5C10.5 9.60457 9.60457 10.5 8.5 10.5H3.5C2.39543 10.5 1.5 9.60457 1.5 8.5Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                         <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 8.5V3.5C1.5 2.39543 2.39543 1.5 3.5 1.5H8.5C9.60457 1.5 10.5 2.39543 10.5 3.5V8.5C10.5 9.60457 9.60457 10.5 8.5 10.5H3.5C2.39543 10.5 1.5 9.60457 1.5 8.5Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </button>
                 </div>
             </div>
@@ -759,7 +629,6 @@
 
                 <div class="flex flex-wrap justify-end items-center gap-4 mt-6">
                     <button id="saveProjectBtn" class="btn btn-secondary">Simpan Proyek</button>
-                    <button id="newProjectBtn" class="btn btn-secondary">Proyek Baru</button>
                     <button id="loadProjectBtn" class="btn btn-secondary">Buka Proyek</button>
                     <input type="file" id="loadProjectInput" class="hidden" accept=".abimantra,.json">
                     <button id="playBtn" class="btn btn-primary">Mainkan</button>
@@ -818,21 +687,6 @@
         𓂃🖊
     </button>
 
-    <button id="show-keyboard-button" title="Tampilkan Keyboard">
-        🎹
-    </button>
-    
-    <!-- New control panel for fullscreen mode -->
-    <div id="fullscreen-controls" class="flex items-center justify-center">
-        <button id="fullscreenPlayBtn" class="control-btn" title="Mainkan">
-            <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-            <svg id="pause-icon" class="hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
-        </button>
-        <button id="fullscreenStopBtn" class="control-btn" title="Stop">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16"></rect></svg>
-        </button>
-    </div>
-
     <!-- The floating window will be created and appended here by JavaScript -->
     
     <script>
@@ -863,7 +717,6 @@
 
         // --- GLOBAL VARIABLES & DOM ELEMENTS ---
         let playBtn, addLayerBtn, downloadPngBtn, downloadPdfBtn, titleInput, arrangerInput, composerInput, biramaSelect, tonalitasSelect, bpmInput, combinedSheetContainer, layersEditorContainer, barsPerRowSelect, undoBtn, redoBtn, fullscreenBtn, saveProjectBtn, loadProjectBtn, loadProjectInput;
-        let fullscreenPlayBtn, fullscreenStopBtn;
 
         function assignGlobalDOMElements() {
             playBtn = document.getElementById('playBtn');
@@ -882,10 +735,6 @@
             loadProjectBtn = document.getElementById('loadProjectBtn');
             loadProjectInput = document.getElementById('loadProjectInput');
             
-            // New fullscreen controls
-            fullscreenPlayBtn = document.getElementById('fullscreenPlayBtn');
-            fullscreenStopBtn = document.getElementById('fullscreenStopBtn');
-
             // These are now in the floating window
             undoBtn = document.getElementById('undoBtn');
             redoBtn = document.getElementById('redoBtn');
@@ -895,7 +744,6 @@
         
         let zoomFactor = 1.0; let layers = []; let TonePlayers = {};
         let activeLayerIndex = 0;
-        let activeEditorElement = null; // New global variable to track focused textarea
         const baseNoteMap = { '1': 'C', '2': 'D', '3': 'E', '4': 'F', '5': 'G', '6': 'A', '7': 'B', '0': null, 'o': null };
         const bassDisplayMap = { '1': 'C', '2': 'D', '3': 'E', '4': 'F', '5': 'G', '6': 'A', '7': 'B' };
         
@@ -1434,62 +1282,32 @@
             return { notes };
         }
 
-        function updatePlayPauseIcon(state) {
-            const playIcon = document.getElementById('play-icon');
-            const pauseIcon = document.getElementById('pause-icon');
-            const playBtnText = document.getElementById('playBtn');
-            if (state === 'started') {
-                playIcon.classList.add('hidden');
-                pauseIcon.classList.remove('hidden');
-                playBtnText.textContent = 'Jeda';
-            } else {
-                playIcon.classList.remove('hidden');
-                pauseIcon.classList.add('hidden');
-                playBtnText.textContent = 'Mainkan';
-            }
-        }
+        async function playAllLayers() {
+            if (Tone.Transport.state === "started") { Tone.Transport.stop(); playBtn.textContent = 'Mainkan'; return; }
+            await Tone.start(); Tone.Transport.stop(); Tone.Transport.cancel();
+            
+            const bpm = parseInt(bpmInput.value); Tone.Transport.bpm.value = bpm;
+            const quarterNoteDuration = Tone.Time('4n').toSeconds();
+            let maxDuration = 0;
 
-        async function togglePlayback() {
-            if (Tone.Transport.state === "started") {
-                Tone.Transport.pause();
-                updatePlayPauseIcon('paused');
-            } else {
-                await Tone.start();
-                if (Tone.Transport.state === "paused") {
-                    Tone.Transport.start();
-                    updatePlayPauseIcon('started');
-                } else {
-                    Tone.Transport.stop();
-                    Tone.Transport.cancel();
-                    const bpm = parseInt(bpmInput.value); Tone.Transport.bpm.value = bpm;
-                    const quarterNoteDuration = Tone.Time('4n').toSeconds();
-                    let maxDuration = 0;
+            layers.forEach(layer => {
+                if (layer.instrument === 'accomp') return; 
 
-                    layers.forEach(layer => {
-                        if (layer.instrument === 'accomp') return; 
+                const processed = processNotes(layer.notation);
+                if (processed.notes.length === 0) return;
+                const notesInTime = []; let currentTime = 0; const player = TonePlayers[layer.instrument]; if (!player) return;
+                processed.notes.forEach(noteData => {
+                    if (noteData.type === 'group' || noteData.type === 'triplet') {
+                        noteData.notes.forEach(n => { const toneNote = getToneNote(n, layer); if (toneNote) { notesInTime.push({ time: currentTime, note: toneNote, duration: n.duration * quarterNoteDuration }); } currentTime += n.duration * quarterNoteDuration; });
+                    } else { const toneNote = getToneNote(noteData, layer); if (toneNote) { notesInTime.push({ time: currentTime, note: toneNote, duration: noteData.duration * quarterNoteDuration }); } currentTime += noteData.duration * quarterNoteDuration; }
+                });
+                if (notesInTime.length > 0) { new Tone.Part((time, value) => { player.triggerAttackRelease(value.note, value.duration, time); }, notesInTime).start(0); maxDuration = Math.max(maxDuration, currentTime); }
+            });
 
-                        const processed = processNotes(layer.notation);
-                        if (processed.notes.length === 0) return;
-                        const notesInTime = []; let currentTime = 0; const player = TonePlayers[layer.instrument]; if (!player) return;
-                        processed.notes.forEach(noteData => {
-                            if (noteData.type === 'group' || noteData.type === 'triplet') {
-                                noteData.notes.forEach(n => { const toneNote = getToneNote(n, layer); if (toneNote) { notesInTime.push({ time: currentTime, note: toneNote, duration: n.duration * quarterNoteDuration }); } currentTime += n.duration * quarterNoteDuration; });
-                            } else { const toneNote = getToneNote(noteData, layer); if (toneNote) { notesInTime.push({ time: currentTime, note: toneNote, duration: noteData.duration * quarterNoteDuration }); } currentTime += noteData.duration * quarterNoteDuration; }
-                        });
-                        if (notesInTime.length > 0) { new Tone.Part((time, value) => { player.triggerAttackRelease(value.note, value.duration, time); }, notesInTime).start(0); maxDuration = Math.max(maxDuration, currentTime); }
-                    });
-
-                    if (maxDuration > 0) {
-                        Tone.Transport.scheduleOnce(() => { updatePlayPauseIcon('stopped'); }, maxDuration);
-                        Tone.Transport.start(); updatePlayPauseIcon('started');
-                    } else { showMessageBox('Tidak ada notasi valid untuk dimainkan.', 'error'); }
-                }
-            }
-        }
-        
-        function stopPlayback() {
-            Tone.Transport.stop();
-            updatePlayPauseIcon('stopped');
+            if (maxDuration > 0) {
+                Tone.Transport.scheduleOnce(() => { playBtn.textContent = 'Mainkan'; Tone.Transport.stop(); }, maxDuration);
+                Tone.Transport.start(); playBtn.textContent = 'Stop';
+            } else { showMessageBox('Tidak ada notasi valid untuk dimainkan.', 'error'); }
         }
         
         function getToneNote(noteData, layer) {
@@ -1536,18 +1354,6 @@
             } else if (action === 'maximize') {
                 floatingWindow.classList.remove('is-minimized');
                 showEditorButton.classList.remove('is-visible');
-            }
-        }
-
-        function toggleKeyboardWindow(action) {
-            const keyboardWindow = document.getElementById('floating-keyboard-window');
-            const showKeyboardButton = document.getElementById('show-keyboard-button');
-            if (action === 'minimize') {
-                keyboardWindow.style.display = 'none';
-                showKeyboardButton.classList.add('is-visible');
-            } else if (action === 'maximize') {
-                keyboardWindow.style.display = 'flex';
-                showKeyboardButton.classList.remove('is-visible');
             }
         }
         
@@ -1694,8 +1500,6 @@
             const iconExit = document.getElementById('fullscreen-exit-icon');
             const floatingEditorWindow = document.getElementById('floating-editor-window');
             const showEditorButton = document.getElementById('show-editor-button');
-            const floatingKeyboardWindow = document.getElementById('floating-keyboard-window');
-            const showKeyboardButton = document.getElementById('show-keyboard-button');
             const fullscreenControls = document.getElementById('fullscreen-controls');
 
             body.classList.toggle('fullscreen-mode');
@@ -1705,16 +1509,12 @@
                 iconExit.classList.remove('hidden');
                 floatingEditorWindow.style.display = 'is-minimized';
                 showEditorButton.classList.add('is-visible');
-                floatingKeyboardWindow.style.display = 'none';
-                showKeyboardButton.classList.add('is-visible');
                 fullscreenControls.style.display = 'flex';
             } else {
                 iconEnter.classList.remove('hidden');
                 iconExit.classList.add('hidden');
                 showEditorButton.classList.remove('is-visible');
                 floatingEditorWindow.style.display = 'flex';
-                showKeyboardButton.classList.remove('is-visible');
-                floatingKeyboardWindow.style.display = 'flex';
                 fullscreenControls.style.display = 'none';
                 stopPlayback();
             }
@@ -1723,9 +1523,8 @@
         async function downloadAsPng() {
             downloadPngBtn.disabled = true;
             downloadPngBtn.textContent = 'Memproses...';
-            stopPlayback();
 
-            const allControls = document.querySelectorAll('.row-layout-controls, #fullscreen-btn, #floating-editor-window, #show-editor-button, #fullscreen-controls, #playBtn, #floating-keyboard-window, #show-keyboard-button');
+            const allControls = document.querySelectorAll('.row-layout-controls, #fullscreen-btn, #floating-editor-window, #show-editor-button');
             allControls.forEach(c => c.style.visibility = 'hidden');
 
             try {
@@ -1792,83 +1591,82 @@
         }
 
         async function downloadAsPdf() {
-            downloadPdfBtn.disabled = true;
-            downloadPdfBtn.textContent = 'Memproses...';
-            stopPlayback();
+    downloadPdfBtn.disabled = true;
+    downloadPdfBtn.textContent = 'Memproses...';
 
-            const allControls = document.querySelectorAll('.row-layout-controls, #fullscreen-btn, #floating-editor-window, #show-editor-button, #fullscreen-controls, #playBtn, #floating-keyboard-window, #show-keyboard-button');
-            allControls.forEach(c => c.style.visibility = 'hidden');
-            document.querySelectorAll('.page-watermark').forEach(wm => wm.classList.add('pdf-export-hidden'));
+    const allControls = document.querySelectorAll('.row-layout-controls, #fullscreen-btn, #floating-editor-window, #show-editor-button');
+    allControls.forEach(c => c.style.visibility = 'hidden');
+    document.querySelectorAll('.page-watermark').forEach(wm => wm.classList.add('pdf-export-hidden'));
 
-            try {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF('p', 'mm', 'a4');
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
 
-                const pages = document.querySelectorAll('#combined-sheet-container .page');
-                if (pages.length === 0) {
-                    showMessageBox('Tidak ada notasi untuk diunduh.', 'error');
-                    return;
-                }
-
-                const watermarkText = 'Dibuat dengan ABIMANTRA NOT ANGKA | by Yoga Andika';
-                const fontSize = 8;
-                const watermarkColor = 150;
-                const pageWidth = doc.internal.pageSize.getWidth();
-                const pageHeight = doc.internal.pageSize.getHeight();
-                const margin = 10;
-                
-                for (let i = 0; i < pages.length; i++) {
-                    const page = pages[i];
-                    const canvas = await html2canvas(page, {
-                        scale: 3,
-                        useCORS: true,
-                        backgroundColor: '#ffffff'
-                    });
-
-                    const imgData = canvas.toDataURL('image/png');
-                    const imgProps = doc.getImageProperties(imgData);
-                    
-                    const availableWidth = pageWidth - margin * 2;
-                    const availableHeight = pageHeight - margin * 2;
-                    const imgRatio = imgProps.width / imgProps.height;
-                    const pageRatio = availableWidth / availableHeight;
-                    let finalWidth, finalHeight;
-                    
-                    if (imgRatio > pageRatio) {
-                        finalWidth = availableWidth;
-                        finalHeight = availableWidth / imgRatio;
-                    } else {
-                        finalHeight = availableHeight;
-                        finalWidth = availableHeight * imgRatio;
-                    }
-
-                    const x = (pageWidth - finalWidth) / 2;
-                    const y = (pageHeight - finalHeight) / 2;
-
-                    if (i > 0) {
-                        doc.addPage();
-                    }
-                    doc.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
-                    
-                    doc.setFontSize(fontSize);
-                    doc.setTextColor(watermarkColor);
-                    doc.text(watermarkText, pageWidth - margin, pageHeight - margin, { align: 'right' });
-                }
-                
-                const titleValue = titleInput.value || 'notasi-lagu';
-                doc.save(`${titleValue.toLowerCase().replace(/\s/g, '-')}.pdf`);
-                showMessageBox('PDF berhasil diunduh!', 'success');
-
-            } catch (error) {
-                console.error("Gagal mengunduh PDF:", error);
-                showMessageBox('Gagal membuat file PDF.', 'error');
-            } finally {
-                downloadPdfBtn.disabled = false;
-                downloadPdfBtn.textContent = 'Unduh PDF';
-                allControls.forEach(c => c.style.visibility = '');
-                document.querySelectorAll('.page-watermark').forEach(wm => wm.classList.remove('pdf-export-hidden'));
-            }
+        const pages = document.querySelectorAll('#combined-sheet-container .page');
+        if (pages.length === 0) {
+            showMessageBox('Tidak ada notasi untuk diunduh.', 'error');
+            return;
         }
+
+        const watermarkText = 'Dibuat dengan ABIMANTRA NOT ANGKA | by Yoga Andika';
+        const fontSize = 8;
+        const watermarkColor = 150;
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const margin = 10;
+        
+        for (let i = 0; i < pages.length; i++) {
+            const page = pages[i];
+            const canvas = await html2canvas(page, {
+                scale: 3,
+                useCORS: true,
+                backgroundColor: '#ffffff'
+            });
+
+            const imgData = canvas.toDataURL('image/png');
+            const imgProps = doc.getImageProperties(imgData);
+            
+            const availableWidth = pageWidth - margin * 2;
+            const availableHeight = pageHeight - margin * 2;
+            const imgRatio = imgProps.width / imgProps.height;
+            const pageRatio = availableWidth / availableHeight;
+            let finalWidth, finalHeight;
+            
+            if (imgRatio > pageRatio) {
+                finalWidth = availableWidth;
+                finalHeight = availableWidth / imgRatio;
+            } else {
+                finalHeight = availableHeight;
+                finalWidth = availableHeight * imgRatio;
+            }
+
+            const x = (pageWidth - finalWidth) / 2;
+            const y = (pageHeight - finalHeight) / 2;
+
+            if (i > 0) {
+                doc.addPage();
+            }
+            doc.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
+            
+            doc.setFontSize(fontSize);
+            doc.setTextColor(watermarkColor);
+            doc.text(watermarkText, pageWidth - margin, pageHeight - margin, { align: 'right' });
+        }
+        
+        const titleValue = titleInput.value || 'notasi-lagu';
+        doc.save(`${titleValue.toLowerCase().replace(/\s/g, '-')}.pdf`);
+        showMessageBox('PDF berhasil diunduh!', 'success');
+
+    } catch (error) {
+        console.error("Gagal mengunduh PDF:", error);
+        showMessageBox('Gagal membuat file PDF.', 'error');
+    } finally {
+        downloadPdfBtn.disabled = false;
+        downloadPdfBtn.textContent = 'Unduh PDF';
+        allControls.forEach(c => c.style.visibility = '');
+        document.querySelectorAll('.page-watermark').forEach(wm => wm.classList.remove('pdf-export-hidden'));
+    }
+}
         
         // --- EDITOR FORMATTING & CURSOR MANAGEMENT ---
         function formatNotationWithAutoBars(notation, biramaValue) {
@@ -1903,40 +1701,10 @@
             return htmlPrefix + htmlOutput;
         }
 
-        // --- KEYBOARD INPUT LOGIC ---
-        function insertCharacter(char) {
-            if (!activeEditorElement) {
-                showMessageBox('Pilih editor terlebih dahulu!', 'error');
-                return;
-            }
-            
-            const start = activeEditorElement.selectionStart;
-            const end = activeEditorElement.selectionEnd;
-            const currentValue = activeEditorElement.value;
-            
-            if (char === 'delete') {
-                if (start === end && start > 0) {
-                    activeEditorElement.value = currentValue.substring(0, start - 1) + currentValue.substring(end);
-                    activeEditorElement.selectionStart = activeEditorElement.selectionEnd = start - 1;
-                } else {
-                    activeEditorElement.value = currentValue.substring(0, start) + currentValue.substring(end);
-                    activeEditorElement.selectionStart = activeEditorElement.selectionEnd = start;
-                }
-            } else {
-                activeEditorElement.value = currentValue.substring(0, start) + char + currentValue.substring(end);
-                activeEditorElement.selectionStart = activeEditorElement.selectionEnd = start + char.length;
-            }
-            
-            // Manually dispatch input event to update everything
-            const event = new Event('input', { bubbles: true });
-            activeEditorElement.dispatchEvent(event);
-            
-            activeEditorElement.focus();
-        }
-
         // --- EVENT LISTENERS & INITIAL SETUP ---
         function addEventListeners() {
-            playBtn.addEventListener('click', togglePlayback);
+            addLayerBtn.addEventListener('click', addLayer);
+            playBtn.addEventListener('click', playAllLayers);
             downloadPngBtn.addEventListener('click', downloadAsPng);
             downloadPdfBtn.addEventListener('click', downloadAsPdf);
             fullscreenBtn.addEventListener('click', togglePseudoFullscreen);
@@ -1996,13 +1764,11 @@
             });
 
             document.body.addEventListener('focusin', (e) => {
-                if (e.target.classList.contains('layer-notation-editor')) {
-                    const editorRow = e.target.closest('.layer-editor-row');
-                    if (editorRow) {
-                        activeLayerIndex = parseInt(editorRow.dataset.index);
-                        updateUndoRedoButtons();
-                        activeEditorElement = e.target;
-                    }
+                if (!e.target.classList.contains('layer-notation-editor')) return;
+                 const editorRow = e.target.closest('.layer-editor-row');
+                if (editorRow) {
+                    activeLayerIndex = parseInt(editorRow.dataset.index);
+                    updateUndoRedoButtons();
                 }
             });
 
@@ -2063,10 +1829,6 @@
                     renderCombinedSheet();
                 }
             });
-
-            // New event listeners for fullscreen controls
-            fullscreenPlayBtn.addEventListener('click', togglePlayback);
-            fullscreenStopBtn.addEventListener('click', stopPlayback);
         }
 
         function makeDraggable(elmnt) {
@@ -2151,7 +1913,6 @@
                             <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 6H11" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </button>
                     </div>
-                
                 </div>
                 <div id="layers-editor-container" class="flex flex-col gap-4"></div>
                 <div class="resizer resizer-r"></div>
@@ -2166,72 +1927,16 @@
             document.body.appendChild(floatingWindow);
             layersEditorContainer = document.getElementById('layers-editor-container');
 
-            const floatingKeyboardWindow = document.createElement('div');
-            floatingKeyboardWindow.id = 'floating-keyboard-window';
-            floatingKeyboardWindow.innerHTML = `
-                <div class="floating-editor-header">
-                    <span>Keyboard Not Angka</span>
-                    <div id="keyboard-window-controls" class="editor-header-actions">
-                         <button id="minimize-keyboard-btn" class="editor-control-btn" title="Sembunyikan Keyboard">
-                            <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 6H11" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        </button>
-                    </div>
-                </div>
-                <div id="keyboard-layout">
-                    <button class="keyboard-btn" data-value="1">1</button>
-                    <button class="keyboard-btn" data-value="2">2</button>
-                    <button class="keyboard-btn" data-value="3">3</button>
-                    <button class="keyboard-btn" data-value="4">4</button>
-                    <button class="keyboard-btn" data-value="5">5</button>
-                    <button class="keyboard-btn" data-value="6">6</button>
-                    <button class="keyboard-btn" data-value="7">7</button>
-                    <button class="keyboard-btn" data-value="0">0</button>
-                    <button class="keyboard-btn" data-value="o">o</button>
-                    <button class="keyboard-btn" data-value=" ">Spasi</button>
-                    <button class="keyboard-btn" data-value=".">Tinggi</button>
-                    <button class="keyboard-btn" data-value=",">Rendah</button>
-                    <button class="keyboard-btn" data-value="/">Kres (♯)</button>
-                    <button class="keyboard-btn" data-value="b">Mol (♭)</button>
-                    <button class="keyboard-btn" data-value="^">Stac.</button>
-                    <button class="keyboard-btn" data-value="~">Fermata</button>
-                    <button class="keyboard-btn" data-value="|">Bar (|)</button>
-                    <button class="keyboard-btn" data-value="delete" class="w-2">Del</button>
-                </div>
-                <div class="resizer resizer-r"></div>
-                <div class="resizer resizer-b"></div>
-                <div class="resizer resizer-rb"></div>
-                <div class="resizer resizer-t"></div>
-                <div class="resizer resizer-l"></div>
-                <div class="resizer resizer-lt"></div>
-                <div class="resizer resizer-rt"></div>
-                <div class="resizer resizer-bl"></div>
-            `;
-            document.body.appendChild(floatingKeyboardWindow);
-
-
             assignGlobalDOMElements();
             addEventListeners();
             makeDraggable(floatingWindow);
             makeResizable(floatingWindow);
-            makeDraggable(floatingKeyboardWindow);
-            makeResizable(floatingKeyboardWindow);
             initializeInstruments(); 
 
             document.getElementById('minimize-editor-btn').addEventListener('click', () => toggleEditorWindow('minimize'));
             document.getElementById('show-editor-button').addEventListener('click', () => toggleEditorWindow('maximize'));
             document.getElementById('minimize-instructions-btn').addEventListener('click', toggleInstructionsWindow);
             document.getElementById('maximize-instructions-btn').addEventListener('click', toggleInstructionsWindow);
-            document.getElementById('minimize-keyboard-btn').addEventListener('click', () => toggleKeyboardWindow('minimize'));
-            document.getElementById('show-keyboard-button').addEventListener('click', () => toggleKeyboardWindow('maximize'));
-
-            // Keyboard buttons logic
-            document.getElementById('keyboard-layout').addEventListener('click', (e) => {
-                const btn = e.target.closest('.keyboard-btn');
-                if (btn) {
-                    const value = btn.dataset.value;
-                    insertCharacter(value);
-                }
-            });
 
             const lightThemeBtn = document.getElementById('light-theme-btn');
             const darkThemeBtn = document.getElementById('dark-theme-btn');
