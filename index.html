@@ -63,13 +63,13 @@
             padding: 2rem;
             transition: all 0.3s ease-in-out;
         }
-        
+
         @media (min-width: 1024px) {
             .container {
                 display: grid;
                 grid-template-columns: 2fr;
                 grid-template-rows: auto auto 2fr auto;
-                grid-template-areas: 
+                grid-template-areas:
                     "title"
                     "instructions"
                     "main"
@@ -77,12 +77,12 @@
                 gap: 2.5rem;
             }
         }
-        
+
         #app-title-wrapper { grid-area: title; }
         #main-content-area { grid-area: main; }
         #instructions-panel { grid-area: instructions; }
         .main-watermark { grid-area: footer; }
-        
+
         .instructions-header {
             display: flex;
             justify-content: space-between;
@@ -97,7 +97,7 @@
         .instructions-content code { background-color: var(--bg-secondary); padding: 0.15rem 0.4rem; border-radius: 0.25rem; font-family: monospace; font-weight: 600; color: var(--text-headings); }
         .instructions-content ul { list-style-position: inside; padding-left: 0.5rem; }
         .instructions-content li { margin-bottom: 0.5rem; }
-        
+
         #instructions-panel.is-minimized .instructions-content { display: none; }
         #instructions-panel.is-minimized .instructions-header { margin-bottom: 0; }
         #instructions-panel.is-minimized #minimize-instructions-btn { display: none; }
@@ -137,7 +137,7 @@
             align-items: center;
             gap: 1.5rem;
         }
-        
+
         .page {
             --zoom-factor: 1.0;
             background: white;
@@ -145,11 +145,11 @@
             width: 800px;
             max-width: 100%;
             aspect-ratio: 210 / 297;
-            padding: 1.5rem; /* Reduced padding for more content space */
+            padding: 1.5rem;
             box-shadow: 0 2px 8px rgba(0,0,0,0.15);
             display: flex;
             flex-direction: column;
-            position: relative; /* Diperlukan untuk watermark */
+            position: relative;
         }
 
         .page-content {
@@ -163,9 +163,17 @@
         .page .header-info p { margin: 0 0 0.25rem 0; }
 
         .layer-editor-row {
-            display: grid; grid-template-columns: flex; 1000px 1fr 1000px; gap: 1.5rem; align-items: center; border: 2px solid var(--border-color); border-radius: 1rem; padding: 1.5rem; background-color: var(--bg-tertiary); transition: padding 0.3s ease, min-height 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            align-items: flex-start;
+            border: 2px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            background-color: var(--bg-tertiary);
+            transition: padding 0.3s ease, min-height 0.3s ease;
         }
-        
+
         .layer-editor-row.is-collapsed {
             display: flex;
             align-items: center;
@@ -175,31 +183,79 @@
             cursor: pointer;
         }
 
-        .layer-editor-row.is-collapsed .editor-wrapper, .layer-editor-row.is-collapsed .remove-btn, .layer-editor-row.is-collapsed .layer-instrument-select {
+        .layer-editor-row.is-collapsed .editor-and-controls {
             display: none;
         }
-        .layer-editor-row.is-collapsed .layer-header {
-             flex-grow: 1;
+
+        .layer-editor-row.is-collapsed .layer-editor-header {
+            margin-bottom: 0;
+            border-bottom: none;
         }
+
+        .layer-editor-row .layer-editor-header {
+            width: 100%;
+            padding: 0;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+        }
+        
         .layer-editor-row .layer-header h3 {
-             font-weight: 600;
-             transition: color 0.2s;
+            font-weight: 600;
+            transition: color 0.2s;
         }
+
         .layer-editor-row.is-collapsed:hover .layer-header h3 {
-             color: var(--accent-color);
+            color: var(--accent-color);
         }
+
         .layer-editor-row.is-collapsed .instrument-name {
             font-size: 0.9rem;
             color: var(--text-secondary);
         }
 
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            color: var(--text-secondary);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-tertiary);
+            transition: border-color 0.2s;
+            color: var(--text-primary);
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px var(--accent-focus-ring);
+        }
+
         .editor-wrapper {
-            position: relative; border: 1px solid var(--border-color); background-color: var(--bg-primary); border-radius: 0.5rem; min-height: 120px;
+            position: relative;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-primary);
+            border-radius: 0.5rem;
+            min-height: 120px;
+            width: 100%;
         }
         .editor-wrapper:focus-within {
-             outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px var(--accent-focus-ring);
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px var(--accent-focus-ring);
         }
-        
+
         .layer-notation-bar-numbers, .layer-notation-editor {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 0.75rem 0.75rem 0.75rem 1.5rem; white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', Courier, monospace; font-size: 1rem; line-height: 2.5; border: none; resize: none;
         }
@@ -210,23 +266,69 @@
         .layer-notation-bar-numbers::before {
             content: ''; position: absolute; left: 0.75rem; top: 2rem; transform: translateY(-50%); height: 1.6em; width: 1.5px; background-color: var(--text-muted); border-radius: 1px;
         }
-        
+
+        .chord-notation-editor {
+            width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 0.5rem; background-color: var(--bg-tertiary); margin-bottom: 0.5rem; resize: none;font-family: 'Poppins', sans-serif;
+        }
+
         .layer-notation-editor {
             z-index: 2; background: transparent; color: var(--text-primary); caret-color: var(--accent-color); outline: none;
         }
+        
+        .text-notation-editor {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-tertiary);
+            transition: border-color 0.2s;
+            color: var(--text-primary);
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            min-height: 120px;
+            resize: vertical;
+        }
 
+        .text-notation-editor:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px var(--accent-focus-ring);
+        }
+
+        .editor-wrapper.text-editor-wrapper {
+            position: relative;
+            border: none;
+            background-color: transparent;
+            min-height: 120px;
+        }
+        
         .editor-auto-bar-line { position: relative; }
         .editor-auto-bar-line::before {
             content: ''; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 1.5px; height: 1.6em; background-color: var(--text-muted); border-radius: 1px;
         }
-        
+
         .editor-bar-number {
             position: absolute; bottom: 100%; left: 50%; transform: translateX(0.5ch); padding-bottom: 0.2em; font-size: 0.6rem; color: var(--accent-color); font-weight: 600; font-style: italic; opacity: 0.7; user-select: none;
         }
 
-
         .music-bar { display: inline-flex; flex-direction: column; justify-content: flex-start; position: relative; padding: 0 calc(0.25em * var(--zoom-factor)); border-left: calc(2px * var(--zoom-factor)) solid #64748b; height: fit-content; gap: calc(0.5rem * var(--zoom-factor)); }
         .layer-bar-notes { display: flex; justify-content: space-around; align-items: center; position: relative; padding: 0.25rem 0; width: 100%; min-height: 2em; }
+
+        /* New Text Layer Styles */
+        .layer-text-notes {
+            width: 100%;
+            font-family: 'Poppins', sans-serif;
+            font-size: calc(0.9rem * var(--zoom-factor));
+            color: #1a202c;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .layer-text-notes p {
+            margin: 0;
+            line-height: 1.5;
+        }
+
         .note-block { display: flex; flex-direction: column; margin: 0.002cm ; justify-content: center; align-items: center; position: relative; padding: 0 calc(0.2rem * var(--zoom-factor)); min-width: 0; z-index: 40; }
         .note-display { font-size: calc(1.2rem * var(--zoom-factor)); font-weight: 500; line-height: 1; font-family: 'Inter', sans-serif; z-index: 40; }
         .accidental-symbol, .dot-high, .dot-low, .double-dot-high, .double-dot-low, .staccato-marker { color: #333; position: absolute; line-height: 1; font-weight: 500; }
@@ -240,32 +342,109 @@
         .long-note-dot { position: absolute; font-size: calc(1.2rem * var(--zoom-factor)); font-weight: 500; z-index: 40; }
         .note-group-container { display: flex; flex-direction: row; position: relative; align-items: center; min-width: 0; }
         .note-group-container.eighth-notes::before, .note-group-container.sixteenth-notes::before, .note-group-container.sixteenth-notes::after { background-color: #333; z-index: 48; }
-        .note-group-container.eighth-notes::before { content: ''; position: absolute; top: calc(-0.6em * var(--zoom-factor)); left: 0; right: 0; height: calc(1.5px * var(--zoom-factor)); }
+        .note-group-container.eighth-notes::before { content: ''; position: absolute; top: calc(-0.6em * var(--zoom-factor)); left: 10%; right: 10%; width: 80%; height: calc(1.5px * var(--zoom-factor)); }
         .note-group-container.sixteenth-notes { display: flex; flex-direction: row; position: relative; align-items: center; width: 1.13cm; }
-        .note-group-container.sixteenth-notes::before { content: ''; position: absolute; top: calc(-0.8em * var(--zoom-factor)); left: 0; right: 0; height: calc(1.5px * var(--zoom-factor)); background-color: #333; z-index: 48;  padding: 0 1em; }
-        .note-group-container.sixteenth-notes::after { content: ''; position: absolute; top: calc(-0.6em * var(--zoom-factor)); left: 0; right: 0; height: calc(1.5px * var(--zoom-factor)); background-color: #333; z-index: 48; padding: 0 1em; }
-        .note-group-container.triplet::before { content: ''; position: absolute; top: calc(-0.7em * var(--zoom-factor)); left: 0; right: 0; height: calc(0.5em * var(--zoom-factor)); border-top: calc(1px * var(--zoom-factor)) solid #333; border-radius: calc(100% * var(--zoom-factor)) calc(100% * var(--zoom-factor)) 0 0; z-index: 38; }
+        .note-group-container.sixteenth-notes::before { content: ''; position: absolute; top: calc(-0.8em * var(--zoom-factor)); left: 0; right: 0; width: 100%; height: calc(1.5px * var(--zoom-factor)); background-color: #333; z-index: 48; padding: 0 1em; }
+        .note-group-container.sixteenth-notes::after { content: ''; position: absolute; top: calc(-0.6em * var(--zoom-factor)); left: 0; right: 0; width: 100%; height: calc(1.5px * var(--zoom-factor)); background-color: #333; z-index: 48; padding: 0 1em; }
+        .note-group-container.triplet::before { content: ''; position: absolute; top: calc(-0.7em * var(--zoom-factor)); left: 0; right: 0; width: 100%; height: calc(0.5em * var(--zoom-factor)); border-top: calc(1px * var(--zoom-factor)) solid #333; border-radius: calc(100% * var(--zoom-factor)) calc(100% * var(--zoom-factor)) 0 0; z-index: 38; }
         .note-group-container.triplet::after { content: '3'; position: absolute; top: calc(-0.7em * var(--zoom-factor)); left: 50%; transform: translate(-50%, -50%); font-size: calc(0.5em * var(--zoom-factor)); font-weight: 400; color: #333; background-color: #fff; padding: 0 calc(0.2em * var(--zoom-factor)); z-index: 39; }
         .note-group-container.eighth-notes.no-staccato::before { top: calc(-0.3em * var(--zoom-factor)); }
         .note-group-container.sixteenth-notes.no-staccato::before { top: calc(-0.5em * var(--zoom-factor)); }
         .note-group-container.sixteenth-notes.no-staccato::after { top: calc(-0.3em * var(--zoom-factor)); }
         .note-group-container.triplet.no-staccato::before { top: calc(-0.4em * var(--zoom-factor)); }
         .note-group-container.triplet.no-staccato::after { top: calc(-0.4em * var(--zoom-factor)); }
+        .note-group-container.combined-note-group.no-staccato::before { top: calc(-0.4em * var(--zoom-factor)); }
+        .note-group-container.combined-note-group.no-staccato::after { top: calc(-0.4em * var(--zoom-factor)); }
+
+        /* Gaya baru untuk notasi 1-23 */
+        .combined-note-group {
+            display: flex;
+            flex-direction: row;
+            position: relative;
+            align-items: center;
+            min-width: 0;
+        }
+        .combined-note-group .note-block:first-child::before,
+        .combined-note-group .note-group-container::before {
+            content: '';
+            position: absolute;
+            top: calc(-0.6em * var(--zoom-factor));
+            left: 30%;
+            right: 0;
+            width: 101%; 
+            height: calc(1.5px * var(--zoom-factor));
+            background-color: #333;
+            z-index: 48;
+        }
+        .combined-note-group .note-group-container::before {
+            content: '';
+            position: absolute;
+            top: calc(-0.6em * var(--zoom-factor));
+            left: 0;
+            right: 0;
+            width: 40%; 
+            height: calc(1.5px * var(--zoom-factor));
+            background-color: #333;
+            z-index: 48;
+        }
+        .combined-note-group .note-group-container::after {
+            content: '';
+            position: absolute;
+            top: calc(-0.4em * var(--zoom-factor));
+            left: 0;
+            right: 0;
+            width: 40%; 
+            height: calc(1.5px * var(--zoom-factor));
+            background-color: #333;
+            z-index: 48;
+        }
+        
+        /* Gaya baru untuk notasi 123- */
+        .note-group-container.sixteenth-eighth-group::before {
+            content: '';
+            position: absolute;
+            top: calc(-0.6em * var(--zoom-factor));
+            left: 10%;
+            right: 10%;
+            height: calc(1.5px * var(--zoom-factor));
+            background-color: #333;
+            z-index: 48;
+        }
+        .note-group-container.sixteenth-eighth-group::after {
+            content: '';
+            position: absolute;
+            top: calc(-0.4em * var(--zoom-factor));
+            left: 10%;
+            width: 50%; /* Hanya mencakup dua not pertama */
+            height: calc(1.5px * var(--zoom-factor));
+            background-color: #333;
+            z-index: 48;
+        }
         .message-box { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: #22c55e; color: white; padding: 1rem 2rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1-px rgba(0, 0, 0, 0.06); z-index: 1000; opacity: 0; transition: opacity 0.5s, top 0.5s; }
-        .message-box.show { opacity: 1; top: 90px; }
+        .message-box.show { opacity: 1; top: 30px; }
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; transition: all 0.3s ease-in-out; opacity: 0; visibility: hidden;
+        }
+        .modal.is-visible { opacity: 1; visibility: visible; }
+        .modal-content { background-color: var(--bg-secondary); padding: 2rem; border-radius: 1rem; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); text-align: center; max-width: 400px; width: 90%; transform: translateY(-20px); transition: transform 0.3s ease-in-out; }
+        .modal.is-visible .modal-content { transform: translateY(0); }
+        .modal-content h3 { font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-headings); }
+        .modal-content p { margin-bottom: 1.5rem; color: var(--text-primary); }
+        .modal-buttons { display: flex; justify-content: center; gap: 1rem; }
+        
         .bar-number { position: absolute; top: calc(-1.6em * var(--zoom-factor)); left: calc(0.25em * var(--zoom-factor)); font-size: calc(0.6rem * var(--zoom-factor)); color: #3b82f6; font-weight: 600; font-style: italic; opacity: 0.7; user-select: none; }
         .remove-btn { background-color: #ef4444; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 600; transition: background-color 0.2s; border: none; }
         .remove-btn:hover { background-color: #dc2626; }
         .bass-note { color: #0354f4; font-size: calc(0.9rem * var(--zoom-factor)); }
         .chord-note-display { color: #ec4899; font-weight: 600; font-size: calc(0.9rem * var(--zoom-factor)); font-family: 'Poppins', sans-serif; }
-        .music-row-wrapper { display: flex; align-items: center; position: relative; margin-bottom: 2.5rem; }
+        .music-row-wrapper { display: flex; flex-direction: column; align-items: center; position: relative; margin-bottom: 2.5rem; }
         .music-row { display: flex; transform-origin: top left; width: 100%; }
         .music-row > .music-bar { flex-shrink: 0; flex-grow: 0; }
         .row-layout-controls { position: absolute; right: -4rem; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 0.4rem; opacity: 0; transition: opacity 0.2s ease-in-out; pointer-events: none; }
         .music-row-wrapper:hover .row-layout-controls { opacity: 1; pointer-events: auto; }
         .row-layout-btn { border: none; background: #eaf0f6; color: #64748b; width: 1.2rem; height: 1.2rem; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; line-height: 1; transition: background-color 0.2s; }
         .row-layout-btn:hover { background: #dde5ed; }
-        
+
         .page-watermark {
             position: absolute;
             bottom: 1.5rem;
@@ -316,7 +495,7 @@
         .dark .view-mode-btn.active {
             background-color: var(--bg-tertiary);
         }
-        
+
         #combined-sheet-container.mobile-view .page {
             width: 100%;
             max-width: 420px;
@@ -324,9 +503,9 @@
             aspect-ratio: auto;
             min-height: 297px;
         }
-         #combined-sheet-container.mobile-view .page .song-title { font-size: 1.5rem; }
-         #combined-sheet-container.mobile-view .page .header-info { flex-direction: column; align-items: center; gap: 0.5rem; }
-         #combined-sheet-container.mobile-view .page .header-info > div { text-align: center !important; }
+        #combined-sheet-container.mobile-view .page .song-title { font-size: 1.5rem; }
+        #combined-sheet-container.mobile-view .page .header-info { flex-direction: column; align-items: center; gap: 0.5rem; }
+        #combined-sheet-container.mobile-view .page .header-info > div { text-align: center !important; }
 
         #combined-sheet-container.tablet-view .page {
             width: 100%;
@@ -374,7 +553,7 @@
             right: 1rem;
             z-index: 1001;
         }
-        
+
         body.fullscreen-mode #fullscreen-controls {
             display: flex;
             position: fixed;
@@ -384,11 +563,11 @@
             z-index: 1002;
             gap: 1.5rem;
         }
-        
+
         body:not(.fullscreen-mode) #fullscreen-controls {
             display: none;
         }
-        
+
         #fullscreen-controls button {
             background: var(--bg-secondary);
             color: var(--text-primary);
@@ -399,17 +578,17 @@
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
             transition: transform 0.2s, background-color 0.2s;
         }
-        
+
         #fullscreen-controls button:hover {
             transform: scale(1.05);
             background: var(--bg-tertiary);
         }
-        
+
         #fullscreen-controls #fullscreen-play-pause-btn .play-icon,
         #fullscreen-controls #fullscreen-play-pause-btn .pause-icon {
             display: none;
         }
-        
+
         #fullscreen-controls #fullscreen-play-pause-btn.playing .pause-icon {
             display: block;
         }
@@ -471,7 +650,7 @@
             z-index: 50;
         }
         .volta-bracket.is-end {
-             border-right: calc(1.5px * var(--zoom-factor)) solid #1a202c;
+            border-right: calc(1.5px * var(--zoom-factor)) solid #1a202c;
         }
         .volta-bracket-end-hook {
             position: absolute;
@@ -481,11 +660,11 @@
             width: calc(1.5px * var(--zoom-factor));
             background-color: #1a202c;
         }
-        
+
         #floating-editor-window {
             position: fixed; top: 150px; right: 40px; width: 600px; max-width: 90vw; max-height: 70vh; background-color: var(--bg-secondary); border-radius: 1.5rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1); z-index: 1000; display: flex; flex-direction: column; border: 1px solid var(--border-color); transition: width 0.3s ease-in-out, height 0.3s ease-in-out; min-width: 300px; min-height: 200px;
         }
-        #floating-editor-window.is-minimized { 
+        #floating-editor-window.is-minimized {
             opacity: 0;
             pointer-events: none;
         }
@@ -497,7 +676,7 @@
         #maximize-editor-btn { display: none; }
         #floating-editor-window.is-minimized #minimize-editor-btn { display: none; }
         #floating-editor-window.is-minimized #maximize-editor-btn { display: flex; }
-        
+
         .resizer { position: absolute; background: transparent; z-index: 1001; }
         .resizer-r { width: 8px; height: 100%; top: 0; right: 0; cursor: ew-resize; }
         .resizer-b { width: 100%; height: 8px; left: 0; bottom: 0; cursor: ns-resize; }
@@ -509,7 +688,7 @@
         .resizer-bl { width: 12px; height: 12px; left: 0; bottom: 0; cursor: nesw-resize; }
 
         #layers-editor-container { overflow-y: auto; padding: 1.5rem; flex-grow: 1; }
-        
+
         .layer-editor-header {
             display: flex;
             align-items: center;
@@ -521,10 +700,10 @@
         }
 
         .layer-editor-header.is-expanded {
-             border-bottom: 1px solid var(--border-color);
-             margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1rem;
         }
-        
+
         .editor-header-actions {
             display: flex;
             align-items: center;
@@ -541,15 +720,11 @@
             display: none;
         }
         .layer-editor-row:not(.is-collapsed) .editor-and-controls {
-            display: grid;
-            grid-template-columns: 200px 1fr 100px;
-            gap: 1.5rem;
-            align-items: center;
-        }
-        .layer-editor-row:not(.is-collapsed) .flex-col {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 1.5rem;
+            align-items: flex-start;
+            width: 100%;
         }
 
         #show-editor-button {
@@ -579,9 +754,21 @@
 </head>
 <body class="bg-gray-100">
     <div id="message-box" class="message-box"></div>
+    
+    <div id="new-project-modal" class="modal">
+        <div class="modal-content">
+            <h3 style="color: var(--text-headings);">Mulai Proyek Baru?</h3>
+            <p style="color: var(--text-primary);">Tindakan ini akan menghapus semua data notasi yang sedang Anda kerjakan. Apakah Anda yakin ingin melanjutkan?</p>
+            <div class="modal-buttons">
+                <button id="confirm-new-project-btn" class="btn btn-primary">Ya, Mulai Baru</button>
+                <button id="cancel-new-project-btn" class="btn btn-secondary">Batal</button>
+            </div>
+        </div>
+    </div>
+    
     <div class="container" id="main-container">
         <div id="app-title-wrapper" class="flex justify-between items-center">
-             <div id="theme-switcher" class="flex gap-2">
+            <div id="theme-switcher" class="flex gap-2">
                 <button id="light-theme-btn" class="theme-btn" title="Light Mode">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
                 </button>
@@ -589,30 +776,30 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                 </button>
             </div>
-             <h1 class="text-3xl font-bold text-center flex-grow text-gray-50" style="color: var(--text-headings);">ABIMANTRA NOT ANGKA</h1>
+            <h1 class="text-3xl font-bold text-center flex-grow text-gray-50" style="color: var(--text-headings);">ABIMANTRA NOT ANGKA</h1>
         </div>
 
         <div id="instructions-panel" class="is-minimized">
             <div class="instructions-header">
-                 <h2 class="text-lg font-bold text-gray-200" style="color: var(--text-headings);">Petunjuk</h2>
-                 <div id="instructions-window-controls">
+                <h2 class="text-lg font-bold text-gray-200" style="color: var(--text-headings);">Petunjuk</h2>
+                <div id="instructions-window-controls">
                     <button id="minimize-instructions-btn" class="editor-control-btn" title="Minimize">
                         <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 6H11" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </button>
                     <button id="maximize-instructions-btn" class="editor-control-btn" title="Maximize">
-                         <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 8.5V3.5C1.5 2.39543 2.39543 1.5 3.5 1.5H8.5C9.60457 1.5 10.5 2.39543 10.5 3.5V8.5C10.5 9.60457 9.60457 10.5 8.5 10.5H3.5C2.39543 10.5 1.5 9.60457 1.5 8.5Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 8.5V3.5C1.5 2.39543 2.39543 1.5 3.5 1.5H8.5C9.60457 1.5 10.5 2.39543 10.5 3.5V8.5C10.5 9.60457 9.60457 10.5 8.5 10.5H3.5C2.39543 10.5 1.5 9.60457 1.5 8.5Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </button>
                 </div>
             </div>
-             <div class="instructions-content space-y-3">
+            <div class="instructions-content space-y-3">
                 <div><h4>Dasar</h4><ul><li><code>1-7</code> untuk not.</li><li><code>0</code> untuk istirahat (diam), <code>o</code> untuk istirahat panjang (titik).</li><li>Spasi atau <code>|</code> untuk pemisah ketukan/bar.</li></ul></div>
                 <div><h4>Oktaf & Aksidental</h4><ul><li><code>1.</code> (tinggi), <code>1,</code> (rendah). Ganda juga bisa.</li><li><code>4/</code> (kres), <code>7b</code> (mol). Nada ini akan menimpa Tonalitas.</li></ul></div>
-                <div><h4>Durasi & Artikulasi</h4><ul><li><code>12</code> (1/8), <code>1234</code> (1/16), <code>123</code> (triplet).</li><li><code>1^</code> (staccato).</li><li><code>1~</code> (fermata/tahan).</li></ul></div>
-                 <div><h4>Pengulangan (Layer 1)</h4><ul><li><code>[</code> untuk mulai ulang, <code>]</code> untuk akhir ulang.</li><li><code>_a, _b, _c, _d</code> untuk ending 1-4.</li><li>Contoh: <code>[ 1 2 | _a 3 4 ] | _b 5 0 |</code></li></ul></div>
-                 <div><h4>Layer Accomp</h4><ul><li>Pilih instrumen "Accomp". Layer ini akan selalu di atas pada pratinjau.</li><li>Tulis nama chord (misal: <code>C G Am F</code>).</li><li>Gunakan <code>z</code> untuk istirahat 1 ketuk (tidak terlihat).</li></ul></div>
-                 <div><h4>Fitur Editor</h4><ul><li>Undo/Redo: <code>Ctrl/Cmd + Z</code> & <code>Y</code>.</li><li>Gunakan tombol <code>+/-</code> di ujung tiap baris untuk mengubah jumlah bar di baris tersebut.</li></ul></div>
-                 <div><h4>Simpan & Buka Proyek</h4><ul><li>Gunakan tombol <b>Simpan Proyek</b> untuk mengunduh pekerjaan Anda sebagai file <code>.abimantra</code>.</li><li>Gunakan <b>Buka Proyek</b> untuk memuat file proyek yang sudah disimpan.</li></ul></div>
-             </div>
+                <div><h4>Durasi & Artikulasi</h4><ul><li><code>12</code> (1/8), <code>1234</code> (1/16), <code>123</code> (triplet).</li><li><b class="text-orange-400">Baru: `1-23` untuk not 1/8 + dua not 1/16.</b></li><li><b class="text-orange-400">Baru: `123-` untuk dua not 1/16 + satu not 1/8.</b></li><li><code>1^</code> (staccato).</li><li><code>1~</code> (fermata/tahan).</li></ul></div>
+                <div><h4>Pengulangan (Layer 1)</h4><ul><li><code>[</code> untuk mulai ulang, <code>]</code> untuk akhir ulang.</li><li><code>_a, _b, _c, _d</code> untuk ending 1-4.</li><li>Contoh: <code>[ 1 2 | _a 3 4 ] | _b 5 0 |</code></li></ul></div>
+                <div><h4>Layer Accomp</h4><ul><li>Pilih instrumen "Accomp". Layer ini akan selalu di atas pada pratinjau.</li><li>Tulis nama chord (misal: <code>C G Am F</code>).</li><li>Gunakan <code>z</code> untuk istirahat 1 ketuk (tidak terlihat).</li></ul></div>
+                <div><h4>Fitur Editor</h4><ul><li>Undo/Redo: <code>Ctrl/Cmd + Z</code> & <code>Y</code>.</li><li>Gunakan tombol <code>+/-</code> di ujung tiap baris untuk mengubah jumlah bar di baris tersebut.</li></ul></div>
+                <div><h4>Simpan & Buka Proyek</h4><ul><li>Gunakan tombol <b>Simpan Proyek</b> untuk mengunduh pekerjaan Anda sebagai file <code>.abimantra</code>.</li><li>Gunakan <b>Buka Proyek</b> untuk memuat file proyek yang sudah disimpan.</li></ul></div>
+            </div>
         </div>
 
         <div id="main-content-area">
@@ -670,6 +857,7 @@
                 </div>
 
                 <div class="flex flex-wrap justify-end items-center gap-4 mt-6">
+                    <button id="newProjectBtn" class="btn btn-secondary">Proyek Baru</button>
                     <button id="saveProjectBtn" class="btn btn-secondary">Simpan Proyek</button>
                     <button id="loadProjectBtn" class="btn btn-secondary">Buka Proyek</button>
                     <input type="file" id="loadProjectInput" class="hidden" accept=".abimantra,.json">
@@ -690,11 +878,11 @@
                                     <span class="hidden md:inline">Mobile</span>
                                 </button>
                                 <button class="view-mode-btn px-3 py-1 text-sm font-semibold rounded-md flex items-center gap-1" data-view="tablet" title="Tampilan Tablet">
-                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
                                     <span class="hidden md:inline">Tablet</span>
                                 </button>
                                 <button class="view-mode-btn px-3 py-1 text-sm font-semibold rounded-md active flex items-center gap-1" data-view="pc" title="Tampilan PC">
-                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="2" y1="21" x2="22" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                                    <svg xmlns="http://www.w3.000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="2" y1="21" x2="22" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
                                     <span class="hidden md:inline">PC</span>
                                 </button>
                             </div>
@@ -710,14 +898,12 @@
                 </div>
                 
                 <div id="combined-sheet-container" class="not-container">
-                     <button id="fullscreen-btn" class="absolute top-4 right-4 z-50 p-2 rounded-full bg-white/60 backdrop-blur-sm hover:bg-white/90 dark:bg-black/40 dark:hover:bg-black/70 transition-colors duration-200" title="Layar Penuh">
+                    <button id="fullscreen-btn" class="absolute top-4 right-4 z-50 p-2 rounded-full bg-white/60 backdrop-blur-sm hover:bg-white/90 dark:bg-black/40 dark:hover:bg-black/70 transition-colors duration-200" title="Layar Penuh">
                         <svg id="fullscreen-enter-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
                         <svg id="fullscreen-exit-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 0-2-2h-3M3 16h3a2 2 0 0 0 2-2v-3"/></svg>
                     </button>
-                    <!-- Unified score preview will be rendered here -->
-                </div>
+                    </div>
 
-                <!-- This container is now just a placeholder. The actual editor will be in a floating window. -->
                 <div id="layers-editor-placeholder"></div>
             </div>
         </div>
@@ -739,8 +925,6 @@
         </button>
     </div>
 
-    <!-- The floating window will be created and appended here by JavaScript -->
-    
     <script>
         // --- UTILITY FUNCTIONS ---
         function showMessageBox(message, type = 'success') {
@@ -749,20 +933,25 @@
             setTimeout(() => { box.classList.remove('show'); }, 3000);
         }
 
+        function showModal(id) {
+            document.getElementById(id).classList.add('is-visible');
+        }
+
+        function hideModal(id) {
+            document.getElementById(id).classList.remove('is-visible');
+        }
+
         function playSingleNote(noteChar, layerIndex) {
             const layer = layers[layerIndex];
-            if (!layer || layer.instrument === 'accomp') return;
+            if (!layer || layer.instrument === 'accomp' || layer.instrument === 'text') return;
 
-            // Ambil nada dasar saat ini untuk pitch yang benar
             const currentKey = tonalitasSelect.value;
-    
-            // Proses karakter not untuk mendapatkan pitch
+            
             const noteData = { visualNote: noteChar, visualModifier: '', isStaccato: false, isFermata: false };
             const toneNote = getToneNote(noteData, layer, currentKey);
 
             if (toneNote) {
                 const player = TonePlayers[layer.instrument];
-                // Mainkan not untuk durasi pendek (misalnya, not seperdelapan)
                 player.triggerAttackRelease(toneNote, '8n');
                 }
         }
@@ -770,6 +959,7 @@
         // --- GLOBAL VARIABLES & DOM ELEMENTS ---
         let playBtn, addLayerBtn, downloadPngBtn, downloadPdfBtn, titleInput, arrangerInput, composerInput, biramaSelect, tonalitasSelect, bpmInput, combinedSheetContainer, layersEditorContainer, barsPerRowSelect, undoBtn, redoBtn, fullscreenBtn, saveProjectBtn, loadProjectBtn, loadProjectInput;
         let fullscreenPlayPauseBtn, fullscreenStopBtn;
+        let newProjectBtn, newProjectModal, confirmNewProjectBtn, cancelNewProjectBtn;
 
         function assignGlobalDOMElements() {
             playBtn = document.getElementById('playBtn');
@@ -787,6 +977,12 @@
             saveProjectBtn = document.getElementById('saveProjectBtn');
             loadProjectBtn = document.getElementById('loadProjectBtn');
             loadProjectInput = document.getElementById('loadProjectInput');
+            
+            // New Elements
+            newProjectBtn = document.getElementById('newProjectBtn');
+            newProjectModal = document.getElementById('new-project-modal');
+            confirmNewProjectBtn = document.getElementById('confirm-new-project-btn');
+            cancelNewProjectBtn = document.getElementById('cancel-new-project-btn');
             
             // These are now in the floating window
             undoBtn = document.getElementById('undoBtn');
@@ -888,13 +1084,35 @@
                 }
             } else {
                 const noteRegex = /([1-7o0])([\/b]?)([.,]*)(\^?)(\~?)/g;
+                const mixedNoteRegex = /^([1-7o0])([\/b]?)([.,]*)(\^?)(\~?)-([1-7o0])([\/b]?)([.,]*)(\^?)(\~?)([1-7o0])([\/b]?)([.,]*)(\^?)(\~?)$/;
+                const sixteenthEighthRegex = /^([1-7o0])([\/b]?)([.,]*)(\^?)(\~?)([1-7o0])([\/b]?)([.,]*)(\^?)(\~?)([1-7o0])([\/b]?)([.,]*)(\^?)(\~?)-$/;
+
                 for (const token of tokens) {
                     if (token === '|') { pushBar(); continue; }
                     if (['[', ']', '_a', '_b', '_c', '_d'].includes(token)) { currentBar.annotations.push(token); continue; }
 
-                    const notesInToken = [...token.matchAll(noteRegex)];
-                    if (notesInToken.length > 0) {
-                        let noteData;
+                    let noteData;
+                    const mixedNotesMatch = token.match(mixedNoteRegex);
+                    const sixteenthEighthMatch = token.match(sixteenthEighthRegex);
+
+                    if (sixteenthEighthMatch) {
+                        const [_, n1, a1, o1, s1, f1, n2, a2, o2, s2, f2, n3, a3, o3, s3, f3] = sixteenthEighthMatch;
+                        const groupData = [
+                            { visualNote: n1, visualSharp: a1 === '/', visualFlat: a1 === 'b', visualModifier: o1, isStaccato: s1.includes('^'), isFermata: f1.includes('~'), duration: 0.25 },
+                            { visualNote: n2, visualSharp: a2 === '/', visualFlat: a2 === 'b', visualModifier: o2, isStaccato: s2.includes('^'), isFermata: f2.includes('~'), duration: 0.25 },
+                            { visualNote: n3, visualSharp: a3 === '/', visualFlat: a3 === 'b', visualModifier: o3, isStaccato: s3.includes('^'), isFermata: f3.includes('~'), duration: 0.5 }
+                        ];
+                        noteData = { type: 'sixteenth-eighth-group', notes: groupData, duration: 1 };
+                    } else if (mixedNotesMatch) {
+                        const [_, n1, a1, o1, s1, f1, n2, a2, o2, s2, f2, n3, a3, o3, s3, f3] = mixedNotesMatch;
+                        const groupData = [
+                            { visualNote: n1, visualSharp: a1 === '/', visualFlat: a1 === 'b', visualModifier: o1, isStaccato: s1.includes('^'), isFermata: f1.includes('~'), duration: 0.5 },
+                            { visualNote: n2, visualSharp: a2 === '/', visualFlat: a2 === 'b', visualModifier: o2, isStaccato: s2.includes('^'), isFermata: f2.includes('~'), duration: 0.25 },
+                            { visualNote: n3, visualSharp: a3 === '/', visualFlat: a3 === 'b', visualModifier: o3, isStaccato: s3.includes('^'), isFermata: f3.includes('~'), duration: 0.25 }
+                        ];
+                        noteData = { type: 'mixed-eighth-sixteenth', notes: groupData, duration: 1 };
+                    } else {
+                        const notesInToken = [...token.matchAll(noteRegex)];
                         if (notesInToken.length === 2) {
                             const groupData = notesInToken.map(m => { const [_, note, acc, oct, stac, fermata] = m; return { visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), isFermata: fermata.includes('~'), duration: 0.5 }; });
                             noteData = { type: 'group', notes: groupData, duration: 1 };
@@ -908,12 +1126,12 @@
                             const [_, note, acc, oct, stac, fermata] = notesInToken[0];
                             noteData = { type: 'single', visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), isFermata: fermata.includes('~'), duration: 1 };
                         }
-
-                        if (currentBarBeats + noteData.duration > beatsPerBar) { pushBar(); }
-                        currentBar.notes.push(noteData);
-                        currentBarBeats += noteData.duration;
-                        if (currentBarBeats >= beatsPerBar) { pushBar(); }
                     }
+
+                    if (currentBarBeats + noteData.duration > beatsPerBar) { pushBar(); }
+                    currentBar.notes.push(noteData);
+                    currentBarBeats += noteData.duration;
+                    if (currentBarBeats >= beatsPerBar) { pushBar(); }
                 }
             }
             if (currentBar.notes.length > 0 || currentBar.annotations.length > 0) { pushBar(); }
@@ -1009,14 +1227,39 @@
                 });
             } else {
                 barNotes.forEach(noteData => {
-                    if (noteData.type === 'group' || noteData.type === 'triplet') {
+                    if (noteData.type === 'sixteenth-eighth-group') {
+                        const firstNoteHtml = createNoteBlockHtml(noteData.notes[0], isBass);
+                        const secondNoteHtml = createNoteBlockHtml(noteData.notes[1], isBass);
+                        const thirdNoteHtml = createNoteBlockHtml(noteData.notes[2], isBass);
+                        
+                        barContentHtml += `
+                            <div class="note-group-container sixteenth-eighth-group">
+                                ${firstNoteHtml}
+                                ${secondNoteHtml}
+                                ${thirdNoteHtml}
+                            </div>
+                        `;
+                    } else if (noteData.type === 'mixed-eighth-sixteenth') {
+                        const firstNoteHtml = createNoteBlockHtml(noteData.notes[0], isBass);
+                        const secondNoteHtml = createNoteBlockHtml(noteData.notes[1], isBass);
+                        const thirdNoteHtml = createNoteBlockHtml(noteData.notes[2], isBass);
+                        
+                        const noteEighthHtml = `<div class="note-block">${firstNoteHtml}</div>`;
+                        const noteSixteenthGroupHtml = `
+                            <div class="note-group-container sixteenth-notes">
+                                ${secondNoteHtml}
+                                ${thirdNoteHtml}
+                            </div>
+                        `;
+                        barContentHtml += `<div class="combined-note-group">${noteEighthHtml}${noteSixteenthGroupHtml}</div>`;
+                    } else if (noteData.type === 'group' || noteData.type === 'triplet') {
                         const hasStaccato = noteData.notes.some(n => n.isStaccato);
                         const staccatoClass = hasStaccato ? '' : 'no-staccato';
                         const groupClass = noteData.type === 'triplet' ? 'triplet' : (noteData.notes.length === 2 ? 'eighth-notes' : 'sixteenth-notes');
                         let groupHtml = noteData.notes.map(n => createNoteBlockHtml(n, isBass)).join('');
                         barContentHtml += `<div class="note-group-container ${groupClass} ${staccatoClass}">${groupHtml}</div>`;
-                    } else { 
-                        barContentHtml += createNoteBlockHtml(noteData, isBass); 
+                    } else {
+                        barContentHtml += createNoteBlockHtml(noteData, isBass);
                     }
                 });
             }
@@ -1036,17 +1279,22 @@
                 combinedSheetContainer.appendChild(fullscreenBtn);
                 return;
             } else {
-                 const placeholder = combinedSheetContainer.querySelector('.placeholder-text');
-                 if(placeholder) placeholder.remove();
+                const placeholder = combinedSheetContainer.querySelector('.placeholder-text');
+                if(placeholder) placeholder.remove();
             }
 
             const birama = parseInt(biramaSelect.value.split('/')[0]);
-            const allLayersBars = layers.map(layer => getBars(layer.notation, birama, layer.instrument === 'accomp'));
+            const allLayersBars = layers.map(layer => {
+                if (layer.instrument === 'text') {
+                    return [{ notes: [], annotations: [] }]; // Dummy for text layer
+                }
+                return getBars(layer.notation, birama, layer.instrument === 'accomp');
+            });
             const annotationBars = layers.length > 0 ? allLayersBars[0] : [];
             const maxBars = Math.max(0, ...allLayersBars.map(bars => bars.length));
 
             if (maxBars === 0) {
-                 if(!combinedSheetContainer.querySelector('.placeholder-text')) {
+                if(!combinedSheetContainer.querySelector('.placeholder-text')) {
                     const placeholder = document.createElement('p');
                     placeholder.className = 'placeholder-text text-gray-500 text-2xl font-bold p-4 text-center opacity-50';
                     placeholder.textContent = 'PRATINJAU KOSONG';
@@ -1093,27 +1341,27 @@
                         else if (annotationData.annotations.includes('_d')) voltaType = '_d';
 
                         if (voltaType) {
-                             const voltaDiv = document.createElement('div');
-                             voltaDiv.className = 'volta-bracket';
-                             
-                             let voltaText = '';
-                             switch (voltaType) {
+                            const voltaDiv = document.createElement('div');
+                            voltaDiv.className = 'volta-bracket';
+                            
+                            let voltaText = '';
+                            switch (voltaType) {
                                 case '_a': voltaText = '1.'; break;
                                 case '_b': voltaText = '2.'; break;
                                 case '_c': voltaText = '3.'; break;
                                 case '_d': voltaText = '4.'; break;
-                             }
-                             voltaDiv.textContent = voltaText;
-                             
-                             const nextBarAnnotation = annotationBars[barIndex + 1];
-                             if (!nextBarAnnotation || !nextBarAnnotation.annotations.includes(voltaType)) {
-                                 voltaDiv.classList.add('is-end');
-                                 const endHook = document.createElement('div');
-                                 endHook.className = 'volta-bracket-end-hook';
-                                 voltaDiv.appendChild(endHook);
-                             }
-                             musicBarDiv.appendChild(voltaDiv);
-                             musicBarDiv.classList.add('has-volta');
+                            }
+                            voltaDiv.textContent = voltaText;
+                            
+                            const nextBarAnnotation = annotationBars[barIndex + 1];
+                            if (!nextBarAnnotation || !nextBarAnnotation.annotations.includes(voltaType)) {
+                                voltaDiv.classList.add('is-end');
+                                const endHook = document.createElement('div');
+                                endHook.className = 'volta-bracket-end-hook';
+                                voltaDiv.appendChild(endHook);
+                            }
+                            musicBarDiv.appendChild(voltaDiv);
+                            musicBarDiv.classList.add('has-volta');
                         }
                     }
                     
@@ -1131,10 +1379,14 @@
                         .sort((a, b) => {
                             if (a.layer.instrument === 'accomp') return -1;
                             if (b.layer.instrument === 'accomp') return 1;
+                            if (a.layer.instrument === 'text') return 1; // Put text at the bottom
+                            if (b.layer.instrument === 'text') return -1;
                             return a.originalIndex - b.originalIndex;
                         });
 
                     displayOrderLayers.forEach(({ layer, bars }) => {
+                        if (layer.instrument === 'text') return; // Handled separately
+
                         const layerBarNotesDiv = document.createElement('div');
                         layerBarNotesDiv.className = 'layer-bar-notes';
                         const barData = bars[barIndex];
@@ -1147,6 +1399,15 @@
                     rowDiv.appendChild(musicBarDiv);
                 }
                 
+                // Add text layers after the music row
+                layers.filter(l => l.instrument === 'text').forEach(textLayer => {
+                    const textDiv = document.createElement('div');
+                    textDiv.className = 'layer-text-notes';
+                    const textLines = textLayer.notation.split('\n');
+                    textDiv.innerHTML = textLines.map(line => `<p>${line}</p>`).join('');
+                    rowWrapper.appendChild(textDiv);
+                });
+
                 const controlsDiv = document.createElement('div');
                 controlsDiv.className = 'row-layout-controls';
                 controlsDiv.innerHTML = `
@@ -1182,7 +1443,7 @@
                     pageDiv.innerHTML = `
                         <div class="song-title">${titleValue}</div>
                         <div class="header-info">
-                             <div>
+                            <div>
                                 <p style="font-weight: 600;">${tonalitasText}</p>
                                 <p>Birama: ${biramaValue}</p>
                             </div>
@@ -1265,8 +1526,24 @@
                     <button class="remove-btn">Hapus</button>
                 ` : '';
 
+                let editorHtml;
+                if (layer.instrument === 'text') {
+                    editorHtml = `
+                        <div class="editor-wrapper text-editor-wrapper">
+                            <textarea class="text-notation-editor" spellcheck="true" placeholder="Masukkan lirik atau catatan di sini..."></textarea>
+                        </div>
+                    `;
+                } else {
+                    editorHtml = `
+                        <div class="editor-wrapper">
+                            <div class="layer-notation-bar-numbers"></div>
+                            <textarea class="layer-notation-editor" spellcheck="false" placeholder="${layer.instrument === 'accomp' ? 'C G Am F z...' : '1 2 3 4...'}"></textarea>
+                        </div>
+                    `;
+                }
+
                 editorRow.innerHTML = `
-                    <div class="layer-editor-header flex items-center justify-between gap-4 py-2 px-4 cursor-pointer w-full">
+                    <div class="layer-editor-header flex items-center justify-between gap-4 w-full">
                         <div class="flex items-center gap-2">
                            <h3 class="font-bold text-gray-200" style="color: var(--text-headings)">Layer ${index + 1}</h3>
                            <span class="instrument-name text-sm text-gray-600" style="color: var(--text-secondary)">(${layer.instrument})</span>
@@ -1281,12 +1558,10 @@
                                 <option value="flute">Flute</option> 
                                 <option value="bass">Bass</option>
                                 <option value="accomp">Accomp</option>
+                                <option value="text">Teks</option>
                             </select>
                         </div>
-                        <div class="editor-wrapper">
-                            <div class="layer-notation-bar-numbers"></div>
-                            <textarea class="layer-notation-editor" spellcheck="false" placeholder="${layer.instrument === 'accomp' ? 'C G Am F z...' : '1 2 3 4...'}"></textarea>
-                        </div>
+                        ${editorHtml}
                         ${removeButtonHtml}
                     </div>
                 `;
@@ -1294,11 +1569,13 @@
                 const instrumentSelect = editorRow.querySelector('.layer-instrument-select');
                 instrumentSelect.value = layer.instrument;
                 
-                const editorTextarea = editorRow.querySelector('.layer-notation-editor');
-                const formatterDiv = editorRow.querySelector('.layer-notation-bar-numbers');
+                const editorTextarea = editorRow.querySelector('textarea');
                 if (editorTextarea) {
                     editorTextarea.value = layer.notation;
-                    formatterDiv.innerHTML = formatNotationWithAutoBars(layer.notation, biramaSelect.value);
+                    if (layer.instrument !== 'text') {
+                        const formatterDiv = editorRow.querySelector('.layer-notation-bar-numbers');
+                        formatterDiv.innerHTML = formatNotationWithAutoBars(editorTextarea.value, biramaSelect.value);
+                    }
                 }
                 
                 layersEditorContainer.appendChild(editorRow);
@@ -1316,27 +1593,47 @@
             const tokens = notation.replace(/\|/g, ' ').split(/\s+/).filter(Boolean);
             const notes = [];
             const noteRegex = /([1-7o0])([\/b]?)([.,]*)(\^?)(\~?)/g;
+            const mixedNoteRegex = /^([1-7o0])([\/b]?)([.,]*)(\^?)(\~?)-([1-7o0])([\/b]?)([.,]*)(\^?)(\~?)([1-7o0])([\/b]?)([.,]*)(\^?)(\~?)$/;
+            const sixteenthEighthRegex = /^([1-7o0])([\/b]?)([.,]*)(\^?)(\~?)([1-7o0])([\/b]?)([.,]*)(\^?)(\~?)([1-7o0])([\/b]?)([.,]*)(\^?)(\~?)-$/;
 
             for (const token of tokens) {
-                 if (['[', ']', '_a', '_b', '_c', '_d'].includes(token)) continue;
+                if (['[', ']', '_a', '_b', '_c', '_d', '|'].includes(token)) continue;
 
-                const notesInToken = [...token.matchAll(noteRegex)];
-                if (notesInToken.length > 0) {
-                    let noteData;
+                let noteData;
+                const mixedNotesMatch = token.match(mixedNoteRegex);
+                const sixteenthEighthMatch = token.match(sixteenthEighthRegex);
+
+                if (sixteenthEighthMatch) {
+                    const [_, n1, a1, o1, s1, f1, n2, a2, o2, s2, f2, n3, a3, o3, s3, f3] = sixteenthEighthMatch;
+                    const groupData = [
+                        { visualNote: n1, visualSharp: a1 === '/', visualFlat: a1 === 'b', visualModifier: o1, isStaccato: s1.includes('^'), isFermata: f1.includes('~'), duration: 0.25 },
+                        { visualNote: n2, visualSharp: a2 === '/', visualFlat: a2 === 'b', visualModifier: o2, isStaccato: s2.includes('^'), isFermata: f2.includes('~'), duration: 0.25 },
+                        { visualNote: n3, visualSharp: a3 === '/', visualFlat: a3 === 'b', visualModifier: o3, isStaccato: s3.includes('^'), isFermata: f3.includes('~'), duration: 0.5 }
+                    ];
+                    notes.push({ type: 'sixteenth-eighth-group', notes: groupData, duration: 1 });
+                } else if (mixedNotesMatch) {
+                    const [_, n1, a1, o1, s1, f1, n2, a2, o2, s2, f2, n3, a3, o3, s3, f3] = mixedNotesMatch;
+                    const groupData = [
+                        { visualNote: n1, visualSharp: a1 === '/', visualFlat: a1 === 'b', visualModifier: o1, isStaccato: s1.includes('^'), isFermata: f1.includes('~'), duration: 0.5 },
+                        { visualNote: n2, visualSharp: a2 === '/', visualFlat: a2 === 'b', visualModifier: o2, isStaccato: s2.includes('^'), isFermata: f2.includes('~'), duration: 0.25 },
+                        { visualNote: n3, visualSharp: a3 === '/', visualFlat: a3 === 'b', visualModifier: o3, isStaccato: s3.includes('^'), isFermata: f3.includes('~'), duration: 0.25 }
+                    ];
+                    notes.push({ type: 'mixed-eighth-sixteenth', notes: groupData, duration: 1 });
+                } else {
+                    const notesInToken = [...token.matchAll(noteRegex)];
                     if (notesInToken.length === 2) {
                         const groupData = notesInToken.map(m => { const [_, note, acc, oct, stac, fermata] = m; return { visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), isFermata: fermata.includes('~'), duration: 0.5 }; });
-                        noteData = { type: 'group', notes: groupData, duration: 1 };
+                        notes.push({ type: 'group', notes: groupData, duration: 1 });
                     } else if (notesInToken.length === 3) {
                         const groupData = notesInToken.map(m => { const [_, note, acc, oct, stac, fermata] = m; return { visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), isFermata: fermata.includes('~'), duration: 1/3 }; });
-                        noteData = { type: 'triplet', notes: groupData, duration: 1 };
+                        notes.push({ type: 'triplet', notes: groupData, duration: 1 });
                     } else if (notesInToken.length === 4) {
                         const groupData = notesInToken.map(m => { const [_, note, acc, oct, stac, fermata] = m; return { visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), isFermata: fermata.includes('~'), duration: 0.25 }; });
-                        noteData = { type: 'group', notes: groupData, duration: 1 };
+                        notes.push({ type: 'group', notes: groupData, duration: 1 });
                     } else {
                         const [_, note, acc, oct, stac, fermata] = notesInToken[0];
-                        noteData = { type: 'single', visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), isFermata: fermata.includes('~'), duration: 1 };
+                        notes.push({ type: 'single', visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), isFermata: fermata.includes('~'), duration: 1 });
                     }
-                    notes.push(noteData);
                 }
             }
             return { notes };
@@ -1351,13 +1648,13 @@
             let maxDuration = 0;
             
             layers.forEach(layer => {
-                if (layer.instrument === 'accomp') return; 
+                if (layer.instrument === 'accomp' || layer.instrument === 'text') return; 
 
                 const processed = processNotes(layer.notation);
                 if (processed.notes.length === 0) return;
                 const notesInTime = []; let currentTime = 0; const player = TonePlayers[layer.instrument]; if (!player) return;
                 processed.notes.forEach(noteData => {
-                    if (noteData.type === 'group' || noteData.type === 'triplet') {
+                    if (noteData.type === 'group' || noteData.type === 'triplet' || noteData.type === 'mixed-eighth-sixteenth' || noteData.type === 'sixteenth-eighth-group') {
                         noteData.notes.forEach(n => { const toneNote = getToneNote(n, layer); if (toneNote) { notesInTime.push({ time: currentTime, note: toneNote, duration: n.duration * quarterNoteDuration }); } currentTime += n.duration * quarterNoteDuration; });
                     } else { const toneNote = getToneNote(noteData, layer); if (toneNote) { notesInTime.push({ time: currentTime, note: toneNote, duration: noteData.duration * quarterNoteDuration }); } currentTime += noteData.duration * quarterNoteDuration; }
                 });
@@ -1417,22 +1714,22 @@
         }
 
         function startHighlight() {
-             stopHighlight();
-             currentBarHighlight = 0;
-             const birama = parseInt(biramaSelect.value.split('/')[0]);
-             
-             Tone.Transport.scheduleRepeat(time => {
-                 Tone.Draw.schedule(() => {
+            stopHighlight();
+            currentBarHighlight = 0;
+            const birama = parseInt(biramaSelect.value.split('/')[0]);
+            
+            Tone.Transport.scheduleRepeat(time => {
+                Tone.Draw.schedule(() => {
                     document.querySelectorAll('.music-bar').forEach(bar => bar.style.backgroundColor = 'transparent');
                     const barToHighlight = document.querySelector(`.music-bar[data-bar-index="${currentBarHighlight}"]`);
                     if (barToHighlight) {
-                         barToHighlight.style.backgroundColor = 'rgba(59, 130, 246, 0.2)';
-                         const barParent = barToHighlight.parentElement;
-                         barParent.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        barToHighlight.style.backgroundColor = 'rgba(59, 130, 246, 0.2)';
+                        const barParent = barToHighlight.parentElement;
+                        barParent.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }
                     currentBarHighlight++;
-                 }, time);
-             }, `${birama}n`); // Highlight every 'birama' beats
+                }, time);
+            }, `${birama}n`); // Highlight every 'birama' beats
         }
         
         function stopHighlight() {
@@ -1473,10 +1770,11 @@
             layers.push({ 
                 instrument: 'piano', 
                 notation: '', 
+                chordNotation: '',
                 history: [''], 
                 historyIndex: 0, 
                 rowOverrides: {},
-                isEditorHidden: true
+                isEditorHidden: false
             });
             activeLayerIndex = layers.length - 1;
             renderAll();
@@ -1496,6 +1794,22 @@
                 activeLayerIndex = Math.min(index, layers.length - 1);
             }
             renderAll();
+        }
+
+        function startNewProject() {
+            titleInput.value = '';
+            composerInput.value = '';
+            arrangerInput.value = '';
+            bpmInput.value = '120';
+            tonalitasSelect.value = 'C';
+            biramaSelect.value = '4/4';
+            barsPerRowSelect.value = '4';
+
+            layers = [];
+            addLayer();
+
+            renderAll();
+            showMessageBox('Proyek baru berhasil dimulai.', 'success');
         }
         
         // --- PROJECT SAVE & LOAD ---
@@ -1681,82 +1995,82 @@
         }
 
         async function downloadAsPdf() {
-    downloadPdfBtn.disabled = true;
-    downloadPdfBtn.textContent = 'Memproses...';
+            downloadPdfBtn.disabled = true;
+            downloadPdfBtn.textContent = 'Memproses...';
 
-    const allControls = document.querySelectorAll('.row-layout-controls, #fullscreen-btn, #floating-editor-window, #show-editor-button, #fullscreen-controls');
-    allControls.forEach(c => c.style.visibility = 'hidden');
-    document.querySelectorAll('.page-watermark').forEach(wm => wm.classList.add('pdf-export-hidden'));
+            const allControls = document.querySelectorAll('.row-layout-controls, #fullscreen-btn, #floating-editor-window, #show-editor-button, #fullscreen-controls');
+            allControls.forEach(c => c.style.visibility = 'hidden');
+            document.querySelectorAll('.page-watermark').forEach(wm => wm.classList.add('pdf-export-hidden'));
 
-    try {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('p', 'mm', 'a4');
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('p', 'mm', 'a4');
 
-        const pages = document.querySelectorAll('#combined-sheet-container .page');
-        if (pages.length === 0) {
-            showMessageBox('Tidak ada notasi untuk diunduh.', 'error');
-            return;
-        }
+                const pages = document.querySelectorAll('#combined-sheet-container .page');
+                if (pages.length === 0) {
+                    showMessageBox('Tidak ada notasi untuk diunduh.', 'error');
+                    return;
+                }
 
-        const watermarkText = 'Dibuat dengan ABIMANTRA NOT ANGKA | by Yoga Andika';
-        const fontSize = 8;
-        const watermarkColor = 150;
-        const pageWidth = doc.internal.pageSize.getWidth();
-        const pageHeight = doc.internal.pageSize.getHeight();
-        const margin = 10;
-        
-        for (let i = 0; i < pages.length; i++) {
-            const page = pages[i];
-            const canvas = await html2canvas(page, {
-                scale: 3,
-                useCORS: true,
-                backgroundColor: '#ffffff'
-            });
+                const watermarkText = 'Dibuat dengan ABIMANTRA NOT ANGKA | by Yoga Andika';
+                const fontSize = 8;
+                const watermarkColor = 150;
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                const margin = 10;
+                
+                for (let i = 0; i < pages.length; i++) {
+                    const page = pages[i];
+                    const canvas = await html2canvas(page, {
+                        scale: 3,
+                        useCORS: true,
+                        backgroundColor: '#ffffff'
+                    });
 
-            const imgData = canvas.toDataURL('image/png');
-            const imgProps = doc.getImageProperties(imgData);
-            
-            const availableWidth = pageWidth - margin * 2;
-            const availableHeight = pageHeight - margin * 2;
-            const imgRatio = imgProps.width / imgProps.height;
-            const pageRatio = availableWidth / availableHeight;
-            let finalWidth, finalHeight;
-            
-            if (imgRatio > pageRatio) {
-                finalWidth = availableWidth;
-                finalHeight = availableWidth / imgRatio;
-            } else {
-                finalHeight = availableHeight;
-                finalWidth = availableHeight * imgRatio;
+                    const imgData = canvas.toDataURL('image/png');
+                    const imgProps = doc.getImageProperties(imgData);
+                    
+                    const availableWidth = pageWidth - margin * 2;
+                    const availableHeight = pageHeight - margin * 2;
+                    const imgRatio = imgProps.width / imgProps.height;
+                    const pageRatio = availableWidth / availableHeight;
+                    let finalWidth, finalHeight;
+                    
+                    if (imgRatio > pageRatio) {
+                        finalWidth = availableWidth;
+                        finalHeight = availableWidth / imgRatio;
+                    } else {
+                        finalHeight = availableHeight;
+                        finalWidth = availableHeight * imgRatio;
+                    }
+
+                    const x = (pageWidth - finalWidth) / 2;
+                    const y = (pageHeight - finalHeight) / 2;
+
+                    if (i > 0) {
+                        doc.addPage();
+                    }
+                    doc.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
+                    
+                    doc.setFontSize(fontSize);
+                    doc.setTextColor(watermarkColor);
+                    doc.text(watermarkText, pageWidth - margin, pageHeight - margin, { align: 'right' });
+                }
+                
+                const titleValue = titleInput.value || 'notasi-lagu';
+                doc.save(`${titleValue.toLowerCase().replace(/\s/g, '-')}.pdf`);
+                showMessageBox('PDF berhasil diunduh!', 'success');
+
+            } catch (error) {
+                console.error("Gagal mengunduh PDF:", error);
+                showMessageBox('Gagal membuat file PDF.', 'error');
+            } finally {
+                downloadPdfBtn.disabled = false;
+                downloadPdfBtn.textContent = 'Unduh PDF';
+                allControls.forEach(c => c.style.visibility = '');
+                document.querySelectorAll('.page-watermark').forEach(wm => wm.classList.remove('pdf-export-hidden'));
             }
-
-            const x = (pageWidth - finalWidth) / 2;
-            const y = (pageHeight - finalHeight) / 2;
-
-            if (i > 0) {
-                doc.addPage();
-            }
-            doc.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
-            
-            doc.setFontSize(fontSize);
-            doc.setTextColor(watermarkColor);
-            doc.text(watermarkText, pageWidth - margin, pageHeight - margin, { align: 'right' });
         }
-        
-        const titleValue = titleInput.value || 'notasi-lagu';
-        doc.save(`${titleValue.toLowerCase().replace(/\s/g, '-')}.pdf`);
-        showMessageBox('PDF berhasil diunduh!', 'success');
-
-    } catch (error) {
-        console.error("Gagal mengunduh PDF:", error);
-        showMessageBox('Gagal membuat file PDF.', 'error');
-    } finally {
-        downloadPdfBtn.disabled = false;
-        downloadPdfBtn.textContent = 'Unduh PDF';
-        allControls.forEach(c => c.style.visibility = '');
-        document.querySelectorAll('.page-watermark').forEach(wm => wm.classList.remove('pdf-export-hidden'));
-    }
-}
         
         // --- EDITOR FORMATTING & CURSOR MANAGEMENT ---
         function formatNotationWithAutoBars(notation, biramaValue) {
@@ -1801,6 +2115,11 @@
             undoBtn.addEventListener('click', undo);
             redoBtn.addEventListener('click', redo);
             
+            // New "New Project" listeners
+            newProjectBtn.addEventListener('click', () => showModal('new-project-modal'));
+            confirmNewProjectBtn.addEventListener('click', () => { hideModal('new-project-modal'); startNewProject(); });
+            cancelNewProjectBtn.addEventListener('click', () => hideModal('new-project-modal'));
+            
             // New fullscreen controls listeners
             fullscreenPlayPauseBtn.addEventListener('click', () => playAllLayers());
             fullscreenStopBtn.addEventListener('click', () => stopPlayback());
@@ -1829,7 +2148,10 @@
             });
 
             document.body.addEventListener('input', (e) => {
-                if (!e.target.classList.contains('layer-notation-editor')) return;
+                const isMusicalEditor = e.target.classList.contains('layer-notation-editor');
+                const isTextEditor = e.target.classList.contains('otation-editor');
+                if (!isMusicalEditor && !isTextEditor) return;
+                
                 const editorRow = e.target.closest('.layer-editor-row');
                 if (!editorRow) return;
                 const index = parseInt(editorRow.dataset.index);
@@ -1838,8 +2160,9 @@
                     layers[index].notation = editorTextarea.value;
                     recordHistory(index, editorTextarea.value);
                     renderCombinedSheet();
-                    editorRow.querySelector('.layer-notation-bar-numbers').innerHTML = formatNotationWithAutoBars(editorTextarea.value, biramaSelect.value);
-                
+                    if (isMusicalEditor) {
+                        editorRow.querySelector('.layer-notation-bar-numbers').innerHTML = formatNotationWithAutoBars(editorTextarea.value, biramaSelect.value);
+                    }
                 }
             });
 
@@ -1859,8 +2182,11 @@
             });
 
             document.body.addEventListener('focusin', (e) => {
-                if (!e.target.classList.contains('layer-notation-editor')) return;
-                 const editorRow = e.target.closest('.layer-editor-row');
+                const isMusicalEditor = e.target.classList.contains('layer-notation-editor');
+                const isTextEditor = e.target.classList.contains('text-notation-editor');
+                if (!isMusicalEditor && !isTextEditor) return;
+
+                const editorRow = e.target.closest('.layer-editor-row');
                 if (editorRow) {
                     activeLayerIndex = parseInt(editorRow.dataset.index);
                     updateUndoRedoButtons();
@@ -1879,13 +2205,13 @@
             });
             
             document.body.addEventListener('click', (e) => {
-                 const header = e.target.closest('.layer-editor-header');
-                 if (header) {
-                     const editorRow = header.closest('.layer-editor-row');
-                     const index = parseInt(editorRow.dataset.index);
-                     layers[index].isEditorHidden = !layers[index].isEditorHidden;
-                     renderAll();
-                 }
+                const header = e.target.closest('.layer-editor-header');
+                if (header) {
+                    const editorRow = header.closest('.layer-editor-row');
+                    const index = parseInt(editorRow.dataset.index);
+                    layers[index].isEditorHidden = !layers[index].isEditorHidden;
+                    renderAll();
+                }
 
                 const removeBtn = e.target.closest('.remove-btn');
                 if (removeBtn) {
@@ -1904,13 +2230,13 @@
                 }
             }, true);
 
-             combinedSheetContainer.addEventListener('click', (e) => {
-                 if (e.target.classList.contains('row-layout-btn')) {
+            combinedSheetContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('row-layout-btn')) {
                     const rowWrapper = e.target.closest('.music-row-wrapper');
                     if (!rowWrapper || layers.length === 0) return;
                     
                     const rowIndex = parseInt(rowWrapper.dataset.rowIndex);
-                    const action = e.target.dataset.action;
+                    const action = e.target.dataset.dataset.action;
                     const layoutGuideLayer = layers[0];
                     const globalBarsPerRow = parseInt(barsPerRowSelect.value);
                     let currentBars = layoutGuideLayer.rowOverrides[rowIndex] || globalBarsPerRow;
