@@ -217,11 +217,11 @@
         .input-group {
             margin-bottom: 1.5rem;
         }
-
+        
         label {
             color: var(--text-secondary);
         }
-
+        
         input, select, textarea {
             width: 100%;
             padding: 0.75rem;
@@ -231,17 +231,176 @@
             transition: border-color 0.2s;
             color: var(--text-primary);
         }
-
-        input::placeholder, textarea::placeholder {
+        
+        input::placeholder,
+        textarea::placeholder {
             color: var(--text-muted);
         }
-
-        input:focus, select:focus, textarea:focus {
+        
+        input:focus,
+        select:focus,
+        textarea:focus {
             outline: none;
             border-color: var(--accent-color);
             box-shadow: 0 0 0 3px var(--accent-focus-ring);
         }
-
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            cursor: pointer;
+            white-space: nowrap;
+            border: 1px solid transparent;
+        }
+        
+        .btn:disabled {
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: var(--accent-text);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary:disabled {
+            background-color: var(--accent-color);
+            opacity: 0.5;
+            color: var(--accent-text);
+        }
+        
+        .btn-secondary {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--border-color);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary:disabled {
+            background-color: var(--bg-tertiary);
+            color: var(--text-muted);
+            border-color: var(--border-color);
+            opacity: 0.7;
+        }
+        
+        .not-container {
+            border: none;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            min-height: 300px;
+            overflow-y: auto;
+            position: relative;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .page {
+            --zoom-factor: 1.0;
+            background: white;
+            color: #1a202c;
+            width: 800px;
+            max-width: 100%;
+            aspect-ratio: 210 / 297;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        .page-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .page .song-title {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .page .header-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+        
+        .page .header-info p {
+            margin: 0 0 0.25rem 0;
+        }
+        
+        .layer-editor-row {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            align-items: flex-start;
+            border: 2px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            background-color: var(--bg-tertiary);
+            transition: padding 0.3s ease, min-height 0.3s ease;
+        }
+        
+        .layer-editor-row.is-collapsed {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 0.5rem 1.5rem;
+            min-height: auto;
+            cursor: pointer;
+        }
+        
+        .layer-editor-row.is-collapsed .editor-and-controls {
+            display: none;
+        }
+        
+        .layer-editor-row.is-collapsed .layer-editor-header {
+            margin-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .layer-editor-row .layer-editor-header {
+            width: 100%;
+            padding: 0;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+        }
+        
+        .layer-editor-row .layer-header h3 {
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+        
+        .layer-editor-row.is-collapsed:hover .layer-header h3 {
+            color: var(--accent-color);
+        }
+        
+        .layer-editor-row.is-collapsed .instrument-name {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
         .editor-wrapper {
             position: relative;
             border: 1px solid var(--border-color);
@@ -250,29 +409,66 @@
             min-height: 120px;
             width: 100%;
         }
+        
         .editor-wrapper:focus-within {
             outline: none;
             border-color: var(--accent-color);
             box-shadow: 0 0 0 3px var(--accent-focus-ring);
         }
-
-        .layer-notation-bar-numbers, .layer-notation-editor {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 0.75rem 0.75rem 0.75rem 1.5rem; white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', Courier, monospace; font-size: 1rem; line-height: 2.5; border: none; resize: none;
-        }
-
-        .layer-notation-bar-numbers {
-            z-index: 1; pointer-events: none; color: transparent; position: relative;
-        }
-        .layer-notation-bar-numbers::before {
-            content: ''; position: absolute; left: 0.75rem; top: 2rem; transform: translateY(-50%); height: 1.6em; width: 1.5px; background-color: var(--text-muted); border-radius: 1px;
-        }
-
-        .chord-notation-editor {
-            width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 0.5rem; background-color: var(--bg-tertiary); margin-bottom: 0.5rem; resize: none;font-family: 'Poppins', sans-serif;
-        }
-
+        
+        .layer-notation-bar-numbers,
         .layer-notation-editor {
-            z-index: 2; background: transparent; color: var(--text-primary); caret-color: var(--accent-color); outline: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 0.75rem 0.75rem 0.75rem 1.5rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1rem;
+            line-height: 2.5;
+            border: none;
+            resize: none;
+        }
+        
+        .layer-notation-bar-numbers {
+            z-index: 1;
+            pointer-events: none;
+            color: transparent;
+            position: relative;
+        }
+        
+        .layer-notation-bar-numbers::before {
+            content: '';
+            position: absolute;
+            left: 0.75rem;
+            top: 2rem;
+            transform: translateY(-50%);
+            height: 1.6em;
+            width: 1.5px;
+            background-color: var(--text-muted);
+            border-radius: 1px;
+        }
+        
+        .chord-notation-editor {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            background-color: var(--bg-tertiary);
+            margin-bottom: 0.5rem;
+            resize: none;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .layer-notation-editor {
+            z-index: 2;
+            background: transparent;
+            color: var(--text-primary);
+            caret-color: var(--accent-color);
+            outline: none;
         }
         
         .text-notation-editor {
@@ -288,13 +484,13 @@
             min-height: 120px;
             resize: vertical;
         }
-
+        
         .text-notation-editor:focus {
             outline: none;
             border-color: var(--accent-color);
             box-shadow: 0 0 0 3px var(--accent-focus-ring);
         }
-
+        
         .editor-wrapper.text-editor-wrapper {
             position: relative;
             border: none;
@@ -302,19 +498,57 @@
             min-height: 120px;
         }
         
-        .editor-auto-bar-line { position: relative; }
+        .editor-auto-bar-line {
+            position: relative;
+        }
+        
         .editor-auto-bar-line::before {
-            content: ''; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 1.5px; height: 1.6em; background-color: var(--text-muted); border-radius: 1px;
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 1.5px;
+            height: 1.6em;
+            background-color: var(--text-muted);
+            border-radius: 1px;
         }
-
+        
         .editor-bar-number {
-            position: absolute; bottom: 100%; left: 50%; transform: translateX(0.5ch); padding-bottom: 0.2em; font-size: 0.6rem; color: var(--accent-color); font-weight: 600; font-style: italic; opacity: 0.7; user-select: none;
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(0.5ch);
+            padding-bottom: 0.2em;
+            font-size: 0.6rem;
+            color: var(--accent-color);
+            font-weight: 600;
+            font-style: italic;
+            opacity: 0.7;
+            user-select: none;
         }
-
-        .music-bar { display: inline-flex; flex-direction: column; justify-content: flex-start; position: relative; padding: 0 calc(0.25em * var(--zoom-factor)); border-left: calc(2px * var(--zoom-factor)) solid #64748b; height: fit-content; gap: calc(0.5rem * var(--zoom-factor)); }
-        .layer-bar-notes { display: flex; justify-content: space-around; align-items: center; position: relative; padding: 0.25rem 0; width: 100%; min-height: 2em; }
-
-        /* New Text Layer Styles */
+        
+        .music-bar {
+            display: inline-flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            position: relative;
+            padding: 0 calc(0.25em * var(--zoom-factor));
+            border-left: calc(2px * var(--zoom-factor)) solid #64748b;
+            height: fit-content;
+            gap: calc(0.5rem * var(--zoom-factor));
+        }
+        
+        .layer-bar-notes {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            position: relative;
+            padding: 0.25rem 0;
+            width: 100%;
+            min-height: 2em;
+        }
+        
         .layer-text-notes {
             width: 100%;
             font-family: 'Poppins', sans-serif;
@@ -323,40 +557,207 @@
             margin-top: 1rem;
             margin-bottom: 0.5rem;
         }
-
+        
         .layer-text-notes p {
             margin: 0;
             line-height: 1.5;
         }
-
-        .note-block { display: flex; flex-direction: column; margin: 0.002cm ; justify-content: center; align-items: center; position: relative; padding: 0 calc(0.2rem * var(--zoom-factor)); min-width: 0; z-index: 40; }
-        .note-display { font-size: calc(1.2rem * var(--zoom-factor)); font-weight: 500; line-height: 1; font-family: 'Inter', sans-serif; z-index: 40; }
-        .accidental-symbol, .dot-high, .dot-low, .double-dot-high, .double-dot-low, .staccato-marker { color: #333; position: absolute; line-height: 1; font-weight: 500; }
-        .accidental-symbol { font-size: calc(1.2rem * var(--zoom-factor) * 1.2); z-index: 41; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-        .accidental-symbol.flat-symbol { font-weight: 300; }
-        .staccato-marker { top: calc(-1.2em * var(--zoom-factor)); font-size: calc(1.2rem * var(--zoom-factor) * 0.8); z-index: 50; }
-        .double-dot-high { top: calc(-0.8em * var(--zoom-factor)); font-size: calc(1.2rem * var(--zoom-factor) * 1.2); z-index: 45; }
-        .dot-high { top: calc(-0.6em * var(--zoom-factor)); font-size: calc(1.2rem * var(--zoom-factor) * 0.7); z-index: 45; }
-        .dot-low { bottom: calc(-0.6em * var(--zoom-factor)); font-size: calc(1.2rem * var(--zoom-factor) * 0.7); z-index: 35; }
-        .double-dot-low { bottom: calc(-0.8em * var(--zoom-factor)); font-size: calc(1.2rem * var(--zoom-factor) * 0.7); z-index: 35; }
-        .long-note-dot { position: absolute; font-size: calc(1.2rem * var(--zoom-factor)); font-weight: 500; z-index: 40; }
-        .note-group-container { display: flex; flex-direction: row; position: relative; align-items: center; min-width: 0; }
-        .note-group-container.eighth-notes::before, .note-group-container.sixteenth-notes::before, .note-group-container.sixteenth-notes::after { background-color: #333; z-index: 48; }
-        .note-group-container.eighth-notes::before { content: ''; position: absolute; top: calc(-0.6em * var(--zoom-factor)); left: 10%; right: 10%; width: 80%; height: calc(1.5px * var(--zoom-factor)); }
-        .note-group-container.sixteenth-notes { display: flex; flex-direction: row; position: relative; align-items: center; width: 1.13cm; }
-        .note-group-container.sixteenth-notes::before { content: ''; position: absolute; top: calc(-0.8em * var(--zoom-factor)); left: 0; right: 0; width: 100%; height: calc(1.5px * var(--zoom-factor)); background-color: #333; z-index: 48; padding: 0 1em; }
-        .note-group-container.sixteenth-notes::after { content: ''; position: absolute; top: calc(-0.6em * var(--zoom-factor)); left: 0; right: 0; width: 100%; height: calc(1.5px * var(--zoom-factor)); background-color: #333; z-index: 48; padding: 0 1em; }
-        .note-group-container.triplet::before { content: ''; position: absolute; top: calc(-0.7em * var(--zoom-factor)); left: 0; right: 0; width: 100%; height: calc(0.5em * var(--zoom-factor)); border-top: calc(1px * var(--zoom-factor)) solid #333; border-radius: calc(100% * var(--zoom-factor)) calc(100% * var(--zoom-factor)) 0 0; z-index: 38; }
-        .note-group-container.triplet::after { content: '3'; position: absolute; top: calc(-0.7em * var(--zoom-factor)); left: 50%; transform: translate(-50%, -50%); font-size: calc(0.5em * var(--zoom-factor)); font-weight: 400; color: #333; background-color: #fff; padding: 0 calc(0.2em * var(--zoom-factor)); z-index: 39; }
-        .note-group-container.eighth-notes.no-staccato::before { top: calc(-0.3em * var(--zoom-factor)); }
-        .note-group-container.sixteenth-notes.no-staccato::before { top: calc(-0.5em * var(--zoom-factor)); }
-        .note-group-container.sixteenth-notes.no-staccato::after { top: calc(-0.3em * var(--zoom-factor)); }
-        .note-group-container.triplet.no-staccato::before { top: calc(-0.4em * var(--zoom-factor)); }
-        .note-group-container.triplet.no-staccato::after { top: calc(-0.4em * var(--zoom-factor)); }
-        .note-group-container.combined-note-group.no-staccato::before { top: calc(-0.4em * var(--zoom-factor)); }
-        .note-group-container.combined-note-group.no-staccato::after { top: calc(-0.4em * var(--zoom-factor)); }
-
-        /* Gaya baru untuk notasi 1-23 */
+        
+        .note-block {
+            display: flex;
+            flex-direction: column;
+            margin: 0.002cm;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 0 calc(0.2rem * var(--zoom-factor));
+            min-width: 0;
+            z-index: 40;
+        }
+        
+        .note-display {
+            font-size: calc(1.2rem * var(--zoom-factor));
+            font-weight: 500;
+            line-height: 1;
+            font-family: 'Inter', sans-serif;
+            z-index: 40;
+        }
+        
+        .accidental-symbol,
+        .dot-high,
+        .dot-low,
+        .double-dot-high,
+        .double-dot-low,
+        .staccato-marker {
+            color: #333;
+            position: absolute;
+            line-height: 1;
+            font-weight: 500;
+        }
+        
+        .accidental-symbol {
+            font-size: calc(1.2rem * var(--zoom-factor) * 1.2);
+            z-index: 41;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .accidental-symbol.flat-symbol {
+            font-weight: 300;
+        }
+        
+        .staccato-marker {
+            top: calc(-1.2em * var(--zoom-factor));
+            font-size: calc(1.2rem * var(--zoom-factor) * 0.8);
+            z-index: 50;
+        }
+        
+        .double-dot-high {
+            top: calc(-0.8em * var(--zoom-factor));
+            font-size: calc(1.2rem * var(--zoom-factor) * 1.2);
+            z-index: 45;
+        }
+        
+        .dot-high {
+            top: calc(-0.6em * var(--zoom-factor));
+            font-size: calc(1.2rem * var(--zoom-factor) * 0.7);
+            z-index: 45;
+        }
+        
+        .dot-low {
+            bottom: calc(-0.6em * var(--zoom-factor));
+            font-size: calc(1.2rem * var(--zoom-factor) * 0.7);
+            z-index: 35;
+        }
+        
+        .double-dot-low {
+            bottom: calc(-0.8em * var(--zoom-factor));
+            font-size: calc(1.2rem * var(--zoom-factor) * 0.7);
+            z-index: 35;
+        }
+        
+        .long-note-dot {
+            position: absolute;
+            font-size: calc(1.2rem * var(--zoom-factor));
+            font-weight: 500;
+            z-index: 40;
+        }
+        
+        .note-group-container {
+            display: flex;
+            flex-direction: row;
+            position: relative;
+            align-items: center;
+            min-width: 0;
+        }
+        
+        .note-group-container.eighth-notes::before,
+        .note-group-container.sixteenth-notes::before,
+        .note-group-container.sixteenth-notes::after {
+            background-color: #333;
+            z-index: 48;
+        }
+        
+        .note-group-container.eighth-notes::before {
+            content: '';
+            position: absolute;
+            top: calc(-0.6em * var(--zoom-factor));
+            left: 10%;
+            right: 10%;
+            width: 80%;
+            height: calc(1.5px * var(--zoom-factor));
+        }
+        
+        .note-group-container.sixteenth-notes {
+            display: flex;
+            flex-direction: row;
+            position: relative;
+            align-items: center;
+            width: 1.13cm;
+        }
+        
+        .note-group-container.sixteenth-notes::before {
+            content: '';
+            position: absolute;
+            top: calc(-0.8em * var(--zoom-factor));
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: calc(1.5px * var(--zoom-factor));
+            background-color: #333;
+            z-index: 48;
+            padding: 0 1em;
+        }
+        
+        .note-group-container.sixteenth-notes::after {
+            content: '';
+            position: absolute;
+            top: calc(-0.6em * var(--zoom-factor));
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: calc(1.5px * var(--zoom-factor));
+            background-color: #333;
+            z-index: 48;
+            padding: 0 1em;
+        }
+        
+        .note-group-container.triplet::before {
+            content: '';
+            position: absolute;
+            top: calc(-0.7em * var(--zoom-factor));
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: calc(0.5em * var(--zoom-factor));
+            border-top: calc(1px * var(--zoom-factor)) solid #333;
+            border-radius: calc(100% * var(--zoom-factor)) calc(100% * var(--zoom-factor)) 0 0;
+            z-index: 38;
+        }
+        
+        .note-group-container.triplet::after {
+            content: '3';
+            position: absolute;
+            top: calc(-0.7em * var(--zoom-factor));
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: calc(0.5em * var(--zoom-factor));
+            font-weight: 400;
+            color: #333;
+            background-color: #fff;
+            padding: 0 calc(0.2em * var(--zoom-factor));
+            z-index: 39;
+        }
+        
+        .note-group-container.eighth-notes.no-staccato::before {
+            top: calc(-0.3em * var(--zoom-factor));
+        }
+        
+        .note-group-container.sixteenth-notes.no-staccato::before {
+            top: calc(-0.5em * var(--zoom-factor));
+        }
+        
+        .note-group-container.sixteenth-notes.no-staccato::after {
+            top: calc(-0.3em * var(--zoom-factor));
+        }
+        
+        .note-group-container.triplet.no-staccato::before {
+            top: calc(-0.4em * var(--zoom-factor));
+        }
+        
+        .note-group-container.triplet.no-staccato::after {
+            top: calc(-0.4em * var(--zoom-factor));
+        }
+        
+        .note-group-container.combined-note-group.no-staccato::before {
+            top: calc(-0.4em * var(--zoom-factor));
+        }
+        
+        .note-group-container.combined-note-group.no-staccato::after {
+            top: calc(-0.4em * var(--zoom-factor));
+        }
+        
         .combined-note-group {
             display: flex;
             flex-direction: row;
@@ -364,6 +765,7 @@
             align-items: center;
             min-width: 0;
         }
+        
         .combined-note-group .note-block:first-child::before,
         .combined-note-group .note-group-container::before {
             content: '';
@@ -371,35 +773,36 @@
             top: calc(-0.6em * var(--zoom-factor));
             left: 30%;
             right: 0;
-            width: 101%; 
+            width: 101%;
             height: calc(1.5px * var(--zoom-factor));
             background-color: #333;
             z-index: 48;
         }
+        
         .combined-note-group .note-group-container::before {
             content: '';
             position: absolute;
             top: calc(-0.6em * var(--zoom-factor));
             left: 0;
             right: 0;
-            width: 40%; 
+            width: 40%;
             height: calc(1.5px * var(--zoom-factor));
             background-color: #333;
             z-index: 48;
         }
+        
         .combined-note-group .note-group-container::after {
             content: '';
             position: absolute;
             top: calc(-0.4em * var(--zoom-factor));
             left: 0;
             right: 0;
-            width: 40%; 
+            width: 40%;
             height: calc(1.5px * var(--zoom-factor));
             background-color: #333;
             z-index: 48;
         }
         
-        /* Gaya baru untuk notasi 123- */
         .note-group-container.sixteenth-eighth-group::before {
             content: '';
             position: absolute;
@@ -410,41 +813,211 @@
             background-color: #333;
             z-index: 48;
         }
+        
         .note-group-container.sixteenth-eighth-group::after {
             content: '';
             position: absolute;
             top: calc(-0.4em * var(--zoom-factor));
             left: 10%;
-            width: 50%; /* Hanya mencakup dua not pertama */
+            width: 50%;
             height: calc(1.5px * var(--zoom-factor));
             background-color: #333;
             z-index: 48;
         }
-        .message-box { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: #22c55e; color: white; padding: 1rem 2rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1-px rgba(0, 0, 0, 0.06); z-index: 1000; opacity: 0; transition: opacity 0.5s, top 0.5s; }
-        .message-box.show { opacity: 1; top: 30px; }
-        .modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; transition: all 0.3s ease-in-out; opacity: 0; visibility: hidden;
-        }
-        .modal.is-visible { opacity: 1; visibility: visible; }
-        .modal-content { background-color: var(--bg-secondary); padding: 2rem; border-radius: 1rem; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); text-align: center; max-width: 400px; width: 90%; transform: translateY(-20px); transition: transform 0.3s ease-in-out; }
-        .modal.is-visible .modal-content { transform: translateY(0); }
-        .modal-content h3 { font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-headings); }
-        .modal-content p { margin-bottom: 1.5rem; color: var(--text-primary); }
-        .modal-buttons { display: flex; justify-content: center; gap: 1rem; }
         
-        .bar-number { position: absolute; top: calc(-1.6em * var(--zoom-factor)); left: calc(0.25em * var(--zoom-factor)); font-size: calc(0.6rem * var(--zoom-factor)); color: #3b82f6; font-weight: 600; font-style: italic; opacity: 0.7; user-select: none; }
-        .remove-btn { background-color: #ef4444; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 600; transition: background-color 0.2s; border: none; }
-        .remove-btn:hover { background-color: #dc2626; }
-        .bass-note { color: #0354f4; font-size: calc(0.9rem * var(--zoom-factor)); }
-        .chord-note-display { color: #ec4899; font-weight: 600; font-size: calc(0.9rem * var(--zoom-factor)); font-family: 'Poppins', sans-serif; }
-        .music-row-wrapper { display: flex; flex-direction: column; align-items: center; position: relative; margin-bottom: 2.5rem; }
-        .music-row { display: flex; transform-origin: top left; width: 100%; }
-        .music-row > .music-bar { flex-shrink: 0; flex-grow: 0; }
-        .row-layout-controls { position: absolute; right: -4rem; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 0.4rem; opacity: 0; transition: opacity 0.2s ease-in-out; pointer-events: none; }
-        .music-row-wrapper:hover .row-layout-controls { opacity: 1; pointer-events: auto; }
-        .row-layout-btn { border: none; background: #eaf0f6; color: #64748b; width: 1.2rem; height: 1.2rem; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; line-height: 1; transition: background-color 0.2s; }
-        .row-layout-btn:hover { background: #dde5ed; }
+        /* Revised CSS for directives container to handle stacking */
+        .notation-directives-container {
+            position: absolute;
+            top: calc(-2.0em * var(--zoom-factor));
+            left: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: calc(0.2em * var(--zoom-factor));
+            z-index: 60;
+        }
 
+        .notation-directive {
+            background-color: #ffffff;
+            color: #1a202c;
+            font-weight: 700;
+            padding: calc(0.1em * var(--zoom-factor)) calc(0.4em * var(--zoom-factor));
+            border-radius: calc(0.25em * var(--zoom-factor));
+            font-size: calc(0.85em * var(--zoom-factor));
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            white-space: nowrap;
+        }
+        
+        .message-box {
+            position: fixed;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #22c55e;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1-px rgba(0, 0, 0, 0.06);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s, top 0.5s;
+        }
+        
+        .message-box.show {
+            opacity: 1;
+            top: 90px;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: all 0.3s ease-in-out;
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .modal.is-visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background-color: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .modal.is-visible .modal-content {
+            transform: translateY(0);
+        }
+        
+        .modal-content h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-headings);
+        }
+        
+        .modal-content p {
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+        
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        .bar-number {
+            position: absolute;
+            top: calc(-1.6em * var(--zoom-factor));
+            left: calc(0.25em * var(--zoom-factor));
+            font-size: calc(0.6rem * var(--zoom-factor));
+            color: #3b82f6;
+            font-weight: 600;
+            font-style: italic;
+            opacity: 0.7;
+            user-select: none;
+        }
+        
+        .remove-btn {
+            background-color: #ef4444;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            border: none;
+        }
+        
+        .remove-btn:hover {
+            background-color: #dc2626;
+        }
+        
+        .bass-note {
+            color: #0354f4;
+            font-size: calc(0.9rem * var(--zoom-factor));
+        }
+        
+        .chord-note-display {
+            color: #ec4899;
+            font-weight: 600;
+            font-size: calc(0.9rem * var(--zoom-factor));
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .music-row-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            margin-bottom: 2.5rem;
+        }
+        
+        .music-row {
+            display: flex;
+            transform-origin: top left;
+            width: 100%;
+        }
+        
+        .music-row > .music-bar {
+            flex-shrink: 0;
+            flex-grow: 0;
+        }
+        
+        .row-layout-controls {
+            position: absolute;
+            right: -4rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+            pointer-events: none;
+        }
+        
+        .music-row-wrapper:hover .row-layout-controls {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .row-layout-btn {
+            border: none;
+            background: #eaf0f6;
+            color: #64748b;
+            width: 1.2rem;
+            height: 1.2rem;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            transition: background-color 0.2s;
+        }
+        
+        .row-layout-btn:hover {
+            background: #dde5ed;
+        }
+        
         .page-watermark {
             position: absolute;
             bottom: 1.5rem;
@@ -456,12 +1029,19 @@
             pointer-events: none;
             z-index: 100;
         }
+        
         .page-watermark.pdf-export-hidden {
             color: white !important;
         }
-
-        .main-watermark { text-align: center; margin-top: 1rem; font-size: 0.8rem; font-weight: 500; color: var(--text-muted); }
-
+        
+        .main-watermark {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+        
         #theme-switcher .theme-btn {
             background-color: var(--bg-tertiary);
             border: 1px solid var(--border-color);
@@ -473,29 +1053,31 @@
             justify-content: center;
             color: var(--text-secondary);
         }
+        
         #theme-switcher .theme-btn.active {
             background-color: var(--accent-color);
             color: var(--accent-text);
             border-color: var(--accent-color);
         }
-
-        /* View Mode Buttons */
+        
         .view-mode-btn {
             background: transparent;
             color: var(--text-secondary);
             border: none;
             transition: all 0.2s;
         }
+        
         .view-mode-btn.active {
             background-color: var(--bg-secondary);
             color: var(--accent-color);
             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             font-weight: 600;
         }
+        
         .dark .view-mode-btn.active {
             background-color: var(--bg-tertiary);
         }
-
+        
         #combined-sheet-container.mobile-view .page {
             width: 100%;
             max-width: 420px;
@@ -503,21 +1085,32 @@
             aspect-ratio: auto;
             min-height: 297px;
         }
-        #combined-sheet-container.mobile-view .page .song-title { font-size: 1.5rem; }
-        #combined-sheet-container.mobile-view .page .header-info { flex-direction: column; align-items: center; gap: 0.5rem; }
-        #combined-sheet-container.mobile-view .page .header-info > div { text-align: center !important; }
-
+        
+        #combined-sheet-container.mobile-view .page .song-title {
+            font-size: 1.5rem;
+        }
+        
+        #combined-sheet-container.mobile-view .page .header-info {
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        #combined-sheet-container.mobile-view .page .header-info>div {
+            text-align: center !important;
+        }
+        
         #combined-sheet-container.tablet-view .page {
             width: 100%;
             max-width: 680px;
             padding: 1.5rem;
         }
-
-        /* Custom Fullscreen Mode Styles */
+        
         body.fullscreen-mode {
             padding: 0;
             overflow: hidden;
         }
+        
         body.fullscreen-mode .container {
             max-width: 100%;
             height: 100vh;
@@ -525,18 +1118,21 @@
             border-radius: 0;
             display: block;
         }
+        
         body.fullscreen-mode #app-title-wrapper,
         body.fullscreen-mode #instructions-panel,
         body.fullscreen-mode #main-controls-wrapper,
         body.fullscreen-mode .main-watermark,
-        body.fullscreen-mode #preview-wrapper > .flex {
+        body.fullscreen-mode #preview-wrapper>.flex {
             display: none;
         }
+        
         body.fullscreen-mode #main-content-area,
         body.fullscreen-mode #preview-wrapper {
             height: 100%;
             margin: 0;
         }
+        
         body.fullscreen-mode #combined-sheet-container {
             position: fixed;
             top: 0;
@@ -547,13 +1143,14 @@
             padding-top: 5rem;
             padding-bottom: 2rem;
         }
+        
         body.fullscreen-mode #fullscreen-btn {
             position: fixed;
             top: 1rem;
             right: 1rem;
             z-index: 1001;
         }
-
+        
         body.fullscreen-mode #fullscreen-controls {
             display: flex;
             position: fixed;
@@ -563,11 +1160,11 @@
             z-index: 1002;
             gap: 1.5rem;
         }
-
+        
         body:not(.fullscreen-mode) #fullscreen-controls {
             display: none;
         }
-
+        
         #fullscreen-controls button {
             background: var(--bg-secondary);
             color: var(--text-primary);
@@ -575,39 +1172,42 @@
             padding: 1rem 2rem;
             font-weight: 600;
             border-radius: 9999px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             transition: transform 0.2s, background-color 0.2s;
         }
-
+        
         #fullscreen-controls button:hover {
             transform: scale(1.05);
             background: var(--bg-tertiary);
         }
-
+        
         #fullscreen-controls #fullscreen-play-pause-btn .play-icon,
         #fullscreen-controls #fullscreen-play-pause-btn .pause-icon {
             display: none;
         }
-
+        
         #fullscreen-controls #fullscreen-play-pause-btn.playing .pause-icon {
             display: block;
         }
+        
         #fullscreen-controls #fullscreen-play-pause-btn:not(.playing) .play-icon {
             display: block;
         }
-
-        /* Repeat and Annotation Styles */
+        
         .music-bar.repeat-start {
             border-left-style: double;
             border-left-width: calc(4px * var(--zoom-factor));
             padding-left: calc(0.5em * var(--zoom-factor));
         }
+        
         .music-bar.repeat-end {
             border-right-style: double;
             border-right-width: calc(4px * var(--zoom-factor));
             padding-right: calc(0.5em * var(--zoom-factor));
         }
-        .music-bar.repeat-start::before, .music-bar.repeat-start::after {
+        
+        .music-bar.repeat-start::before,
+        .music-bar.repeat-start::after {
             content: '•';
             position: absolute;
             font-size: calc(1.2em * var(--zoom-factor));
@@ -616,7 +1216,9 @@
             left: calc(0.1em * var(--zoom-factor));
             transform: translateY(-50%);
         }
-        .music-bar.repeat-end::before, .music-bar.repeat-end::after {
+        
+        .music-bar.repeat-end::before,
+        .music-bar.repeat-end::after {
             content: '•';
             position: absolute;
             font-size: calc(1.2em * var(--zoom-factor));
@@ -625,70 +1227,204 @@
             right: calc(0.1em * var(--zoom-factor));
             transform: translateY(-50%);
         }
-        .music-bar.repeat-start::before, .music-bar.repeat-end::before {
+        
+        .music-bar.repeat-start::before,
+        .music-bar.repeat-end::before {
             top: 40%;
         }
-        .music-bar.repeat-start::after, .music-bar.repeat-end::after {
+        
+        .music-bar.repeat-start::after,
+        .music-bar.repeat-end::after {
             top: 60%;
         }
-
+        
         .music-bar.has-volta .bar-number {
-            opacity: 0.15; /* Membuat nomor bar di bawah volta menjadi sangat samar */
+            opacity: 0.15;
         }
-
+        
         .volta-bracket {
             position: absolute;
-            top: calc(-1.8em * var(--zoom-factor)); /* Disesuaikan agar lebih kecil */
+            top: calc(-1.8em * var(--zoom-factor));
             left: 0;
-            height: calc(0.8em * var(--zoom-factor)); /* Disesuaikan agar lebih kecil */
+            height: calc(0.8em * var(--zoom-factor));
             border-top: calc(1.5px * var(--zoom-factor)) solid #1a202c;
             border-left: calc(1.5px * var(--zoom-factor)) solid #1a202c;
             padding-left: calc(0.3em * var(--zoom-factor));
-            font-size: calc(0.7em * var(--zoom-factor)); /* Disesuaikan agar lebih kecil */
+            font-size: calc(0.7em * var(--zoom-factor));
             font-weight: 700;
             color: #1a202c;
             z-index: 50;
         }
+        
         .volta-bracket.is-end {
             border-right: calc(1.5px * var(--zoom-factor)) solid #1a202c;
         }
+        
         .volta-bracket-end-hook {
             position: absolute;
             top: 0;
             right: calc(-1.5px * var(--zoom-factor));
-            height: calc(0.5em * var(--zoom-factor)); /* Disesuaikan agar lebih kecil */
+            height: calc(0.5em * var(--zoom-factor));
             width: calc(1.5px * var(--zoom-factor));
             background-color: #1a202c;
         }
-
+        
         #floating-editor-window {
-            position: fixed; top: 150px; right: 40px; width: 600px; max-width: 90vw; max-height: 70vh; background-color: var(--bg-secondary); border-radius: 1.5rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1); z-index: 1000; display: flex; flex-direction: column; border: 1px solid var(--border-color); transition: width 0.3s ease-in-out, height 0.3s ease-in-out; min-width: 300px; min-height: 200px;
+            position: fixed;
+            top: 150px;
+            right: 40px;
+            width: 600px;
+            max-width: 90vw;
+            max-height: 70vh;
+            background-color: var(--bg-secondary);
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border-color);
+            transition: width 0.3s ease-in-out, height 0.3s ease-in-out;
+            min-width: 300px;
+            min-height: 200px;
         }
+        
         #floating-editor-window.is-minimized {
             opacity: 0;
             pointer-events: none;
         }
-        .floating-editor-header { padding: 1rem 1.5rem; font-weight: 700; color: var(--text-headings); background-color: var(--bg-tertiary); border-bottom: 1px solid var(--border-color); cursor: move; border-top-left-radius: 1.5rem; border-top-right-radius: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
-        #editor-window-controls { display: flex; align-items: center; gap: 0.5rem; }
-        .editor-control-btn { background-color: var(--border-color); border: none; width: 20px; height: 20px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s; }
-        .editor-control-btn:hover { background-color: var(--text-muted); }
-        .editor-control-btn svg { width: 12px; height: 12px; stroke: var(--text-primary); stroke-width: 2.5; }
-        #maximize-editor-btn { display: none; }
-        #floating-editor-window.is-minimized #minimize-editor-btn { display: none; }
-        #floating-editor-window.is-minimized #maximize-editor-btn { display: flex; }
-
-        .resizer { position: absolute; background: transparent; z-index: 1001; }
-        .resizer-r { width: 8px; height: 100%; top: 0; right: 0; cursor: ew-resize; }
-        .resizer-b { width: 100%; height: 8px; left: 0; bottom: 0; cursor: ns-resize; }
-        .resizer-rb { width: 12px; height: 12px; right: 0; bottom: 0; cursor: nwse-resize; }
-        .resizer-t { width: 100%; height: 8px; left: 0; top: 0; cursor: ns-resize; }
-        .resizer-l { width: 8px; height: 100%; left: 0; top: 0; cursor: ew-resize; }
-        .resizer-lt { width: 12px; height: 12px; left: 0; top: 0; cursor: nwse-resize; }
-        .resizer-rt { width: 12px; height: 12px; right: 0; top: 0; cursor: nesw-resize; }
-        .resizer-bl { width: 12px; height: 12px; left: 0; bottom: 0; cursor: nesw-resize; }
-
-        #layers-editor-container { overflow-y: auto; padding: 1.5rem; flex-grow: 1; }
-
+        
+        .floating-editor-header {
+            padding: 1rem 1.5rem;
+            font-weight: 700;
+            color: var(--text-headings);
+            background-color: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border-color);
+            cursor: move;
+            border-top-left-radius: 1.5rem;
+            border-top-right-radius: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        #editor-window-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .editor-control-btn {
+            background-color: var(--border-color);
+            border: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+        
+        .editor-control-btn:hover {
+            background-color: var(--text-muted);
+        }
+        
+        .editor-control-btn svg {
+            width: 12px;
+            height: 12px;
+            stroke: var(--text-primary);
+            stroke-width: 2.5;
+        }
+        
+        #maximize-editor-btn {
+            display: none;
+        }
+        
+        #floating-editor-window.is-minimized #minimize-editor-btn {
+            display: none;
+        }
+        
+        #floating-editor-window.is-minimized #maximize-editor-btn {
+            display: flex;
+        }
+        
+        .resizer {
+            position: absolute;
+            background: transparent;
+            z-index: 1001;
+        }
+        
+        .resizer-r {
+            width: 8px;
+            height: 100%;
+            top: 0;
+            right: 0;
+            cursor: ew-resize;
+        }
+        
+        .resizer-b {
+            width: 100%;
+            height: 8px;
+            left: 0;
+            bottom: 0;
+            cursor: ns-resize;
+        }
+        
+        .resizer-rb {
+            width: 12px;
+            height: 12px;
+            right: 0;
+            bottom: 0;
+            cursor: nwse-resize;
+        }
+        
+        .resizer-t {
+            width: 100%;
+            height: 8px;
+            left: 0;
+            top: 0;
+            cursor: ns-resize;
+        }
+        
+        .resizer-l {
+            width: 8px;
+            height: 100%;
+            left: 0;
+            top: 0;
+            cursor: ew-resize;
+        }
+        
+        .resizer-lt {
+            width: 12px;
+            height: 12px;
+            left: 0;
+            top: 0;
+            cursor: nwse-resize;
+        }
+        
+        .resizer-rt {
+            width: 12px;
+            height: 12px;
+            right: 0;
+            top: 0;
+            cursor: nesw-resize;
+        }
+        
+        .resizer-bl {
+            width: 12px;
+            height: 12px;
+            left: 0;
+            bottom: 0;
+            cursor: nesw-resize;
+        }
+        
+        #layers-editor-container {
+            overflow-y: auto;
+            padding: 1.5rem;
+            flex-grow: 1;
+        }
+        
         .layer-editor-header {
             display: flex;
             align-items: center;
@@ -698,27 +1434,32 @@
             width: 100%;
             padding: 0.5rem 0;
         }
-
+        
         .layer-editor-header.is-expanded {
             border-bottom: 1px solid var(--border-color);
             margin-bottom: 1rem;
         }
-
+        
         .editor-header-actions {
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
-
-        .layer-editor-row.is-collapsed .editor-wrapper, .layer-editor-row.is-collapsed .remove-btn, .layer-editor-row.is-collapsed .layer-controls {
+        
+        .layer-editor-row.is-collapsed .editor-wrapper,
+        .layer-editor-row.is-collapsed .remove-btn,
+        .layer-editor-row.is-collapsed .layer-controls {
             display: none;
         }
+        
         .layer-editor-row.is-collapsed .layer-editor-header {
             padding: 0.5rem 1.5rem;
         }
+        
         .layer-editor-row:not(.is-collapsed) .layer-editor-header {
             display: none;
         }
+        
         .layer-editor-row:not(.is-collapsed) .editor-and-controls {
             display: flex;
             flex-direction: column;
@@ -726,27 +1467,27 @@
             align-items: flex-start;
             width: 100%;
         }
-
+        
         #show-editor-button {
             position: fixed;
-            top: 4rem;
+            top: 6rem;
             right: 2rem;
             z-index: 999;
             display: none;
-            background-color: 'none';
-            color: white;
+            background-color: var(--bg-tertiary);
+            color: rgb(255, 255, 255);
             padding: 1rem;
             border-radius: 9999px;
-            box-shadow: 0 4px 6px -1px rgb(255, 255, 255), 0 2px 4px -1px rgba(255, 255, 255, 0.996);
+            box-shadow: 0 4px 6px -1px rgb(255, 254, 254), 0 2px 4px -1px rgb(255, 253, 253);
             cursor: pointer;
             transition: transform 0.2s ease-in-out, background-color 0.2s;
         }
-
+        
         #show-editor-button:hover {
             transform: scale(1.05);
-            background-color: var(--border-color);
+            background-color: rgb(32, 46, 88);
         }
-
+        
         #show-editor-button.is-visible {
             display: flex;
         }
@@ -794,7 +1535,8 @@
             <div class="instructions-content space-y-3">
                 <div><h4>Dasar</h4><ul><li><code>1-7</code> untuk not.</li><li><code>0</code> untuk istirahat (diam), <code>o</code> untuk istirahat panjang (titik).</li><li>Spasi atau <code>|</code> untuk pemisah ketukan/bar.</li></ul></div>
                 <div><h4>Oktaf & Aksidental</h4><ul><li><code>1.</code> (tinggi), <code>1,</code> (rendah). Ganda juga bisa.</li><li><code>4/</code> (kres), <code>7b</code> (mol). Nada ini akan menimpa Tonalitas.</li></ul></div>
-                <div><h4>Durasi & Artikulasi</h4><ul><li><code>12</code> (1/8), <code>1234</code> (1/16), <code>123</code> (triplet).</li><li><b class="text-orange-400">Baru: `1-23` untuk not 1/8 + dua not 1/16.</b></li><li><b class="text-orange-400">Baru: `123-` untuk dua not 1/16 + satu not 1/8.</b></li><li><code>1^</code> (staccato).</li><li><code>1~</code> (fermata/tahan).</li></ul></div>
+                <div><h4>Durasi & Artikulasi</h4><ul><li><code>12</code> (1/8), <code>1234</code> (1/16), <code>123</code> (triplet).</li><li><code>1-23</code> untuk not 1/8 + dua not 1/16.</li><li><code>123-</code> untuk dua not 1/16 + satu not 1/8.</li><li><code>1^</code> (staccato).</li><li><code>1~</code> (fermata/tahan).</li></ul></div>
+                <div><h4 class="text-teal-500">Fitur Baru: Perubahan di Tengah Lagu</h4><ul><li>Ubah Birama: Tulis <code>(B=3/4)</code> untuk mengubah birama menjadi 3/4.</li><li>Ubah Tonalitas: Tulis <code>(Do=G)</code> untuk mengubah nada dasar menjadi Do = G.</li><li>Perubahan ini berlaku untuk semua not setelahnya.</li><li>Contoh: <code>1 2 3 4 | (B=3/4) 5 6 7 | (Do=G) 1 2 3 |</code></li></ul></div>
                 <div><h4>Pengulangan (Layer 1)</h4><ul><li><code>[</code> untuk mulai ulang, <code>]</code> untuk akhir ulang.</li><li><code>_a, _b, _c, _d</code> untuk ending 1-4.</li><li>Contoh: <code>[ 1 2 | _a 3 4 ] | _b 5 0 |</code></li></ul></div>
                 <div><h4>Layer Accomp</h4><ul><li>Pilih instrumen "Accomp". Layer ini akan selalu di atas pada pratinjau.</li><li>Tulis nama chord (misal: <code>C G Am F</code>).</li><li>Gunakan <code>z</code> untuk istirahat 1 ketuk (tidak terlihat).</li></ul></div>
                 <div><h4>Fitur Editor</h4><ul><li>Undo/Redo: <code>Ctrl/Cmd + Z</code> & <code>Y</code>.</li><li>Gunakan tombol <code>+/-</code> di ujung tiap baris untuk mengubah jumlah bar di baris tersebut.</li></ul></div>
@@ -815,7 +1557,7 @@
                         <input type="number" id="bpm" class="w-full" value="120" min="40" max="240">
                     </div>
                     <div>
-                        <label for="tonalitas" class="block font-semibold mb-2">Tonalitas</label>
+                        <label for="tonalitas" class="block font-semibold mb-2">Tonalitas (Awal)</label>
                         <select id="tonalitas" class="w-full">
                             <option value="C">Do = C</option>
                             <optgroup label="Kres (♯)">
@@ -835,7 +1577,7 @@
                         </select>
                     </div>
                     <div>
-                        <label for="birama" class="block font-semibold mb-2">Birama</label>
+                        <label for="birama" class="block font-semibold mb-2">Birama (Awal)</label>
                         <select id="birama" class="w-full">
                             <option value="4/4">4/4</option>
                             <option value="3/4">3/4</option>
@@ -882,7 +1624,7 @@
                                     <span class="hidden md:inline">Tablet</span>
                                 </button>
                                 <button class="view-mode-btn px-3 py-1 text-sm font-semibold rounded-md active flex items-center gap-1" data-view="pc" title="Tampilan PC">
-                                    <svg xmlns="http://www.w3.000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="2" y1="21" x2="22" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="2" y1="21" x2="22" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
                                     <span class="hidden md:inline">PC</span>
                                 </button>
                             </div>
@@ -923,6 +1665,14 @@
         <button id="fullscreen-stop-btn">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12"></rect></svg>
         </button>
+        <button id="fullscreen-new-project-btn" class="btn btn-secondary">
+            🆕
+        </button>
+        <button id="fullscreen-save-project-btn" class="btn btn-secondary">
+            💾
+        </button>
+        <button id="fullscreen-load-project-btn" class="btn btn-secondary">
+            📁
     </div>
 
     <script>
@@ -960,6 +1710,7 @@
         let playBtn, addLayerBtn, downloadPngBtn, downloadPdfBtn, titleInput, arrangerInput, composerInput, biramaSelect, tonalitasSelect, bpmInput, combinedSheetContainer, layersEditorContainer, barsPerRowSelect, undoBtn, redoBtn, fullscreenBtn, saveProjectBtn, loadProjectBtn, loadProjectInput;
         let fullscreenPlayPauseBtn, fullscreenStopBtn;
         let newProjectBtn, newProjectModal, confirmNewProjectBtn, cancelNewProjectBtn;
+        let highlightBarIntervalId = []; // [PERBAIKAN] Diinisialisasi sebagai array
 
         function assignGlobalDOMElements() {
             playBtn = document.getElementById('playBtn');
@@ -978,27 +1729,25 @@
             loadProjectBtn = document.getElementById('loadProjectBtn');
             loadProjectInput = document.getElementById('loadProjectInput');
             
-            // New Elements
             newProjectBtn = document.getElementById('newProjectBtn');
             newProjectModal = document.getElementById('new-project-modal');
             confirmNewProjectBtn = document.getElementById('confirm-new-project-btn');
             cancelNewProjectBtn = document.getElementById('cancel-new-project-btn');
             
-            // These are now in the floating window
             undoBtn = document.getElementById('undoBtn');
             redoBtn = document.getElementById('redoBtn');
             addLayerBtn = document.getElementById('addLayerBtn');
             layersEditorContainer = document.getElementById('layers-editor-container');
             
-            // New fullscreen controls
             fullscreenPlayPauseBtn = document.getElementById('fullscreen-play-pause-btn');
             fullscreenStopBtn = document.getElementById('fullscreen-stop-btn');
+            fullscreenNewProjectBtn = document.getElementById('fullscreen-new-project-btn');
+            fullscreenSaveProjectBtn = document.getElementById('fullscreen-save-project-btn');
+            fullscreenLoadProjectBtn = document.getElementById('fullscreen-load-project-btn'); 
         }
         
         let zoomFactor = 1.0; let layers = []; let TonePlayers = {};
         let activeLayerIndex = 0;
-        let highlightBarIntervalId = null;
-        let currentBarHighlight = 0;
         
         const baseNoteMap = { '1': 'C', '2': 'D', '3': 'E', '4': 'F', '5': 'G', '6': 'A', '7': 'B', '0': null, 'o': null };
         const bassDisplayMap = { '1': 'C', '2': 'D', '3': 'E', '4': 'F', '5': 'G', '6': 'A', '7': 'B' };
@@ -1056,26 +1805,29 @@
         }
 
         // --- NOTATION PROCESSING & DISPLAY ---
-        function getBars(layerNotation, birama, isAccompLayer = false) {
-            const beatsPerBar = parseInt(birama);
-            const tokens = layerNotation.replace(/\|/g, ' | ').split(/\s+/g).filter(n => n !== '');
-
+        function getBars(layerNotation, initialBirama, isAccompLayer = false) {
+            const keyChangeRegex = /\(Do=([A-G][b#]?)\)/i;
+            const timeSigChangeRegex = /\(B=(\d{1,2}\/\d{1,2})\)/i;
+            const directiveRegex = /(\([Bb]=[\d\/]+\)|\(Do=[A-Ga-g][b#]?\))/g;
+            const tokens = layerNotation.replace(directiveRegex, ' $1 ').replace(/\|/g, ' | ').split(/\s+/g).filter(n => n !== '');
+            
             let bars = [];
             let currentBar = { notes: [], annotations: [] };
+            let currentBirama = initialBirama;
+            let beatsPerBar = parseInt(currentBirama.split('/')[0]);
             let currentBarBeats = 0;
-
+            
             const pushBar = () => {
-                if (currentBar.notes.length > 0 || currentBar.annotations.length > 0) {
+                if (currentBar.notes.length > 0 || currentBar.annotations.length > 0 || currentBar.newKey || currentBar.newTimeSignature) {
                     bars.push(currentBar);
                 }
                 currentBar = { notes: [], annotations: [] };
                 currentBarBeats = 0;
             };
-
+            
             if (isAccompLayer) {
-                for (const token of tokens) {
+                 for (const token of tokens) {
                     if (token === '|') { pushBar(); continue; }
-                    
                     const duration = 1;
                     if (currentBarBeats + duration > beatsPerBar) { pushBar(); }
                     currentBar.notes.push({ type: 'chord', text: token, duration: duration });
@@ -1088,6 +1840,20 @@
                 const sixteenthEighthRegex = /^([1-7o0])([\/b]?)([.,]*)(\^?)(\~?)([1-7o0])([\/b]?)([.,]*)(\^?)(\~?)([1-7o0])([\/b]?)([.,]*)(\^?)(\~?)-$/;
 
                 for (const token of tokens) {
+                    const keyMatch = token.match(keyChangeRegex);
+                    if (keyMatch) {
+                        currentBar.newKey = keyMatch[1];
+                        continue;
+                    }
+
+                    const timeSigMatch = token.match(timeSigChangeRegex);
+                    if (timeSigMatch) {
+                        currentBirama = timeSigMatch[1];
+                        beatsPerBar = parseInt(currentBirama.split('/')[0]);
+                        currentBar.newTimeSignature = currentBirama;
+                        continue;
+                    }
+
                     if (token === '|') { pushBar(); continue; }
                     if (['[', ']', '_a', '_b', '_c', '_d'].includes(token)) { currentBar.annotations.push(token); continue; }
 
@@ -1097,20 +1863,18 @@
 
                     if (sixteenthEighthMatch) {
                         const [_, n1, a1, o1, s1, f1, n2, a2, o2, s2, f2, n3, a3, o3, s3, f3] = sixteenthEighthMatch;
-                        const groupData = [
+                        noteData = { type: 'sixteenth-eighth-group', notes: [
                             { visualNote: n1, visualSharp: a1 === '/', visualFlat: a1 === 'b', visualModifier: o1, isStaccato: s1.includes('^'), isFermata: f1.includes('~'), duration: 0.25 },
                             { visualNote: n2, visualSharp: a2 === '/', visualFlat: a2 === 'b', visualModifier: o2, isStaccato: s2.includes('^'), isFermata: f2.includes('~'), duration: 0.25 },
                             { visualNote: n3, visualSharp: a3 === '/', visualFlat: a3 === 'b', visualModifier: o3, isStaccato: s3.includes('^'), isFermata: f3.includes('~'), duration: 0.5 }
-                        ];
-                        noteData = { type: 'sixteenth-eighth-group', notes: groupData, duration: 1 };
+                        ], duration: 1 };
                     } else if (mixedNotesMatch) {
-                        const [_, n1, a1, o1, s1, f1, n2, a2, o2, s2, f2, n3, a3, o3, s3, f3] = mixedNotesMatch;
-                        const groupData = [
-                            { visualNote: n1, visualSharp: a1 === '/', visualFlat: a1 === 'b', visualModifier: o1, isStaccato: s1.includes('^'), isFermata: f1.includes('~'), duration: 0.5 },
-                            { visualNote: n2, visualSharp: a2 === '/', visualFlat: a2 === 'b', visualModifier: o2, isStaccato: s2.includes('^'), isFermata: f2.includes('~'), duration: 0.25 },
-                            { visualNote: n3, visualSharp: a3 === '/', visualFlat: a3 === 'b', visualModifier: o3, isStaccato: s3.includes('^'), isFermata: f3.includes('~'), duration: 0.25 }
-                        ];
-                        noteData = { type: 'mixed-eighth-sixteenth', notes: groupData, duration: 1 };
+                         const [_, n1, a1, o1, s1, f1, n2, a2, o2, s2, f2, n3, a3, o3, s3, f3] = mixedNotesMatch;
+                        noteData = { type: 'mixed-eighth-sixteenth', notes: [
+                             { visualNote: n1, visualSharp: a1 === '/', visualFlat: a1 === 'b', visualModifier: o1, isStaccato: s1.includes('^'), isFermata: f1.includes('~'), duration: 0.5 },
+                             { visualNote: n2, visualSharp: a2 === '/', visualFlat: a2 === 'b', visualModifier: o2, isStaccato: s2.includes('^'), isFermata: f2.includes('~'), duration: 0.25 },
+                             { visualNote: n3, visualSharp: a3 === '/', visualFlat: a3 === 'b', visualModifier: o3, isStaccato: s3.includes('^'), isFermata: f3.includes('~'), duration: 0.25 }
+                        ], duration: 1 };
                     } else {
                         const notesInToken = [...token.matchAll(noteRegex)];
                         if (notesInToken.length === 2) {
@@ -1122,9 +1886,11 @@
                         } else if (notesInToken.length === 4) {
                             const groupData = notesInToken.map(m => { const [_, note, acc, oct, stac, fermata] = m; return { visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), isFermata: fermata.includes('~'), duration: 0.25 }; });
                             noteData = { type: 'group', notes: groupData, duration: 1 };
-                        } else {
+                        } else if (notesInToken.length > 0) {
                             const [_, note, acc, oct, stac, fermata] = notesInToken[0];
                             noteData = { type: 'single', visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), isFermata: fermata.includes('~'), duration: 1 };
+                        } else {
+                            continue; // Skip invalid tokens
                         }
                     }
 
@@ -1134,35 +1900,28 @@
                     if (currentBarBeats >= beatsPerBar) { pushBar(); }
                 }
             }
-            if (currentBar.notes.length > 0 || currentBar.annotations.length > 0) { pushBar(); }
+            if (currentBar.notes.length > 0 || currentBar.annotations.length > 0 || currentBar.newKey || currentBar.newTimeSignature) { pushBar(); }
             return bars;
         }
 
-        function getTransposedBassNoteName(noteData) {
+        function getTransposedBassNoteName(noteData, currentKey) {
             const scaleIntervals = { '1': 0, '2': 2, '3': 4, '4': 5, '5': 7, '6': 9, '7': 11 };
             const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
             const rootNoteIndexes = { 'C': 0, 'G': 7, 'D': 2, 'A': 9, 'E': 4, 'B': 11, 'F': 5, 'Bb': 10, 'Eb': 3, 'Ab': 8, 'Db': 1 };
             
-            const key = tonalitasSelect.value;
-            const rootIndex = rootNoteIndexes[key];
+            const rootIndex = rootNoteIndexes[currentKey];
             
             let interval = scaleIntervals[noteData.visualNote];
-            if (interval === undefined) {
-                return noteData.visualNote;
-            }
+            if (interval === undefined) return noteData.visualNote;
 
-            // Apply explicit accidentals from notation
-            if (noteData.visualSharp) {
-                interval += 1;
-            } else if (noteData.visualFlat) {
-                interval -= 1;
-            }
+            if (noteData.visualSharp) interval += 1;
+            else if (noteData.visualFlat) interval -= 1;
             
             const finalNoteIndex = (rootIndex + interval + 12) % 12;
             return noteNames[finalNoteIndex];
         }
 
-        function createNoteBlockHtml(noteData, isBass) {
+        function createNoteBlockHtml(noteData, isBass, currentKey) {
             let innerHtml = '';
             const noteClass = isBass ? 'bass-note' : '';
 
@@ -1185,7 +1944,7 @@
             } else {
                 let noteToDisplay;
                 if (isBass) {
-                    noteToDisplay = getTransposedBassNoteName(noteData);
+                    noteToDisplay = getTransposedBassNoteName(noteData, currentKey);
                 } else {
                     noteToDisplay = noteData.visualNote;
                     if (noteData.visualSharp) {
@@ -1212,7 +1971,7 @@
             return `<div class="note-block">${innerHtml}</div>`;
         }
 
-        function generateBarContentHtml(barNotes, layer) {
+        function generateBarContentHtml(barNotes, layer, currentKey) {
             let barContentHtml = '';
             const isBass = layer.instrument === 'bass';
             const isAccomp = layer.instrument === 'accomp';
@@ -1222,44 +1981,28 @@
                     if (noteData.text.toLowerCase() !== 'z') {
                         barContentHtml += `<div class="note-block"><span class="chord-note-display">${noteData.text}</span></div>`;
                     } else {
-                        barContentHtml += `<div class="note-block">&nbsp;</div>`; // Invisible placeholder
+                        barContentHtml += `<div class="note-block">&nbsp;</div>`;
                     }
                 });
             } else {
                 barNotes.forEach(noteData => {
                     if (noteData.type === 'sixteenth-eighth-group') {
-                        const firstNoteHtml = createNoteBlockHtml(noteData.notes[0], isBass);
-                        const secondNoteHtml = createNoteBlockHtml(noteData.notes[1], isBass);
-                        const thirdNoteHtml = createNoteBlockHtml(noteData.notes[2], isBass);
-                        
-                        barContentHtml += `
-                            <div class="note-group-container sixteenth-eighth-group">
-                                ${firstNoteHtml}
-                                ${secondNoteHtml}
-                                ${thirdNoteHtml}
-                            </div>
-                        `;
+                        const notesHtml = noteData.notes.map(n => createNoteBlockHtml(n, isBass, currentKey)).join('');
+                        barContentHtml += `<div class="note-group-container sixteenth-eighth-group">${notesHtml}</div>`;
                     } else if (noteData.type === 'mixed-eighth-sixteenth') {
-                        const firstNoteHtml = createNoteBlockHtml(noteData.notes[0], isBass);
-                        const secondNoteHtml = createNoteBlockHtml(noteData.notes[1], isBass);
-                        const thirdNoteHtml = createNoteBlockHtml(noteData.notes[2], isBass);
-                        
-                        const noteEighthHtml = `<div class="note-block">${firstNoteHtml}</div>`;
-                        const noteSixteenthGroupHtml = `
-                            <div class="note-group-container sixteenth-notes">
-                                ${secondNoteHtml}
-                                ${thirdNoteHtml}
-                            </div>
-                        `;
-                        barContentHtml += `<div class="combined-note-group">${noteEighthHtml}${noteSixteenthGroupHtml}</div>`;
+                        const firstNoteHtml = createNoteBlockHtml(noteData.notes[0], isBass, currentKey);
+                        const secondNoteHtml = createNoteBlockHtml(noteData.notes[1], isBass, currentKey);
+                        const thirdNoteHtml = createNoteBlockHtml(noteData.notes[2], isBass, currentKey);
+                        const noteSixteenthGroupHtml = `<div class="note-group-container sixteenth-notes">${secondNoteHtml}${thirdNoteHtml}</div>`;
+                        barContentHtml += `<div class="combined-note-group">${firstNoteHtml}${noteSixteenthGroupHtml}</div>`;
                     } else if (noteData.type === 'group' || noteData.type === 'triplet') {
                         const hasStaccato = noteData.notes.some(n => n.isStaccato);
                         const staccatoClass = hasStaccato ? '' : 'no-staccato';
                         const groupClass = noteData.type === 'triplet' ? 'triplet' : (noteData.notes.length === 2 ? 'eighth-notes' : 'sixteenth-notes');
-                        let groupHtml = noteData.notes.map(n => createNoteBlockHtml(n, isBass)).join('');
+                        let groupHtml = noteData.notes.map(n => createNoteBlockHtml(n, isBass, currentKey)).join('');
                         barContentHtml += `<div class="note-group-container ${groupClass} ${staccatoClass}">${groupHtml}</div>`;
                     } else {
-                        barContentHtml += createNoteBlockHtml(noteData, isBass);
+                        barContentHtml += createNoteBlockHtml(noteData, isBass, currentKey);
                     }
                 });
             }
@@ -1283,18 +2026,18 @@
                 if(placeholder) placeholder.remove();
             }
 
-            const birama = parseInt(biramaSelect.value.split('/')[0]);
+            const initialBirama = biramaSelect.value;
+            let currentKey = tonalitasSelect.value;
+
             const allLayersBars = layers.map(layer => {
-                if (layer.instrument === 'text') {
-                    return [{ notes: [], annotations: [] }]; // Dummy for text layer
-                }
-                return getBars(layer.notation, birama, layer.instrument === 'accomp');
+                if (layer.instrument === 'text') return [{ notes: [], annotations: [] }];
+                return getBars(layer.notation, initialBirama, layer.instrument === 'accomp');
             });
             const annotationBars = layers.length > 0 ? allLayersBars[0] : [];
             const maxBars = Math.max(0, ...allLayersBars.map(bars => bars.length));
 
             if (maxBars === 0) {
-                if(!combinedSheetContainer.querySelector('.placeholder-text')) {
+                 if(!combinedSheetContainer.querySelector('.placeholder-text')) {
                     const placeholder = document.createElement('p');
                     placeholder.className = 'placeholder-text text-gray-500 text-2xl font-bold p-4 text-center opacity-50';
                     placeholder.textContent = 'PRATINJAU KOSONG';
@@ -1330,38 +2073,64 @@
                     musicBarDiv.dataset.barIndex = barIndex;
 
                     const annotationData = annotationBars[barIndex];
-                    if (annotationData && annotationData.annotations.length > 0 && layers[0].instrument !== 'accomp') {
-                        if (annotationData.annotations.includes('[')) musicBarDiv.classList.add('repeat-start');
-                        if (annotationData.annotations.includes(']')) musicBarDiv.classList.add('repeat-end');
-                        
-                        let voltaType = null;
-                        if (annotationData.annotations.includes('_a')) voltaType = '_a';
-                        else if (annotationData.annotations.includes('_b')) voltaType = '_b';
-                        else if (annotationData.annotations.includes('_c')) voltaType = '_c';
-                        else if (annotationData.annotations.includes('_d')) voltaType = '_d';
+                    if (annotationData) {
+                         // Wadah baru untuk menampung semua direktif notasi di satu tempat
+                         const directivesContainer = document.createElement('div');
+                         directivesContainer.className = 'notation-directives-container';
 
-                        if (voltaType) {
-                            const voltaDiv = document.createElement('div');
-                            voltaDiv.className = 'volta-bracket';
+                         // Cek perubahan Nada Dasar
+                         if (annotationData.newKey) {
+                             currentKey = annotationData.newKey;
+                             const keyChangeDiv = document.createElement('div');
+                             keyChangeDiv.className = 'notation-directive';
+                             keyChangeDiv.textContent = `Do = ${currentKey}`;
+                             directivesContainer.appendChild(keyChangeDiv);
+                         }
+
+                         // Cek perubahan Birama
+                         if (annotationData.newTimeSignature) {
+                             const timeSigChangeDiv = document.createElement('div');
+                             timeSigChangeDiv.className = 'notation-directive';
+                             timeSigChangeDiv.textContent = `B = ${annotationData.newTimeSignature}`;
+                             directivesContainer.appendChild(timeSigChangeDiv);
+                         }
+
+                         if (directivesContainer.childElementCount > 0) {
+                             musicBarDiv.appendChild(directivesContainer);
+                         }
+
+                        if (annotationData.annotations.length > 0 && layers[0].instrument !== 'accomp') {
+                            if (annotationData.annotations.includes('[')) musicBarDiv.classList.add('repeat-start');
+                            if (annotationData.annotations.includes(']')) musicBarDiv.classList.add('repeat-end');
                             
-                            let voltaText = '';
-                            switch (voltaType) {
-                                case '_a': voltaText = '1.'; break;
-                                case '_b': voltaText = '2.'; break;
-                                case '_c': voltaText = '3.'; break;
-                                case '_d': voltaText = '4.'; break;
+                            let voltaType = null;
+                            if (annotationData.annotations.includes('_a')) voltaType = '_a';
+                            else if (annotationData.annotations.includes('_b')) voltaType = '_b';
+                            else if (annotationData.annotations.includes('_c')) voltaType = '_c';
+                            else if (annotationData.annotations.includes('_d')) voltaType = '_d';
+
+                            if (voltaType) {
+                                const voltaDiv = document.createElement('div');
+                                voltaDiv.className = 'volta-bracket';
+                                let voltaText = '';
+                                switch (voltaType) {
+                                    case '_a': voltaText = '1.'; break;
+                                    case '_b': voltaText = '2.'; break;
+                                    case '_c': voltaText = '3.'; break;
+                                    case '_d': voltaText = '4.'; break;
+                                }
+                                voltaDiv.textContent = voltaText;
+                                
+                                const nextBarAnnotation = annotationBars[barIndex + 1];
+                                if (!nextBarAnnotation || !nextBarAnnotation.annotations.includes(voltaType)) {
+                                    voltaDiv.classList.add('is-end');
+                                    const endHook = document.createElement('div');
+                                    endHook.className = 'volta-bracket-end-hook';
+                                    voltaDiv.appendChild(endHook);
+                                }
+                                musicBarDiv.appendChild(voltaDiv);
+                                musicBarDiv.classList.add('has-volta');
                             }
-                            voltaDiv.textContent = voltaText;
-                            
-                            const nextBarAnnotation = annotationBars[barIndex + 1];
-                            if (!nextBarAnnotation || !nextBarAnnotation.annotations.includes(voltaType)) {
-                                voltaDiv.classList.add('is-end');
-                                const endHook = document.createElement('div');
-                                endHook.className = 'volta-bracket-end-hook';
-                                voltaDiv.appendChild(endHook);
-                            }
-                            musicBarDiv.appendChild(voltaDiv);
-                            musicBarDiv.classList.add('has-volta');
                         }
                     }
                     
@@ -1379,19 +2148,19 @@
                         .sort((a, b) => {
                             if (a.layer.instrument === 'accomp') return -1;
                             if (b.layer.instrument === 'accomp') return 1;
-                            if (a.layer.instrument === 'text') return 1; // Put text at the bottom
+                            if (a.layer.instrument === 'text') return 1; 
                             if (b.layer.instrument === 'text') return -1;
                             return a.originalIndex - b.originalIndex;
                         });
 
                     displayOrderLayers.forEach(({ layer, bars }) => {
-                        if (layer.instrument === 'text') return; // Handled separately
+                        if (layer.instrument === 'text') return;
 
                         const layerBarNotesDiv = document.createElement('div');
                         layerBarNotesDiv.className = 'layer-bar-notes';
                         const barData = bars[barIndex];
                         if (barData) {
-                            layerBarNotesDiv.innerHTML = generateBarContentHtml(barData.notes, layer);
+                            layerBarNotesDiv.innerHTML = generateBarContentHtml(barData.notes, layer, currentKey);
                         }
                         musicBarDiv.appendChild(layerBarNotesDiv);
                     });
@@ -1404,7 +2173,7 @@
                     const textDiv = document.createElement('div');
                     textDiv.className = 'layer-text-notes';
                     const textLines = textLayer.notation.split('\n');
-                    textDiv.innerHTML = textLines.map(line => `<p>${line}</p>`).join('');
+                    textDiv.innerHTML = textLines.map(line => `<p>${line || '&nbsp;'}</p>`).join('');
                     rowWrapper.appendChild(textDiv);
                 });
 
@@ -1504,7 +2273,7 @@
                         const rowIndex = parseInt(wrapper.dataset.rowIndex);
                         const barsInThisRow = wrapper.querySelectorAll('.music-bar');
 
-                        if (layers[0].rowOverrides[rowIndex]) {
+                        if (layers[0] && layers[0].rowOverrides[rowIndex]) {
                             const customBarWidth = availableWidth / barsInThisRow.length;
                             barsInThisRow.forEach(bar => { bar.style.width = `${customBarWidth}px`; });
                         } else {
@@ -1522,24 +2291,13 @@
                 editorRow.className = `layer-editor-row ${layer.isEditorHidden ? 'is-collapsed' : ''}`;
                 editorRow.dataset.index = index;
                 
-                const removeButtonHtml = index > 0 || layers.length > 1 ? `
-                    <button class="remove-btn">Hapus</button>
-                ` : '';
+                const removeButtonHtml = index > 0 || layers.length > 1 ? `<button class="remove-btn">Hapus</button>` : '';
 
                 let editorHtml;
                 if (layer.instrument === 'text') {
-                    editorHtml = `
-                        <div class="editor-wrapper text-editor-wrapper">
-                            <textarea class="text-notation-editor" spellcheck="true" placeholder="Masukkan lirik atau catatan di sini..."></textarea>
-                        </div>
-                    `;
+                    editorHtml = `<div class="editor-wrapper text-editor-wrapper"><textarea class="text-notation-editor" spellcheck="true" placeholder="Masukkan lirik atau catatan di sini..."></textarea></div>`;
                 } else {
-                    editorHtml = `
-                        <div class="editor-wrapper">
-                            <div class="layer-notation-bar-numbers"></div>
-                            <textarea class="layer-notation-editor" spellcheck="false" placeholder="${layer.instrument === 'accomp' ? 'C G Am F z...' : '1 2 3 4...'}"></textarea>
-                        </div>
-                    `;
+                    editorHtml = `<div class="editor-wrapper"><div class="layer-notation-bar-numbers"></div><textarea class="layer-notation-editor" spellcheck="false" placeholder="${layer.instrument === 'accomp' ? 'C G Am F z...' : '1 2 3 4...'}"></textarea></div>`;
                 }
 
                 editorRow.innerHTML = `
@@ -1589,81 +2347,118 @@
         }
         
         // --- AUDIO PLAYBACK ---
-        function processNotes(notation) {
-            const tokens = notation.replace(/\|/g, ' ').split(/\s+/).filter(Boolean);
-            const notes = [];
+        function processNotesForPlayback(notation, initialBirama, initialKey) {
+            const keyChangeRegex = /\(Do=([A-G][b#]?)\)/i;
+            const timeSigChangeRegex = /\(B=(\d{1,2}\/\d{1,2})\)/i;
+            const directiveRegex = /(\([Bb]=[\d\/]+\)|\(Do=[A-Ga-g][b#]?\))/g;
+
+            const tokens = notation.replace(directiveRegex, ' $1 ').replace(/\|/g, ' ').split(/\s+/g).filter(Boolean);
+
+            const timedEvents = [];
+            let currentTime = 0; // in quarter notes
+            let currentBirama = initialBirama;
+            let currentKey = initialKey;
+
             const noteRegex = /([1-7o0])([\/b]?)([.,]*)(\^?)(\~?)/g;
             const mixedNoteRegex = /^([1-7o0])([\/b]?)([.,]*)(\^?)(\~?)-([1-7o0])([\/b]?)([.,]*)(\^?)(\~?)([1-7o0])([\/b]?)([.,]*)(\^?)(\~?)$/;
             const sixteenthEighthRegex = /^([1-7o0])([\/b]?)([.,]*)(\^?)(\~?)([1-7o0])([\/b]?)([.,]*)(\^?)(\~?)([1-7o0])([\/b]?)([.,]*)(\^?)(\~?)-$/;
 
             for (const token of tokens) {
-                if (['[', ']', '_a', '_b', '_c', '_d', '|'].includes(token)) continue;
+                 if (['[', ']', '_a', '_b', '_c', '_d'].includes(token)) continue;
 
-                let noteData;
+                const keyMatch = token.match(keyChangeRegex);
+                if (keyMatch) {
+                    currentKey = keyMatch[1];
+                    continue;
+                }
+
+                const timeSigMatch = token.match(timeSigChangeRegex);
+                if (timeSigMatch) {
+                    currentBirama = timeSigMatch[1];
+                    continue;
+                }
+                
+                const createNoteEvent = (noteData, duration) => {
+                    const event = {
+                        time: currentTime,
+                        type: 'note',
+                        key: currentKey,
+                        duration: duration,
+                        data: noteData
+                    };
+                    timedEvents.push(event);
+                    currentTime += duration;
+                }
+
                 const mixedNotesMatch = token.match(mixedNoteRegex);
                 const sixteenthEighthMatch = token.match(sixteenthEighthRegex);
 
                 if (sixteenthEighthMatch) {
-                    const [_, n1, a1, o1, s1, f1, n2, a2, o2, s2, f2, n3, a3, o3, s3, f3] = sixteenthEighthMatch;
-                    const groupData = [
-                        { visualNote: n1, visualSharp: a1 === '/', visualFlat: a1 === 'b', visualModifier: o1, isStaccato: s1.includes('^'), isFermata: f1.includes('~'), duration: 0.25 },
-                        { visualNote: n2, visualSharp: a2 === '/', visualFlat: a2 === 'b', visualModifier: o2, isStaccato: s2.includes('^'), isFermata: f2.includes('~'), duration: 0.25 },
-                        { visualNote: n3, visualSharp: a3 === '/', visualFlat: a3 === 'b', visualModifier: o3, isStaccato: s3.includes('^'), isFermata: f3.includes('~'), duration: 0.5 }
-                    ];
-                    notes.push({ type: 'sixteenth-eighth-group', notes: groupData, duration: 1 });
+                     const [_, n1, a1, o1, s1, f1, n2, a2, o2, s2, f2, n3, a3, o3, s3, f3] = sixteenthEighthMatch;
+                     createNoteEvent({ visualNote: n1, visualSharp: a1 === '/', visualFlat: a1 === 'b', visualModifier: o1, isStaccato: s1.includes('^'), isFermata: f1.includes('~') }, 0.25);
+                     createNoteEvent({ visualNote: n2, visualSharp: a2 === '/', visualFlat: a2 === 'b', visualModifier: o2, isStaccato: s2.includes('^'), isFermata: f2.includes('~') }, 0.25);
+                     createNoteEvent({ visualNote: n3, visualSharp: a3 === '/', visualFlat: a3 === 'b', visualModifier: o3, isStaccato: s3.includes('^'), isFermata: f3.includes('~') }, 0.5);
                 } else if (mixedNotesMatch) {
                     const [_, n1, a1, o1, s1, f1, n2, a2, o2, s2, f2, n3, a3, o3, s3, f3] = mixedNotesMatch;
-                    const groupData = [
-                        { visualNote: n1, visualSharp: a1 === '/', visualFlat: a1 === 'b', visualModifier: o1, isStaccato: s1.includes('^'), isFermata: f1.includes('~'), duration: 0.5 },
-                        { visualNote: n2, visualSharp: a2 === '/', visualFlat: a2 === 'b', visualModifier: o2, isStaccato: s2.includes('^'), isFermata: f2.includes('~'), duration: 0.25 },
-                        { visualNote: n3, visualSharp: a3 === '/', visualFlat: a3 === 'b', visualModifier: o3, isStaccato: s3.includes('^'), isFermata: f3.includes('~'), duration: 0.25 }
-                    ];
-                    notes.push({ type: 'mixed-eighth-sixteenth', notes: groupData, duration: 1 });
+                    createNoteEvent({ visualNote: n1, visualSharp: a1 === '/', visualFlat: a1 === 'b', visualModifier: o1, isStaccato: s1.includes('^'), isFermata: f1.includes('~') }, 0.5);
+                    createNoteEvent({ visualNote: n2, visualSharp: a2 === '/', visualFlat: a2 === 'b', visualModifier: o2, isStaccato: s2.includes('^'), isFermata: f2.includes('~') }, 0.25);
+                    createNoteEvent({ visualNote: n3, visualSharp: a3 === '/', visualFlat: a3 === 'b', visualModifier: o3, isStaccato: s3.includes('^'), isFermata: f3.includes('~') }, 0.25);
                 } else {
                     const notesInToken = [...token.matchAll(noteRegex)];
                     if (notesInToken.length === 2) {
-                        const groupData = notesInToken.map(m => { const [_, note, acc, oct, stac, fermata] = m; return { visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), isFermata: fermata.includes('~'), duration: 0.5 }; });
-                        notes.push({ type: 'group', notes: groupData, duration: 1 });
+                        notesInToken.forEach(m => { const [_, note, acc, oct, stac, fermata] = m; createNoteEvent({ visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), isFermata: fermata.includes('~') }, 0.5); });
                     } else if (notesInToken.length === 3) {
-                        const groupData = notesInToken.map(m => { const [_, note, acc, oct, stac, fermata] = m; return { visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), isFermata: fermata.includes('~'), duration: 1/3 }; });
-                        notes.push({ type: 'triplet', notes: groupData, duration: 1 });
+                         notesInToken.forEach(m => { const [_, note, acc, oct, stac, fermata] = m; createNoteEvent({ visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), isFermata: fermata.includes('~') }, 1/3); });
                     } else if (notesInToken.length === 4) {
-                        const groupData = notesInToken.map(m => { const [_, note, acc, oct, stac, fermata] = m; return { visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), isFermata: fermata.includes('~'), duration: 0.25 }; });
-                        notes.push({ type: 'group', notes: groupData, duration: 1 });
-                    } else {
+                         notesInToken.forEach(m => { const [_, note, acc, oct, stac, fermata] = m; createNoteEvent({ visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), isFermata: fermata.includes('~') }, 0.25); });
+                    } else if (notesInToken.length > 0) {
                         const [_, note, acc, oct, stac, fermata] = notesInToken[0];
-                        notes.push({ type: 'single', visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), isFermata: fermata.includes('~'), duration: 1 });
+                        createNoteEvent({ visualNote: note, visualSharp: acc === '/', visualFlat: acc === 'b', visualModifier: oct, isStaccato: stac.includes('^'), isFermata: fermata.includes('~') }, 1);
                     }
                 }
             }
-            return { notes };
+            return timedEvents;
         }
 
         async function playAllLayers() {
-            if (Tone.Transport.state === "started") { Tone.Transport.stop(); playBtn.textContent = 'Mainkan'; fullscreenPlayPauseBtn.classList.remove('playing'); return; }
-            await Tone.start(); Tone.Transport.stop(); Tone.Transport.cancel();
+            if (Tone.Transport.state === "started") { Tone.Transport.stop(); playBtn.textContent = 'Mainkan'; fullscreenPlayPauseBtn.classList.remove('playing'); stopHighlight(); return; }
+            await Tone.start(); Tone.Transport.stop(); Tone.Transport.cancel(0); // [PERBAIKAN] Selalu reset transport
             
             const bpm = parseInt(bpmInput.value); Tone.Transport.bpm.value = bpm;
-            const quarterNoteDuration = Tone.Time('4n').toSeconds();
+            const initialKey = tonalitasSelect.value;
+            const initialBirama = biramaSelect.value;
             let maxDuration = 0;
             
             layers.forEach(layer => {
-                if (layer.instrument === 'accomp' || layer.instrument === 'text') return; 
+                if (layer.instrument === 'accomp' || layer.instrument === 'text' || !layer.notation) return; 
 
-                const processed = processNotes(layer.notation);
-                if (processed.notes.length === 0) return;
-                const notesInTime = []; let currentTime = 0; const player = TonePlayers[layer.instrument]; if (!player) return;
-                processed.notes.forEach(noteData => {
-                    if (noteData.type === 'group' || noteData.type === 'triplet' || noteData.type === 'mixed-eighth-sixteenth' || noteData.type === 'sixteenth-eighth-group') {
-                        noteData.notes.forEach(n => { const toneNote = getToneNote(n, layer); if (toneNote) { notesInTime.push({ time: currentTime, note: toneNote, duration: n.duration * quarterNoteDuration }); } currentTime += n.duration * quarterNoteDuration; });
-                    } else { const toneNote = getToneNote(noteData, layer); if (toneNote) { notesInTime.push({ time: currentTime, note: toneNote, duration: noteData.duration * quarterNoteDuration }); } currentTime += noteData.duration * quarterNoteDuration; }
-                });
-                if (notesInTime.length > 0) { new Tone.Part((time, value) => { player.triggerAttackRelease(value.note, value.duration, time); }, notesInTime).start(0); maxDuration = Math.max(maxDuration, currentTime); }
+                const timedEvents = processNotesForPlayback(layer.notation, initialBirama, initialKey);
+                if (timedEvents.length === 0) return;
+
+                const player = TonePlayers[layer.instrument]; if (!player) return;
+                
+                const partEvents = timedEvents.map(event => {
+                    const toneNote = getToneNote(event.data, layer, event.key);
+                    const quarterNoteDuration = Tone.Time('4n').toSeconds();
+                    return {
+                        time: event.time * quarterNoteDuration,
+                        note: toneNote,
+                        duration: event.duration * quarterNoteDuration
+                    };
+                }).filter(e => e.note); // Filter out rests
+
+                if (partEvents.length > 0) {
+                     new Tone.Part((time, value) => {
+                        player.triggerAttackRelease(value.note, value.duration, time);
+                     }, partEvents).start(0);
+                     const lastEvent = partEvents[partEvents.length - 1];
+                     maxDuration = Math.max(maxDuration, lastEvent.time + lastEvent.duration);
+                }
             });
 
             if (maxDuration > 0) {
                 Tone.Transport.scheduleOnce(() => { playBtn.textContent = 'Mainkan'; fullscreenPlayPauseBtn.classList.remove('playing'); Tone.Transport.stop(); stopHighlight(); }, maxDuration);
-                Tone.Transport.start(); playBtn.textContent = 'Stop'; fullscreenPlayPauseBtn.classList.add('playing'); startHighlight();
+                Tone.Transport.start(); playBtn.textContent = 'Stop'; fullscreenPlayPauseBtn.classList.add('playing'); startHighlight(initialBirama);
             } else { showMessageBox('Tidak ada notasi valid untuk dimainkan.', 'error'); }
         }
 
@@ -1679,63 +2474,61 @@
             }
         }
         
-        function getToneNote(noteData, layer) {
-            const majorScaleIntervals = {
-                '1': 0,  // Do
-                '2': 2,  // Re
-                '3': 4,  // Mi
-                '4': 5,  // Fa
-                '5': 7,  // So
-                '6': 9,  // La
-                '7': 11  // Ti
-            };
+        function getToneNote(noteData, layer, currentKey) {
+            const majorScaleIntervals = { '1': 0, '2': 2, '3': 4, '4': 5, '5': 7, '6': 9, '7': 11 };
+            if (majorScaleIntervals[noteData.visualNote] === undefined) return null; // Rest note
 
             let interval = majorScaleIntervals[noteData.visualNote];
-            if (interval === undefined) return null;
-
+            
             let octave = layer.instrument === 'bass' ? 3 : 4; 
             if (noteData.visualModifier === '.') octave++;
             else if (noteData.visualModifier === '..') octave += 2;
             else if (noteData.visualModifier === ',') octave--;
             else if (noteData.visualModifier === ',,') octave -= 2;
             
-            const key = tonalitasSelect.value;
-            const tonic = key + octave;
+            const tonic = currentKey + octave;
 
-            // Apply explicit accidentals to the interval *before* transposing
-            if (noteData.visualSharp) {
-                interval += 1;
-            } else if (noteData.visualFlat) {
-                interval -= 1;
-            }
+            if (noteData.visualSharp) interval += 1;
+            else if (noteData.visualFlat) interval -= 1;
             
-            const finalNote = Tone.Frequency(tonic).transpose(interval).toNote();
-            return finalNote;
+            return Tone.Frequency(tonic).transpose(interval).toNote();
         }
 
-        function startHighlight() {
-            stopHighlight();
-            currentBarHighlight = 0;
-            const birama = parseInt(biramaSelect.value.split('/')[0]);
+        function startHighlight(initialBirama) {
+            stopHighlight(); // Clear any previous highlight schedules
+
+            const allBars = getBars(layers[0]?.notation || '', initialBirama);
+            if (allBars.length === 0) return;
+
+            let timeCursor = 0; // in seconds
+            const quarterNoteDuration = Tone.Time('4n').toSeconds();
             
-            Tone.Transport.scheduleRepeat(time => {
-                Tone.Draw.schedule(() => {
-                    document.querySelectorAll('.music-bar').forEach(bar => bar.style.backgroundColor = 'transparent');
-                    const barToHighlight = document.querySelector(`.music-bar[data-bar-index="${currentBarHighlight}"]`);
-                    if (barToHighlight) {
-                        barToHighlight.style.backgroundColor = 'rgba(59, 130, 246, 0.2)';
-                        const barParent = barToHighlight.parentElement;
-                        barParent.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-                    currentBarHighlight++;
-                }, time);
-            }, `${birama}n`); // Highlight every 'birama' beats
+            allBars.forEach((bar, index) => {
+                const scheduleId = Tone.Transport.scheduleOnce(time => {
+                    Tone.Draw.schedule(() => {
+                        document.querySelectorAll('.music-bar').forEach(b => b.style.backgroundColor = 'transparent');
+                        const barToHighlight = document.querySelector(`.music-bar[data-bar-index="${index}"]`);
+                        if (barToHighlight) {
+                            barToHighlight.style.backgroundColor = 'rgba(59, 130, 246, 0.2)';
+                            barToHighlight.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+                        }
+                    }, time);
+                }, timeCursor);
+                
+                highlightBarIntervalId.push(scheduleId); // Store the schedule ID
+
+                let barDuration = 0;
+                bar.notes.forEach(note => barDuration += note.duration);
+                timeCursor += barDuration * quarterNoteDuration;
+            });
         }
         
         function stopHighlight() {
-            Tone.Transport.clear(highlightBarIntervalId);
+            if (highlightBarIntervalId && highlightBarIntervalId.length > 0) {
+                highlightBarIntervalId.forEach(id => Tone.Transport.clear(id));
+            }
+            highlightBarIntervalId = [];
             document.querySelectorAll('.music-bar').forEach(bar => bar.style.backgroundColor = 'transparent');
-            currentBarHighlight = 0;
         }
 
         function toggleEditorWindow(action) {
@@ -1908,10 +2701,6 @@
             const body = document.body;
             const iconEnter = document.getElementById('fullscreen-enter-icon');
             const iconExit = document.getElementById('fullscreen-exit-icon');
-            const floatingEditorWindow = document.getElementById('floating-editor-window');
-            const showEditorButton = document.getElementById('show-editor-button');
-            const fullscreenControls = document.getElementById('fullscreen-controls');
-
             body.classList.toggle('fullscreen-mode');
 
             if (body.classList.contains('fullscreen-mode')) {
@@ -2115,14 +2904,27 @@
             undoBtn.addEventListener('click', undo);
             redoBtn.addEventListener('click', redo);
             
-            // New "New Project" listeners
             newProjectBtn.addEventListener('click', () => showModal('new-project-modal'));
             confirmNewProjectBtn.addEventListener('click', () => { hideModal('new-project-modal'); startNewProject(); });
             cancelNewProjectBtn.addEventListener('click', () => hideModal('new-project-modal'));
             
-            // New fullscreen controls listeners
             fullscreenPlayPauseBtn.addEventListener('click', () => playAllLayers());
             fullscreenStopBtn.addEventListener('click', () => stopPlayback());
+            
+            fullscreenNewProjectBtn.addEventListener('click', () => {
+                stopPlayback();
+                showModal('new-project-modal');
+            });
+
+            fullscreenSaveProjectBtn.addEventListener('click', () => {
+                stopPlayback();
+                saveProject();
+            });
+
+            fullscreenLoadProjectBtn.addEventListener('click', () => {
+                stopPlayback();
+                loadProjectInput.click();
+            });
             
             [titleInput, composerInput, arrangerInput, biramaSelect, tonalitasSelect, bpmInput, barsPerRowSelect].forEach(el => { el.addEventListener('change', renderAll); });
             
@@ -2143,13 +2945,13 @@
                     viewModeControls.querySelectorAll('.view-mode-btn').forEach(btn => btn.classList.remove('active'));
                     button.classList.add('active');
                     
-                    renderCombinedSheet(); // Re-render to apply width changes
+                    renderCombinedSheet();
                 }
             });
 
             document.body.addEventListener('input', (e) => {
                 const isMusicalEditor = e.target.classList.contains('layer-notation-editor');
-                const isTextEditor = e.target.classList.contains('otation-editor');
+                const isTextEditor = e.target.classList.contains('text-notation-editor');
                 if (!isMusicalEditor && !isTextEditor) return;
                 
                 const editorRow = e.target.closest('.layer-editor-row');
@@ -2166,11 +2968,8 @@
                 }
             });
 
-             // Pendengar acara baru untuk pemutaran not secara real-time
             document.body.addEventListener('keyup', (e) => {
                 if (!e.target.classList.contains('layer-notation-editor')) return;
-
-                // Kita hanya ingin memutar not musik, bukan tombol lainnya
                 const musicalNotes = ['1', '2', '3', '4', '5', '6', '7', 'o'];
                 if (musicalNotes.includes(e.key)) {
                     const editorRow = e.target.closest('.layer-editor-row');
@@ -2231,12 +3030,13 @@
             }, true);
 
             combinedSheetContainer.addEventListener('click', (e) => {
-                if (e.target.classList.contains('row-layout-btn')) {
-                    const rowWrapper = e.target.closest('.music-row-wrapper');
+                 const button = e.target.closest('.row-layout-btn');
+                if (button) {
+                    const rowWrapper = button.closest('.music-row-wrapper');
                     if (!rowWrapper || layers.length === 0) return;
                     
                     const rowIndex = parseInt(rowWrapper.dataset.rowIndex);
-                    const action = e.target.dataset.dataset.action;
+                    const action = button.dataset.action;
                     const layoutGuideLayer = layers[0];
                     const globalBarsPerRow = parseInt(barsPerRowSelect.value);
                     let currentBars = layoutGuideLayer.rowOverrides[rowIndex] || globalBarsPerRow;
