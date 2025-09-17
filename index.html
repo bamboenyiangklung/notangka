@@ -972,7 +972,7 @@
         }
         
         .chord-note-display {
-            color: #ec4899;
+            color: #000000;
             font-weight: 600;
             font-size: calc(0.9rem * var(--zoom-factor));
             font-family: 'Poppins', sans-serif;
@@ -1550,6 +1550,84 @@
         #show-editor-button.is-visible {
             display: flex;
         }
+
+        /* NEW: STYLES FOR PRINTING */
+        @media print {
+            body, .container {
+                padding: 0 !important;
+                margin: 0 !important;
+                box-shadow: none !important;
+                background-color: #ffffff !important;
+                display: block !important;
+            }
+
+            /* SEMUA ELEMEN UI DISEMBUNYIKAN DI SINI */
+            #app-title-wrapper, #instructions-panel, #main-controls-wrapper, 
+            .main-watermark, #floating-editor-window, #show-editor-button, 
+            #fullscreen-controls, .row-layout-controls, #preview-controls-container,
+            #fullscreen-btn /* <-- TOMBOL FULLSCREEN DIJAMIN HILANG */ {
+                display: none !important;
+            }
+
+            /* Properti ini memaksa browser untuk mencetak warna latar belakang */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }           
+
+            /* Hide everything except the sheet music itself */
+            body > *:not(.container),
+            .container > *:not(#main-content-area),
+            #main-content-area > *:not(#preview-wrapper),
+            #preview-wrapper > *:not(#combined-sheet-container),
+            #app-title-wrapper, #instructions-panel, #main-controls-wrapper, 
+            .main-watermark, #floating-editor-window, #show-editor-button, 
+            #fullscreen-controls, .row-layout-controls, #preview-controls-container {
+                display: none !important;
+            }
+
+            #combined-sheet-container {
+                position: static !important;
+                height: auto !important;
+                width: 100% !important;
+                padding: 0 !important;
+                overflow: visible !important;
+                background-color: transparent !important;
+                border: none !important;
+                display: block !important;
+            }
+
+            .page {
+                box-shadow: none !important;
+                border: none !important;
+                width: 115% !important;
+                max-width: 110% !important;
+                height: 290mm; /* A bit less than A4 height for margin */
+                padding: 15mm !important;
+                margin: 0 !important;
+                box-sizing: border-box !important;
+                page-break-after: always;
+                overflow: hidden;
+            }
+
+            .page:last-child {
+                page-break-after: auto;
+            }
+
+            .music-row-wrapper {
+                page-break-inside: avoid;
+            }
+
+            .page-watermark {
+                display: block !important; /* Pastikan watermark selalu tampil */
+                position: absolute !important;
+                bottom: -0.7mm;    /* Jarak 1 cm dari tepi bawah kertas */
+                right: 15mm;       /* Jarak 1.5 cm dari tepi kanan kertas */
+                font-size: 8pt !important;
+                color: #999999 !important; /* Warna abu-abu agar tidak terlalu mencolok */
+            }
+        }
+
     </style>
 </head>
 <body class="bg-gray-100">
@@ -1610,7 +1688,21 @@
                 <div><h4>Durasi & Artikulasi</h4><ul><li><code>12</code> (1/8), <code>1234</code> (1/16), <code>123</code> (triplet).</li><li><code>1-23</code> untuk not 1/8 + dua not 1/16.</li><li><code>123-</code> untuk dua not 1/16 + satu not 1/8.</li><li><code>1^</code> (staccato).</li><li><code>1~</code> (fermata/tahan).</li></ul></div>
                 <div><h4 class="text-teal-500">Fitur Baru: Perubahan di Tengah Lagu</h4><ul><li>Ubah Birama: Tulis <code>(B=3/4)</code> untuk mengubah birama menjadi 3/4.</li><li>Ubah Tonalitas: Tulis <code>(Do=G)</code> untuk mengubah nada dasar menjadi Do = G.</li><li>Perubahan ini berlaku untuk semua not setelahnya.</li><li>Contoh: <code>1 2 3 4 | (B=3/4) 5 6 7 | (Do=G) 1 2 3 |</code></li></ul></div>
                 <div><h4>Pengulangan (Layer 1)</h4><ul><li><code>[</code> untuk mulai ulang, <code>]</code> untuk akhir ulang.</li><li><code>_a, _b, _c, _d</code> untuk ending 1-4.</li><li>Contoh: <code>[ 1 2 | _a 3 4 ] | _b 5 0 |</code></li></ul></div>
-                <div><h4>Layer Accomp</h4><ul><li>Pilih instrumen "Accomp". Layer ini akan selalu di atas pada pratinjau.</li><li>Tulis nama chord (misal: <code>C G Am F</code>).</li><li>Gunakan <code>z</code> untuk istirahat 1 ketuk (tidak terlihat).</li></ul></div>
+                <div>
+                    <h4>Layer Accomp</h4>
+                    <ul>
+                        <li>Pilih instrumen "Accomp". Layer ini akan selalu di atas pada pratinjau.</li>
+                        <li>Tulis nama chord (misal: <code>C G Am F</code>). Ini akan dimainkan sebagai akor mayor/minor standar.</li>
+                        <li>Gunakan <code>z</code> untuk istirahat 1 ketuk (tidak terlihat).</li>
+                    </ul>
+                    <h4 class="text-teal-500">BARU: Chord Tingkatan (Romawi)</h4>
+                    <ul>
+                        <li>Gunakan angka Romawi untuk menulis akor berdasarkan tingkatan nada dasar.</li>
+                        <li><code>I</code> (mayor), <code>ii</code> (minor), <code>iii</code> (minor), <code>IV</code> (mayor), <code>V</code> (mayor), <code>vi</code> (minor).</li>
+                        <li>Ganti kualitas: <code>Im</code> (minor), <code>IIM</code> (mayor), <code>IIIM</code> (mayor), <code>IVm</code> (minor), <code>Vm</code> (minor), <code>VIM</code> (mayor).</li>
+                        <li>Contoh: Jika Do=C, <code>I ii V I</code> akan dimainkan sebagai akor C mayor, D minor, G mayor, C mayor.</li>
+                    </ul>
+                </div>
                 <div><h4>Fitur Editor</h4><ul><li>Undo/Redo: <code>Ctrl/Cmd + Z</code> & <code>Y</code>.</li><li>Gunakan tombol <code>+/-</code> di ujung tiap baris untuk mengubah jumlah bar di baris tersebut.</li></ul></div>
                 <div><h4>Simpan & Buka Proyek</h4><ul><li>Gunakan tombol <b>Simpan Proyek</b> untuk mengunduh pekerjaan Anda sebagai file <code>.abimantra</code>.</li><li>Gunakan <b>Buka Proyek</b> untuk memuat file proyek yang sudah disimpan.</li></ul></div>
             </div>
@@ -1678,6 +1770,7 @@
                     <button id="playBtn" class="btn btn-primary">Mainkan</button>
                     <button id="downloadPngBtn" class="btn btn-primary">Unduh PNG</button>
                     <button id="downloadPdfBtn" class="btn btn-primary">Unduh PDF</button>
+                    <button id="printBtn" class="btn btn-primary">Cetak</button>
                 </div>
             </div>
 
@@ -1784,6 +1877,9 @@
         <button id="fullscreen-download-pdf-btn" title="Unduh PDF">
              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
         </button>
+        <button id="fullscreen-print-btn" title="Cetak">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+        </button>
     </div>
 
     <script>
@@ -1818,8 +1914,8 @@
         }
 
         // --- GLOBAL VARIABLES & DOM ELEMENTS ---
-        let playBtn, addLayerBtn, downloadPngBtn, downloadPdfBtn, titleInput, arrangerInput, composerInput, biramaSelect, tonalitasSelect, bpmInput, combinedSheetContainer, layersEditorContainer, barsPerRowSelect, undoBtn, redoBtn, fullscreenBtn, saveProjectBtn, loadProjectBtn, loadProjectInput, fontSizeSelect;
-        let fullscreenPlayPauseBtn, fullscreenStopBtn;
+        let playBtn, addLayerBtn, downloadPngBtn, downloadPdfBtn, printBtn, titleInput, arrangerInput, composerInput, biramaSelect, tonalitasSelect, bpmInput, combinedSheetContainer, layersEditorContainer, barsPerRowSelect, undoBtn, redoBtn, fullscreenBtn, saveProjectBtn, loadProjectBtn, loadProjectInput, fontSizeSelect;
+        let fullscreenPlayPauseBtn, fullscreenStopBtn, fullscreenPrintBtn;
         let newProjectBtn, newProjectModal, confirmNewProjectBtn, cancelNewProjectBtn, tempoModal, confirmTempoBtn, cancelTempoBtn, modalTempoInput;
         let fontNormalBtn, fontBoldBtn, fontItalicBtn, fullscreenFontSizeSelect, fullscreenFontNormalBtn, fullscreenFontBoldBtn, fullscreenFontItalicBtn, fullscreenDownloadPngBtn, fullscreenDownloadPdfBtn, fullscreenSaveProjectBtn, fullscreenLoadProjectBtn, fullscreenNewProjectBtn;
 
@@ -1830,6 +1926,7 @@
             playBtn = document.getElementById('playBtn');
             downloadPngBtn = document.getElementById('downloadPngBtn');
             downloadPdfBtn = document.getElementById('downloadPdfBtn');
+            printBtn = document.getElementById('printBtn');
             fullscreenBtn = document.getElementById('fullscreen-btn');
             titleInput = document.getElementById('title');
             arrangerInput = document.getElementById('arranger');
@@ -1875,6 +1972,7 @@
             fullscreenSaveProjectBtn = document.getElementById('fullscreen-save-project-btn');
             fullscreenLoadProjectBtn = document.getElementById('fullscreen-load-project-btn');
             fullscreenNewProjectBtn = document.getElementById('fullscreen-new-project-btn');
+            fullscreenPrintBtn = document.getElementById('fullscreen-print-btn');
         }
         
         let zoomFactor = 1.0; let layers = []; let TonePlayers = {};
@@ -1889,7 +1987,7 @@
                 'flute': new Tone.Synth({ oscillator: { type: "sine" }, envelope: { attack: 0.05, decay: 0.5, sustain: 0.1, release: 1 } }).toDestination(),
                 'piano': new Tone.PolySynth(Tone.Synth, { oscillator: { type: "triangle" }, envelope: { attack: 0.02, decay: 0.1, sustain: 0.3, release: 1 } }).toDestination(),
                 'bass': new Tone.FMSynth({ carrier: { oscillator: { type: "sine" }, envelope: { attack: 0.01, decay: 0.4, sustain: 0.1, release: 0.8 }, }, modulator: { oscillator: { type: "square" }, envelope: { attack: 0.01, decay: 0.2, sustain: 0, release: 0.2 }, }, harmonicity: 0.5, modulationIndex: 1, }).toDestination(),
-                'accomp': new Tone.FMSynth({ carrier: { oscillator: { type: "sine" }, envelope: { attack: 0.01, decay: 0.4, sustain: 0.1, release: 0.8 }, }, modulator: { oscillator: { type: "square" }, envelope: { attack: 0.01, decay: 0.2, sustain: 0, release: 0.2 }, }, harmonicity: 0.5, modulationIndex: 1, }).toDestination()
+                'accomp': new Tone.PolySynth(Tone.Synth, { oscillator: { type: "triangle" }, envelope: { attack: 0.02, decay: 0.1, sustain: 0.3, release: 1 } }).toDestination()
             };
         }
         
@@ -1988,13 +2086,13 @@
             
             if (isAccompLayer) {
                  for (const token of tokens) {
-                    if (token === '|') { pushBar(); continue; }
-                    const duration = 1;
-                    if (currentBarBeats + duration > beatsPerBar) { pushBar(); }
-                    currentBar.notes.push({ type: 'chord', text: token, duration: duration });
-                    currentBarBeats += duration;
-                    if (currentBarBeats >= beatsPerBar) { pushBar(); }
-                }
+                     if (token === '|') { pushBar(); continue; }
+                     const duration = 1;
+                     if (currentBarBeats + duration > beatsPerBar) { pushBar(); }
+                     currentBar.notes.push({ type: 'chord', text: token, duration: duration });
+                     currentBarBeats += duration;
+                     if (currentBarBeats >= beatsPerBar) { pushBar(); }
+                 }
             } else {
                 const noteRegex = /([1-7o0])([\/b]?)([.,]*)(\^?)(\~?)/g;
                 const mixedNoteRegex = /^([1-7o0])([\/b]?)([.,]*)(\^?)(\~?)-([1-7o0])([\/b]?)([.,]*)(\^?)(\~?)([1-7o0])([\/b]?)([.,]*)(\^?)(\~?)$/;
@@ -2139,10 +2237,13 @@
 
             if (isAccomp) {
                 barNotes.forEach(noteData => {
-                    if (noteData.text.toLowerCase() !== 'z') {
-                        barContentHtml += `<div class="note-block"><span class="chord-note-display">${noteData.text}</span></div>`;
-                    } else {
+                    // KOREKSI: Memvalidasi token sebelum merendernya
+                    const isValidChord = getNotesForRomanNumeral(noteData.text, currentKey) !== null;
+                    
+                    if (noteData.text.toLowerCase() === 'z') {
                         barContentHtml += `<div class="note-block">&nbsp;</div>`;
+                    } else if (isValidChord) {
+                        barContentHtml += `<div class="note-block"><span class="chord-note-display">${noteData.text}</span></div>`;
                     }
                 });
             } else {
@@ -2302,8 +2403,6 @@
                     const displayOrderLayers = layers
                         .map((layer, index) => ({ layer, bars: allLayersBars[index], originalIndex: index }))
                         .sort((a, b) => {
-                            if (a.layer.instrument === 'accomp') return -1;
-                            if (b.layer.instrument === 'accomp') return 1;
                             if (a.layer.instrument === 'text') return 1; 
                             if (b.layer.instrument === 'text') return -1;
                             return a.originalIndex - b.originalIndex;
@@ -2455,7 +2554,7 @@
                 if (layer.instrument === 'text') {
                     editorHtml = `<div class="editor-wrapper text-editor-wrapper"><textarea class="text-notation-editor" spellcheck="true" placeholder="Masukkan lirik atau catatan di sini..."></textarea></div>`;
                 } else {
-                    editorHtml = `<div class="editor-wrapper"><div class="layer-notation-bar-numbers"></div><textarea class="layer-notation-editor" spellcheck="false" placeholder="${layer.instrument === 'accomp' ? 'C G Am F z...' : '1 2 3 4...'}"></textarea></div>`;
+                    editorHtml = `<div class="editor-wrapper"><div class="layer-notation-bar-numbers"></div><textarea class="layer-notation-editor" spellcheck="false" placeholder="${layer.instrument === 'accomp' ? 'C G Am F | I V vi IV | z...' : '1 2 3 4...'}"></textarea></div>`;
                 }
 
                 editorRow.innerHTML = `
@@ -2505,6 +2604,79 @@
         }
         
         // --- AUDIO PLAYBACK ---
+        // NEW: Function to convert Roman numeral to notes
+        function getNotesForRomanNumeral(roman, key, octave = 3) {
+            const romanNumeralToInfo = {
+                'I':    { rootDegree: 1, quality: 'major' }, 'Im':   { rootDegree: 1, quality: 'minor' },
+                'ii':   { rootDegree: 2, quality: 'minor' }, 'IIM':  { rootDegree: 2, quality: 'major' },
+                'iii':  { rootDegree: 3, quality: 'minor' }, 'IIIM': { rootDegree: 3, quality: 'major' },
+                'IV':   { rootDegree: 4, quality: 'major' }, 'IVm':  { rootDegree: 4, quality: 'minor' },
+                'V':    { rootDegree: 5, quality: 'major' }, 'Vm':   { rootDegree: 5, quality: 'minor' },
+                'vi':   { rootDegree: 6, quality: 'minor' }, 'VIM':  { rootDegree: 6, quality: 'major' }
+            };
+
+            const info = romanNumeralToInfo[roman];
+            if (!info) {
+                 // Fallback for simple chord names like C, Gm, F#
+                try {
+                    return Tone.Frequency(roman + octave).harmonize([0, (roman.includes('m') ? 3 : 4), 7]).map(f => f.toNote());
+                } catch (e) {
+                    return null;
+                }
+            }
+
+            const keyRootMidi = Tone.Frequency(key + "4").toMidi();
+            const majorScaleIntervals = [0, 2, 4, 5, 7, 9, 11]; // Do, Re, Mi, Fa, Sol, La, Ti
+            
+            const chordRootNoteMidi = keyRootMidi + majorScaleIntervals[info.rootDegree - 1];
+            
+            const intervals = (info.quality === 'major') ? [0, 4, 7] : [0, 3, 7];
+
+            return intervals.map(interval => Tone.Frequency(chordRootNoteMidi + interval, 'midi').toNote().replace(/\d+$/, octave));
+        }
+        
+        // NEW: Function to process Accomp layer for playback
+        function processChordsForPlayback(notation, initialBirama, initialKey) {
+            const keyChangeRegex = /\(Do=([A-G][b#]?)\)/i;
+            const timeSigChangeRegex = /\(B=(\d{1,2}\/\d{1,2})\)/i;
+            const directiveRegex = /(\([Bb]=[\d\/]+\)|\(Do=[A-Ga-g][b#]?\))/g;
+
+            const tokens = notation.replace(directiveRegex, ' $1 ').replace(/\|/g, ' ').split(/\s+/g).filter(Boolean);
+
+            const timedEvents = [];
+            let currentTime = 0; // in quarter notes
+            let currentKey = initialKey;
+
+            for (const token of tokens) {
+                if (['[', ']', '_a', '_b', '_c', '_d'].includes(token)) continue;
+
+                const keyMatch = token.match(keyChangeRegex);
+                if (keyMatch) {
+                    currentKey = keyMatch[1];
+                    continue;
+                }
+                
+                if (token.match(timeSigChangeRegex)) continue; // Birama change doesn't affect chord timing per token
+
+                if (token.toLowerCase() === 'z') {
+                    currentTime += 1;
+                    continue;
+                }
+
+                const notes = getNotesForRomanNumeral(token, currentKey, 3); // Play chords in octave 3
+                if (notes) {
+                    const quarterNoteDuration = Tone.Time('4n').toSeconds();
+                    timedEvents.push({
+                        time: currentTime * quarterNoteDuration,
+                        notes: notes,
+                        duration: 1 * quarterNoteDuration,
+                    });
+                    currentTime += 1; // KOREKSI: Pindahkan ke dalam blok if
+                }
+            }
+            return timedEvents;
+        }
+
         function processNotesForPlayback(notation, initialBirama, initialKey) {
             const keyChangeRegex = /\(Do=([A-G][b#]?)\)/i;
             const timeSigChangeRegex = /\(B=(\d{1,2}\/\d{1,2})\)/i;
@@ -2580,7 +2752,7 @@
 
         async function playAllLayers() {
             if (Tone.Transport.state === "started") { Tone.Transport.stop(); playBtn.textContent = 'Mainkan'; fullscreenPlayPauseBtn.classList.remove('playing'); stopHighlight(); return; }
-            await Tone.start(); Tone.Transport.stop(); Tone.Transport.cancel(0); // [PERBAIKAN] Selalu reset transport
+            await Tone.start(); Tone.Transport.stop(); Tone.Transport.cancel(0);
             
             const bpm = parseInt(bpmInput.value); Tone.Transport.bpm.value = bpm;
             const initialKey = tonalitasSelect.value;
@@ -2588,27 +2760,36 @@
             let maxDuration = 0;
             
             layers.forEach(layer => {
-                if (layer.instrument === 'accomp' || layer.instrument === 'text' || !layer.notation) return; 
+                if (layer.instrument === 'text' || !layer.notation) return; 
 
-                const timedEvents = processNotesForPlayback(layer.notation, initialBirama, initialKey);
-                if (timedEvents.length === 0) return;
+                const player = TonePlayers[layer.instrument];
+                if (!player) return;
 
-                const player = TonePlayers[layer.instrument]; if (!player) return;
-                
-                const partEvents = timedEvents.map(event => {
-                    const toneNote = getToneNote(event.data, layer, event.key);
+                let partEvents = [];
+                if (layer.instrument === 'accomp') {
+                    partEvents = processChordsForPlayback(layer.notation, initialBirama, initialKey);
+                } else {
+                    const timedEvents = processNotesForPlayback(layer.notation, initialBirama, initialKey);
+                    if (timedEvents.length === 0) return;
+
                     const quarterNoteDuration = Tone.Time('4n').toSeconds();
-                    return {
+                    partEvents = timedEvents.map(event => ({
                         time: event.time * quarterNoteDuration,
-                        note: toneNote,
+                        note: getToneNote(event.data, layer, event.key),
                         duration: event.duration * quarterNoteDuration
-                    };
-                }).filter(e => e.note); // Filter out rests
+                    })).filter(e => e.note);
+                }
 
                 if (partEvents.length > 0) {
                     new Tone.Part((time, value) => {
-                        player.triggerAttackRelease(value.note, value.duration, time);
+                        // For accomp, value.note is undefined, value.notes is an array.
+                        // For others, value.note is a string, value.notes is undefined.
+                        const notesToPlay = value.note || value.notes;
+                        if (notesToPlay) {
+                            player.triggerAttackRelease(notesToPlay, value.duration, time);
+                        }
                     }, partEvents).start(0);
+
                     const lastEvent = partEvents[partEvents.length - 1];
                     maxDuration = Math.max(maxDuration, lastEvent.time + lastEvent.duration);
                 }
@@ -2841,10 +3022,10 @@
                     }));
                     
                     if (layers.length === 0) {
-                       addLayer();
+                        addLayer();
                     } else {
-                       activeLayerIndex = 0;
-                       renderAll();
+                        activeLayerIndex = 0;
+                        renderAll();
                     }
 
                     showMessageBox('Proyek berhasil dimuat!', 'success');
@@ -2862,6 +3043,11 @@
             };
 
             reader.readAsText(file);
+        }
+
+        // --- NEW: PRINT FUNCTIONALITY ---
+        function printSheet() {
+            window.print();
         }
 
         // --- VIEW & EXPORT FUNCTIONALITY ---
@@ -3072,6 +3258,7 @@
             playBtn.addEventListener('click', playAllLayers);
             downloadPngBtn.addEventListener('click', downloadAsPng);
             downloadPdfBtn.addEventListener('click', downloadAsPdf);
+            printBtn.addEventListener('click', printSheet);
             fullscreenBtn.addEventListener('click', togglePseudoFullscreen);
             undoBtn.addEventListener('click', undo);
             redoBtn.addEventListener('click', redo);
@@ -3114,6 +3301,7 @@
             fullscreenStopBtn.addEventListener('click', stopPlayback);
             fullscreenDownloadPngBtn.addEventListener('click', downloadAsPng);
             fullscreenDownloadPdfBtn.addEventListener('click', downloadAsPdf);
+            fullscreenPrintBtn.addEventListener('click', printSheet);
             fullscreenNewProjectBtn.addEventListener('click', () => { stopPlayback(); showModal('new-project-modal'); });
             fullscreenSaveProjectBtn.addEventListener('click', () => { stopPlayback(); saveProject(); });
             fullscreenLoadProjectBtn.addEventListener('click', () => { stopPlayback(); loadProjectInput.click(); });
@@ -3230,7 +3418,7 @@
             }, true);
 
             combinedSheetContainer.addEventListener('click', (e) => {
-                 const button = e.target.closest('.row-layout-btn');
+                const button = e.target.closest('.row-layout-btn');
                 if (button) {
                     const rowWrapper = button.closest('.music-row-wrapper');
                     if (!rowWrapper || layers.length === 0) return;
