@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abimantra Not Angka | Masa Depan Notasi Musik</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #020617;
+            --accent-cyan: #22d3ee;
+            --glass-white: rgba(255, 255, 255, 0.03);
+            --border-slate: rgba(51, 65, 85, 0.5);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .glow-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% -20%, rgba(34, 211, 238, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 0% 100%, rgba(34, 211, 238, 0.05) 0%, transparent 40%);
+            z-index: -1;
+        }
+
+        .hero-title {
+            background: linear-gradient(135deg, #ffffff 0%, var(--accent-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-glow {
+            box-shadow: 0 0 20px rgba(34, 211, 238, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .btn-glow:hover {
+            box-shadow: 0 0 35px rgba(34, 211, 238, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .feature-card {
+            background: var(--glass-white);
+            border: 1px solid var(--border-slate);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: var(--accent-cyan);
+            background: rgba(34, 211, 238, 0.07);
+        }
+
+        .logo-dot-glow {
+            filter: drop-shadow(0 0 8px #22d3ee);
+        }
+
+        .story-gradient {
+            background: linear-gradient(to right, #22d3ee, #0ea5e9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glow-bg"></div>
+
+    <!-- Navigation -->
+    <nav class="container mx-auto px-6 py-8 flex justify-between items-center">
+        <div class="flex items-center gap-4">
+            <div class="logo-container">
+                <svg width="45" height="45" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M48.5 7.5C40.1667 22.8333 21 57.5 12.5 71.5C11.3 73.5 9 78 12.5 80.5C16 83 23 83.5 27 79.5C31 75.5 40 60 48.5 47C57 34 67.5 18 73.5 10C75 8 77.5 5 73.5 5C69.5 5 57 23.5 48.5 35C40 46.5 30 63.5 25 73C23.8 75.3 21.5 79 25 80.5C28.5 82 34 81 37.5 77C41 73 49.5 60.5 58 47.5C66.5 34.5 76 20 81.5 13C83 11 85.5 8.5 81.5 8.5C77.5 8.5 67 23.5 58 35.5C49 47.5 40 63 36.5 69" stroke="#22d3ee" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M28.5 59.5C36.8333 55.1667 56 46.5 66.5 42.5C68.9 41.6 72 40 70.5 42C69 44 63.5 50 56.5 56C49.5 62 39 71 33.5 75.5C32.1 76.6 30 78 31.5 76C33 74 39.5 67 46.5 60C53.5 53 62.5 44 66.5 40.5" stroke="#22d3ee" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="48" cy="53" r="5" fill="#22d3ee" class="logo-dot-glow"/>
+                </svg>
+            </div>
+            <div class="flex flex-col">
+                <span class="text-xl font-bold tracking-tighter leading-none text-white">ABIMANTRA</span>
+                <span class="text-[10px] font-bold tracking-[0.2em] text-cyan-400">NOT ANGKA</span>
+            </div>
+        </div>
+        <div class="hidden md:flex gap-8 text-sm font-medium text-slate-400">
+            <a href="#about" class="hover:text-cyan-400 transition-colors">Cerita Kami</a>
+            <a href="#team" class="hover:text-cyan-400 transition-colors">Tim</a>
+            <a href="https://github.com/andika-yoga" class="hover:text-cyan-400 transition-colors" target="_blank">GitHub</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="container mx-auto px-6 py-20 text-center relative overflow-hidden">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+        
+        <h1 class="text-5xl md:text-7xl font-bold mb-8 hero-title leading-tight">
+            Selamat Datang di <br> Abimantra Not Angka
+        </h1>
+        <p class="text-slate-300 text-lg md:text-2xl max-w-4xl mx-auto mb-6 leading-relaxed font-light">
+            Menyatukan tradisi dan teknologi dalam satu ketukan digital yang presisi. Telah dilengkapi dengan berbagai fitur yang sudah disesuaikan dengan kebutuhan untuk melatih instrumen Angklung secara efektif.
+        </p>
+        
+        <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+            <button onclick="startProject()" class="btn-glow bg-cyan-400 text-slate-950 px-10 py-4 rounded-full font-bold text-lg flex items-center gap-2 group">
+                Mulai Proyek
+                <svg class="group-hover:translate-x-1 transition-transform" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </button>
+            <a href="#about" class="px-8 py-4 rounded-full border border-slate-700 hover:bg-slate-800 transition-all font-medium">Baca Perjalanan Kami</a>
+        </div>
+    </header>
+
+    <!-- About Section / Our Story -->
+    <section id="about" class="container mx-auto px-6 py-24 border-t border-slate-800">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold mb-12 text-white text-center">Sebuah Perjalanan <span class="story-gradient">Dedikasi</span></h2>
+            
+            <div class="space-y-8 text-slate-300 leading-relaxed text-lg">
+                <p>
+                    Segalanya bermula dari sebuah <span class="text-cyan-400">keresahan</span> yang sudah lama menghambat dunia musik kita. Selama bertahun-tahun, pembuatan partitur not angka digital terasa sangat sulit. Pilihannya terbatas: antara menggunakan Microsoft Word dengan font khusus yang sangat <span class="text-cyan-400 font-semibold italic">tricky</span> untuk diatur, atau kembali ke cara manual yang memakan waktu.
+                </p>
+                
+                <div class="bg-slate-900/50 border-l-4 border-cyan-400 p-8 rounded-r-2xl my-10 italic">
+                    "Sebagai pengguna DAW (Digital Audio Workstation), saya selalu melihat fitur MIDI-to-Sheet Music untuk notasi balok. Pertanyaan saya selalu sama: Mengapa kita tidak bisa melakukan hal yang sama untuk notasi angka?"
+                </div>
+
+                <p>
+                    Pada tahun 2025, impian itu mulai saya wujudkan. Langkah pertama saya adalah mencari inspirasi, dan saya menemukannya pada aplikasi <span class="text-white font-bold">"Galung"</span>, sebuah karya luar biasa dari <span class="text-white font-bold">Kang Ardian Sumarwan</span>. Tidak ingin hanya sekadar mengagumi, saya memutuskan untuk berkonsultasi langsung dengan beliau.
+                </p>
+
+                <p>
+                    Pertemuan itu berubah menjadi kolaborasi yang nyata. Kami tidak hanya berbagi ide, tapi juga visi untuk melestarikan budaya notasi musik Indonesia melalui teknologi modern. Dengan bangga, Kang Ardian turut serta di dalam pengembangan ini, menyatukan pengalaman beliau dengan tekad tim pengembang kami.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section id="team" class="container mx-auto px-6 py-24 bg-slate-950/50 rounded-[3rem] border border-slate-800/50">
+        <h2 class="text-3xl font-bold mb-16 text-center text-white">Di Balik <span class="text-cyan-400">Abimantra</span></h2>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <!-- Team Member 1 -->
+            <div class="feature-card p-6 rounded-3xl text-center">
+                <div class="w-20 h-20 bg-cyan-400/10 rounded-full mx-auto mb-4 flex items-center justify-center border border-cyan-400/20">
+                    <span class="text-2xl font-bold text-cyan-400">YA</span>
+                </div>
+                <h4 class="text-white font-bold">Yoga Andika</h4>
+            </div>
+
+            <!-- Team Member 2 -->
+            <div class="feature-card p-6 rounded-3xl text-center">
+                <div class="w-20 h-20 bg-cyan-400/10 rounded-full mx-auto mb-4 flex items-center justify-center border border-cyan-400/20">
+                    <span class="text-2xl font-bold text-cyan-400">AS</span>
+                </div>
+                <h4 class="text-white font-bold">Ardian Sumarwan</h4>
+            </div>
+
+            <!-- Team Member 3 -->
+            <div class="feature-card p-6 rounded-3xl text-center">
+                <div class="w-20 h-20 bg-cyan-400/10 rounded-full mx-auto mb-4 flex items-center justify-center border border-cyan-400/20">
+                    <span class="text-2xl font-bold text-cyan-400">HS</span>
+                </div>
+                <h4 class="text-white font-bold">Hadi Setiadi</h4>
+            </div>
+
+            <!-- Team Member 4 -->
+            <div class="feature-card p-6 rounded-3xl text-center">
+                <div class="w-20 h-20 bg-cyan-400/10 rounded-full mx-auto mb-4 flex items-center justify-center border border-cyan-400/20">
+                    <span class="text-2xl font-bold text-cyan-400">RA</span>
+                </div>
+                <h4 class="text-white font-bold">Reza Aditiana</h4>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-20 text-center border-t border-slate-900 mt-20">
+        <div class="mb-10">
+            <h3 class="text-2xl font-bold mb-4">Siap untuk mulai menulis?</h3>
+            <button onclick="startProject()" class="btn-glow bg-cyan-400 text-slate-950 px-8 py-3 rounded-full font-bold transition-all">
+                Luncurkan Engine v3.5
+            </button>
+        </div>
+        <p class="text-slate-500 text-sm mb-2">Developed with passion by <span class="text-white font-semibold">Yoga Andika & Team</span></p>
+        <p class="text-slate-600 text-xs">© 2025 Abimantra Not Angka Project. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function startProject() {
+            // Animasi transisi yang halus sebelum redirect
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+            
+            setTimeout(() => {
+                window.location.href = "https://abimantra-not-angka.web.app/";
+            }, 600);
+        }
+
+        // Smooth scroll untuk navigasi internal
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    window.scrollTo({
+                        top: target.offsetTop - 50,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Intersection Observer untuk efek reveal saat scroll
+        const observerOptions = { threshold: 0.1 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = "1";
+                    entry.target.style.transform = "translateY(0)";
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.feature-card, section h2, header p').forEach(el => {
+            el.style.opacity = "0";
+            el.style.transform = "translateY(20px)";
+            el.style.transition = "all 0.8s ease-out";
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
